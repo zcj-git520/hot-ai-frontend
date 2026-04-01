@@ -1,0 +1,9 @@
+# API 配置
+NUXT_PUBLIC_API_URL=http://192.168.40.15:8000/api
+
+# 站点配置
+NUXT_SITE_NAME=AI 热点追踪平台
+NUXT_SITE_DESCRIPTION=AI 时代的职业导航仪
+
+# 其他配置
+NUXT_DEBUG=false
