@@ -22,6 +22,9 @@ const setupInterceptors = (client: typeof apiClient) => {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
+        console.log('[API Request]', config.method?.toUpperCase(), config.url, 'Token:', token.substring(0, 20) + '...')
+      } else {
+        console.warn('[API Request] No token found for:', config.url)
       }
       return config
     },
@@ -33,9 +36,11 @@ const setupInterceptors = (client: typeof apiClient) => {
   // 响应拦截器
   client.interceptors.response.use(
     (response) => {
+      console.log('[API Response]', response.config.url, 'Success')
       return response.data
     },
     (error) => {
+      console.error('[API Error]', error.config?.url, error.response?.status, error.response?.data)
       // 处理常见错误
       if (error.response) {
         switch (error.response.status) {
@@ -152,7 +157,7 @@ export const userApi = {
     return apiClient.put('/user/preferences', data)
   },
   changePassword(data: { old_password: string; new_password: string }) {
-    return apiClient.put('/user/password', data)
+    return apiClient.post('/user/change-password', data)
   },
 }
 

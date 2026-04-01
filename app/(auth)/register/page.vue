@@ -21,6 +21,8 @@ const successMessage = ref('')
 const sendingCode = ref(false)
 const codeSent = ref(false)
 const countdown = ref(0)
+// 新增：字段级别的错误信息
+const fieldErrors = ref<Record<string, string>>({})
 
 let countdownTimer: ReturnType<typeof setInterval> | null = null
 
@@ -76,48 +78,70 @@ const sendVerificationCode = async () => {
 const handleRegister = async () => {
   error.value = ''
   successMessage.value = ''
+  fieldErrors.value = {}
 
   // 验证昵称
   if (!form.value.nickname || form.value.nickname.trim().length < 2) {
-    error.value = '昵称至少 2 个字符'
+    fieldErrors.value.nickname = '昵称至少 2 个字符'
     return
   }
 
   if (form.value.nickname.length > 20) {
-    error.value = '昵称不能超过 20 个字符'
+    fieldErrors.value.nickname = '昵称不能超过 20 个字符'
     return
   }
 
   // 验证邮箱
   if (!form.value.email || !isValidEmail(form.value.email)) {
-    error.value = '请输入有效的邮箱地址'
+    fieldErrors.value.email = '请输入有效的邮箱地址'
     return
   }
 
   // 验证密码
   if (form.value.password.length < 8) {
+    fieldErrors.value.password = '密码长度至少为 8 位'
     error.value = '密码长度至少为 8 位'
     return
   }
 
   if (form.value.password.length > 32) {
+    fieldErrors.value.password = '密码长度不能超过 32 位'
     error.value = '密码长度不能超过 32 位'
     return
   }
 
+  // 密码复杂度验证
+  const hasUppercase = /[A-Z]/.test(form.value.password)
+  const hasLowercase = /[a-z]/.test(form.value.password)
+  const hasNumbers = /\d/.test(form.value.password)
+  const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(form.value.password)
+  
+  if (!hasUppercase || !hasLowercase || !hasNumbers || !hasSpecialChar) {
+    const requirements: string[] = []
+    if (!hasUppercase) requirements.push('大写字母')
+    if (!hasLowercase) requirements.push('小写字母')
+    if (!hasNumbers) requirements.push('数字')
+    if (!hasSpecialChar) requirements.push('特殊字符')
+    const errorMsg = `密码必须包含：${requirements.join('、')}`
+    fieldErrors.value.password = errorMsg
+    error.value = errorMsg
+    return
+  }
+
   if (form.value.password !== form.value.confirmPassword) {
+    fieldErrors.value.confirmPassword = '两次输入的密码不一致'
     error.value = '两次输入的密码不一致'
     return
   }
 
   // 验证验证码
   if (!form.value.verificationCode) {
-    error.value = '请输入验证码'
+    fieldErrors.value.verificationCode = '请输入验证码'
     return
   }
 
   if (form.value.verificationCode.length !== 6 || !/^\d{6}$/.test(form.value.verificationCode)) {
-    error.value = '请输入 6 位数字验证码'
+    fieldErrors.value.verificationCode = '请输入 6 位数字验证码'
     return
   }
 
@@ -132,6 +156,7 @@ const handleRegister = async () => {
     await authApi.register({
       email: form.value.email,
       password: form.value.password,
+      password_confirm: form.value.confirmPassword,  // 添加密码确认字段
       nickname: form.value.nickname,
       verification_code: form.value.verificationCode
     })
@@ -142,7 +167,19 @@ const handleRegister = async () => {
       navigateTo('/login')
     }, 1000)
   } catch (err: any) {
-    error.value = err.data?.message || err.response?.data?.message || '注册失败，请稍后重试'
+    // 处理后端返回的验证错误
+    const backendError = err.data || err.response?.data
+    if (backendError?.errors) {
+      // 如果是字段级别的错误，映射到对应的字段
+      Object.keys(backendError.errors).forEach(field => {
+        const messages = backendError.errors[field]
+        fieldErrors.value[field === 'password_confirm' ? 'confirmPassword' : field] = 
+          Array.isArray(messages) ? messages[0] : messages
+      })
+    }
+    
+    // 设置通用错误信息
+    error.value = backendError?.message || err.response?.data?.message || '注册失败，请稍后重试'
   } finally {
     loading.value = false
   }

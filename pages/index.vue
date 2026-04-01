@@ -18,10 +18,28 @@
             </nav>
           </div>
           <div class="flex items-center gap-4">
-            <NuxtLink to="/login" class="text-[#8b949e] hover:text-white transition-colors font-medium">登录</NuxtLink>
-            <NuxtLink to="/register" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-md font-medium transition-all shadow-lg hover:shadow-xl">
-              注册
-            </NuxtLink>
+            <template v-if="user">
+              <!-- 已登录：显示用户信息 -->
+              <NuxtLink to="/profile" class="flex items-center gap-2 text-[#8b949e] hover:text-white transition-colors">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold text-sm">
+                  {{ user.nickname?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U' }}
+                </div>
+                <span class="font-medium hidden sm:block">{{ user.nickname || user.email }}</span>
+              </NuxtLink>
+              <button 
+                @click="handleLogout"
+                class="text-[#8b949e] hover:text-white transition-colors font-medium text-sm"
+              >
+                退出
+              </button>
+            </template>
+            <template v-else>
+              <!-- 未登录：显示登录注册 -->
+              <NuxtLink to="/login" class="text-[#8b949e] hover:text-white transition-colors font-medium">登录</NuxtLink>
+              <NuxtLink to="/register" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-md font-medium transition-all shadow-lg hover:shadow-xl">
+                注册
+              </NuxtLink>
+            </template>
           </div>
         </div>
       </div>
@@ -226,6 +244,34 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useAuth } from '~/composables/useAuth'
+import { useToast } from '~/composables/useToast'
+
+// 获取认证信息
+const { user, clearAuth, restoreAuth } = useAuth()
+const { toastSuccess, toastError } = useToast()
+
+// 恢复用户认证信息
+onMounted(() => {
+  restoreAuth()
+})
+
+// 退出登录
+const handleLogout = async () => {
+  try {
+    const { authApi } = await import('~/app/lib/api')
+    await authApi.logout()
+    toastSuccess('已退出登录')
+  } catch (error) {
+    console.error('Logout failed', error)
+    toastError('退出登录失败')
+  } finally {
+    clearAuth()
+    navigateTo('/')
+  }
+}
+
 // 资讯数据
 const articles = ref([
   {

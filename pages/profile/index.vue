@@ -4,10 +4,21 @@
     <header class="border-b border-[#30363d] bg-[#161b22]/80 backdrop-blur-sm sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
-          <NuxtLink to="/" class="text-2xl font-bold text-white flex items-center gap-2">
-            <span class="text-3xl">🤖</span>
-            <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">AI 热点追踪</span>
-          </NuxtLink>
+          <div class="flex items-center gap-8">
+            <NuxtLink to="/" class="text-2xl font-bold text-white flex items-center gap-2">
+              <span class="text-3xl">🤖</span>
+              <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">AI 热点追踪</span>
+            </NuxtLink>
+            <NuxtLink 
+              to="/" 
+              class="text-[#8b949e] hover:text-white transition-colors font-medium flex items-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              <span>返回主页</span>
+            </NuxtLink>
+          </div>
           <div class="flex items-center gap-4">
             <template v-if="user">
               <NuxtLink to="/profile" class="flex items-center gap-2 text-[#8b949e] hover:text-white transition-colors">
@@ -148,12 +159,14 @@
 import { ref, onMounted } from 'vue'
 import { userApi } from '~/app/lib/api'
 import { useAuth } from '~/composables/useAuth'
+import { useToast } from '~/composables/useToast'
 
 definePageMeta({
   middleware: 'auth'
 })
 
 const { user, logout } = useAuth()
+const { toastSuccess, toastError, toastInfo } = useToast()
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -163,7 +176,8 @@ const profileLoaded = ref(false)
 
 const profileForm = ref({
   nickname: '',
-  bio: ''
+  bio: '',
+  avatar: ''
 })
 
 const passwordForm = ref({
@@ -181,6 +195,7 @@ onMounted(async () => {
     if (user.value) {
       profileForm.value.nickname = user.value.nickname || ''
       profileForm.value.bio = user.value.bio || ''
+      profileForm.value.avatar = user.value.avatar || ''
       profileLoaded.value = true
     }
     
@@ -190,6 +205,7 @@ onMounted(async () => {
       console.log('获取用户信息成功:', userData)
       profileForm.value.nickname = userData.nickname || ''
       profileForm.value.bio = userData.bio || ''
+      profileForm.value.avatar = userData.avatar || ''
       profileLoaded.value = true
     } catch (apiError: any) {
       console.error('API 获取用户信息失败:', apiError)
@@ -199,6 +215,7 @@ onMounted(async () => {
         
         // 如果是 401 错误，跳转到登录页
         if (apiError.response?.status === 401) {
+          toastError('请先登录', '未授权')
           setTimeout(() => {
             navigateTo('/login')
           }, 2000)
@@ -216,16 +233,24 @@ onMounted(async () => {
 const updateProfile = async () => {
   submitting.value = true
   try {
-    await userApi.updateProfile(profileForm.value)
+    // 确保 avatar 字段有默认值
+    const updateData = {
+      nickname: profileForm.value.nickname,
+      bio: profileForm.value.bio,
+      avatar: profileForm.value.avatar || ''
+    }
+    
+    await userApi.updateProfile(updateData)
     // 更新本地用户状态
     if (user.value) {
       user.value.nickname = profileForm.value.nickname
       user.value.bio = profileForm.value.bio
+      user.value.avatar = updateData.avatar
     }
-    alert('个人资料已更新')
+    toastSuccess('个人资料已更新')
   } catch (err: any) {
     console.error('更新个人资料失败:', err)
-    alert(err.response?.data?.message || err.data?.message || '更新失败')
+    toastError(err.response?.data?.message || err.data?.message || '更新失败', '更新错误')
   } finally {
     submitting.value = false
   }
@@ -242,7 +267,7 @@ const changePassword = async () => {
 
   try {
     await userApi.changePassword(passwordForm.value)
-    alert('密码已修改')
+    toastSuccess('密码已修改')
     passwordForm.value = { old_password: '', new_password: '' }
   } catch (err: any) {
     passwordError.value = err.data?.message || err.response?.data?.message || '修改失败'

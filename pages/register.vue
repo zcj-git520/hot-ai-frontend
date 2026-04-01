@@ -29,7 +29,7 @@
             </svg>
           </button>
         </div>
-        
+
         <!-- 成功提示 -->
         <div v-if="successMessage" class="mb-6 p-4 bg-green-900/20 border border-green-800 rounded-md flex items-start gap-3">
           <svg class="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,9 +52,15 @@
               v-model="form.nickname"
               type="text" 
               required
-              class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
+              :class="[
+                'w-full bg-[#0d1117] border rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all',
+                fieldErrors.nickname ? 'border-red-500' : 'border-[#30363d]'
+              ]"
               placeholder="你的昵称"
             />
+            <p v-if="fieldErrors.nickname" class="mt-1 text-red-400 text-xs">
+              {{ fieldErrors.nickname }}
+            </p>
           </div>
 
           <div>
@@ -63,9 +69,15 @@
               v-model="form.email"
               type="email" 
               required
-              class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
+              :class="[
+                'w-full bg-[#0d1117] border rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all',
+                fieldErrors.email ? 'border-red-500' : 'border-[#30363d]'
+              ]"
               placeholder="your@email.com"
             />
+            <p v-if="fieldErrors.email" class="mt-1 text-red-400 text-xs">
+              {{ fieldErrors.email }}
+            </p>
           </div>
 
           <div>
@@ -75,9 +87,23 @@
               type="password" 
               required
               minlength="8"
-              class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
-              placeholder="至少 8 位"
+              :class="[
+                'w-full bg-[#0d1117] border rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all',
+                fieldErrors.password ? 'border-red-500' : 'border-[#30363d]'
+              ]"
+              placeholder="至少 8 位，包含大写字母、小写字母、数字和特殊字符"
             />
+            <p v-if="fieldErrors.password" class="mt-1 text-red-400 text-xs">
+              {{ fieldErrors.password }}
+            </p>
+            <!-- 密码要求提示 -->
+            <p class="mt-2 text-xs text-[#8b949e]">
+              <span class="font-medium">密码要求：</span>
+              <span :class="hasUppercase ? 'text-green-400' : ''">✓ 大写字母</span>、
+              <span :class="hasLowercase ? 'text-green-400' : ''">✓ 小写字母</span>、
+              <span :class="hasNumbers ? 'text-green-400' : ''">✓ 数字</span>、
+              <span :class="hasSpecialChar ? 'text-green-400' : ''">✓ 特殊字符</span>
+            </p>
           </div>
 
           <div>
@@ -87,9 +113,15 @@
               type="password" 
               required
               minlength="8"
-              class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
+              :class="[
+                'w-full bg-[#0d1117] border rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all',
+                fieldErrors.confirmPassword ? 'border-red-500' : 'border-[#30363d]'
+              ]"
               placeholder="再次输入密码"
             />
+            <p v-if="fieldErrors.confirmPassword" class="mt-1 text-red-400 text-xs">
+              {{ fieldErrors.confirmPassword }}
+            </p>
           </div>
 
           <div>
@@ -100,7 +132,10 @@
                 type="text" 
                 required
                 maxlength="6"
-                class="flex-1 bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
+                :class="[
+                  'flex-1 bg-[#0d1117] border rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all',
+                  fieldErrors.verificationCode ? 'border-red-500' : 'border-[#30363d]'
+                ]"
                 placeholder="6 位验证码"
               />
               <button 
@@ -112,6 +147,9 @@
                 {{ countdown > 0 ? `${countdown}秒后重发` : (sendingCode ? '发送中...' : '获取验证码') }}
               </button>
             </div>
+            <p v-if="fieldErrors.verificationCode" class="mt-1 text-red-400 text-xs">
+              {{ fieldErrors.verificationCode }}
+            </p>
           </div>
 
           <div class="flex items-start">
@@ -144,7 +182,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import { authApi } from '~/app/lib/api'
+import { navigateTo } from '#app'
 
 const form = ref({
   nickname: '',
@@ -154,16 +194,25 @@ const form = ref({
   verificationCode: ''
 })
 
+// 密码复杂度实时检测
+const hasUppercase = computed(() => /[A-Z]/.test(form.value.password))
+const hasLowercase = computed(() => /[a-z]/.test(form.value.password))
+const hasNumbers = computed(() => /\d/.test(form.value.password))
+const hasSpecialChar = computed(() => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(form.value.password))
+
 const loading = ref(false)
 const sendingCode = ref(false)
 const countdown = ref(0)
 const errorMessage = ref('')
 const successMessage = ref('')
+// 字段级别的错误信息
+const fieldErrors = ref<Record<string, string>>({})
 
 // 发送验证码
 const sendVerificationCode = async () => {
   errorMessage.value = ''
   successMessage.value = ''
+  fieldErrors.value = {}
   
   if (!form.value.email) {
     errorMessage.value = '请先输入邮箱地址'
@@ -202,22 +251,76 @@ const sendVerificationCode = async () => {
 const handleRegister = async () => {
   errorMessage.value = ''
   successMessage.value = ''
+  fieldErrors.value = {}
   
-  // 验证密码
-  if (form.value.password !== form.value.confirmPassword) {
-    errorMessage.value = '两次输入的密码不一致'
+  // 验证昵称
+  if (!form.value.nickname || form.value.nickname.trim().length < 2) {
+    fieldErrors.value.nickname = '昵称至少 2 个字符'
+    return
+  }
+
+  if (form.value.nickname.length > 20) {
+    fieldErrors.value.nickname = '昵称不能超过 20 个字符'
+    return
+  }
+
+  // 验证邮箱
+  if (!form.value.email) {
+    fieldErrors.value.email = '请输入邮箱地址'
     return
   }
   
-  // 验证密码长度
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(form.value.email)) {
+    fieldErrors.value.email = '请输入有效的邮箱地址'
+    return
+  }
+  
+  // 验证密码
   if (form.value.password.length < 8) {
+    fieldErrors.value.password = '密码长度至少为 8 位'
     errorMessage.value = '密码长度至少为 8 位'
+    return
+  }
+  
+  if (form.value.password.length > 32) {
+    fieldErrors.value.password = '密码长度不能超过 32 位'
+    errorMessage.value = '密码长度不能超过 32 位'
+    return
+  }
+  
+  // 密码复杂度验证
+  const hasUppercase = /[A-Z]/.test(form.value.password)
+  const hasLowercase = /[a-z]/.test(form.value.password)
+  const hasNumbers = /\d/.test(form.value.password)
+  const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(form.value.password)
+  
+  if (!hasUppercase || !hasLowercase || !hasNumbers || !hasSpecialChar) {
+    const requirements: string[] = []
+    if (!hasUppercase) requirements.push('大写字母')
+    if (!hasLowercase) requirements.push('小写字母')
+    if (!hasNumbers) requirements.push('数字')
+    if (!hasSpecialChar) requirements.push('特殊字符')
+    const errorMsg = `密码必须包含：${requirements.join('、')}`
+    fieldErrors.value.password = errorMsg
+    errorMessage.value = errorMsg
+    return
+  }
+  
+  if (form.value.password !== form.value.confirmPassword) {
+    fieldErrors.value.confirmPassword = '两次输入的密码不一致'
+    errorMessage.value = '两次输入的密码不一致'
     return
   }
   
   // 验证验证码
   if (!form.value.verificationCode) {
-    errorMessage.value = '请输入邮箱验证码'
+    fieldErrors.value.verificationCode = '请输入邮箱验证码'
+    return
+  }
+  
+  if (form.value.verificationCode.length !== 6 || !/^\d{6}$/.test(form.value.verificationCode)) {
+    fieldErrors.value.verificationCode = '请输入 6 位数字验证码'
     return
   }
   
@@ -226,6 +329,7 @@ const handleRegister = async () => {
     await authApi.register({
       email: form.value.email,
       password: form.value.password,
+      password_confirm: form.value.confirmPassword,  // 添加密码确认字段
       nickname: form.value.nickname,
       verification_code: form.value.verificationCode
     })
@@ -236,7 +340,21 @@ const handleRegister = async () => {
     }, 1500)
   } catch (err: any) {
     console.error('Registration failed:', err)
-    errorMessage.value = err.response?.data?.message || '注册失败，请稍后重试'
+    
+    // 处理后端返回的验证错误
+    const backendError = err.response?.data
+    if (backendError?.errors) {
+      // 如果是字段级别的错误，映射到对应的字段
+      Object.keys(backendError.errors).forEach(field => {
+        const messages = backendError.errors[field]
+        // 将后端的 password_confirm 映射到前端的 confirmPassword
+        fieldErrors.value[field === 'password_confirm' ? 'confirmPassword' : field] = 
+          Array.isArray(messages) ? messages[0] : messages
+      })
+    }
+    
+    // 设置通用错误信息
+    errorMessage.value = backendError?.message || '注册失败，请稍后重试'
   } finally {
     loading.value = false
   }
