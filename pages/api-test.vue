@@ -133,7 +133,7 @@
 
 <script setup lang="ts">
 import { authApi, userApi } from '~/app/lib/api'
-import { useAuth } from '~/comables/useAuth'
+import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({
   middleware: 'auth'

@@ -2,14 +2,14 @@
   <div class="min-h-screen bg-[#0d1117]">
     <!-- 顶部导航栏 -->
     <header class="border-b border-[#30363d] bg-[#161b22]/80 backdrop-blur-sm sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-8">
-            <NuxtLink to="/" class="text-2xl font-bold text-white flex items-center gap-2">
-              <span class="text-3xl">🤖</span>
+          <div class="flex items-center gap-4 sm:gap-8">
+            <NuxtLink to="/" class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+              <span class="text-2xl sm:text-3xl">🤖</span>
               <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">AI 热点追踪</span>
             </NuxtLink>
-            <nav class="hidden md:flex items-center gap-6">
+            <nav class="hidden lg:flex items-center gap-6">
               <NuxtLink to="/" class="text-white hover:text-[#58a6ff] transition-colors font-medium">首页</NuxtLink>
               <NuxtLink to="/articles" class="text-[#8b949e] hover:text-white transition-colors font-medium">资讯</NuxtLink>
               <NuxtLink to="/professions" class="text-[#8b949e] hover:text-white transition-colors font-medium">职业风险</NuxtLink>
@@ -17,26 +17,26 @@
               <NuxtLink to="/tools" class="text-[#8b949e] hover:text-white transition-colors font-medium">工具库</NuxtLink>
             </nav>
           </div>
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2 sm:gap-4">
             <template v-if="user">
               <!-- 已登录：显示用户信息 -->
               <NuxtLink to="/profile" class="flex items-center gap-2 text-[#8b949e] hover:text-white transition-colors">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold text-sm">
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
                   {{ user.nickname?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U' }}
                 </div>
-                <span class="font-medium hidden sm:block">{{ user.nickname || user.email }}</span>
+                <span class="font-medium text-sm hidden sm:block">{{ user.nickname || user.email }}</span>
               </NuxtLink>
               <button 
                 @click="handleLogout"
-                class="text-[#8b949e] hover:text-white transition-colors font-medium text-sm"
+                class="text-[#8b949e] hover:text-white transition-colors font-medium text-xs sm:text-sm"
               >
                 退出
               </button>
             </template>
             <template v-else>
               <!-- 未登录：显示登录注册 -->
-              <NuxtLink to="/login" class="text-[#8b949e] hover:text-white transition-colors font-medium">登录</NuxtLink>
-              <NuxtLink to="/register" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-md font-medium transition-all shadow-lg hover:shadow-xl">
+              <NuxtLink to="/login" class="text-[#8b949e] hover:text-white transition-colors font-medium text-sm">登录</NuxtLink>
+              <NuxtLink to="/register" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md font-medium text-xs sm:text-sm transition-all shadow-lg hover:shadow-xl">
                 注册
               </NuxtLink>
             </template>
@@ -45,43 +45,43 @@
       </div>
     </header>
 
-    <div class="max-w-7xl mx-auto px-6 py-8">
-      <!-- 左侧主要内容 + 右侧边栏 布局 -->
-      <div class="flex gap-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <!-- 主内容区（移动端单列，桌面端双列） -->
+      <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
         <!-- 主内容区 -->
-        <main class="flex-1 min-w-0">
+        <main class="flex-1 min-w-0 order-2 lg:order-1">
           <!-- 统计卡片 -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#58a6ff] transition-all cursor-pointer group">
-              <div class="text-[#8b949e] text-sm mb-2">📰 资讯总数</div>
-              <div class="text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">1,234</div>
-              <div class="text-[#3fb950] text-sm mt-1">↑ 12% 较上周</div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 sm:p-4 hover:border-[#58a6ff] transition-all cursor-pointer group">
+              <div class="text-[#8b949e] text-xs sm:text-sm mb-1 sm:mb-2">📰 资讯总数</div>
+              <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">1,234</div>
+              <div class="text-[#3fb950] text-xs sm:text-sm mt-1">↑ 12% 较上周</div>
             </div>
-            <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#58a6ff] transition-all cursor-pointer group">
-              <div class="text-[#8b949e] text-sm mb-2">💼 职业分析</div>
-              <div class="text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">567</div>
-              <div class="text-[#3fb950] text-sm mt-1">↑ 8% 较上周</div>
+            <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 sm:p-4 hover:border-[#58a6ff] transition-all cursor-pointer group">
+              <div class="text-[#8b949e] text-xs sm:text-sm mb-1 sm:mb-2">💼 职业分析</div>
+              <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">567</div>
+              <div class="text-[#3fb950] text-xs sm:text-sm mt-1">↑ 8% 较上周</div>
             </div>
-            <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#58a6ff] transition-all cursor-pointer group">
-              <div class="text-[#8b949e] text-sm mb-2">🎓 学习路径</div>
-              <div class="text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">89</div>
-              <div class="text-[#3fb950] text-sm mt-1">↑ 5% 较上周</div>
+            <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 sm:p-4 hover:border-[#58a6ff] transition-all cursor-pointer group">
+              <div class="text-[#8b949e] text-xs sm:text-sm mb-1 sm:mb-2">🎓 学习路径</div>
+              <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">89</div>
+              <div class="text-[#3fb950] text-xs sm:text-sm mt-1">↑ 5% 较上周</div>
             </div>
-            <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#58a6ff] transition-all cursor-pointer group">
-              <div class="text-[#8b949e] text-sm mb-2">👥 活跃用户</div>
-              <div class="text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">12.5k</div>
-              <div class="text-[#3fb950] text-sm mt-1">↑ 23% 较上周</div>
+            <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 sm:p-4 hover:border-[#58a6ff] transition-all cursor-pointer group">
+              <div class="text-[#8b949e] text-xs sm:text-sm mb-1 sm:mb-2">👥 活跃用户</div>
+              <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">12.5k</div>
+              <div class="text-[#3fb950] text-xs sm:text-sm mt-1">↑ 23% 较上周</div>
             </div>
           </div>
 
           <!-- 最新资讯 -->
-          <section class="mb-8">
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                <span class="w-1 h-6 bg-[#58a6ff] rounded"></span>
+          <section class="mb-6 sm:mb-8">
+            <div class="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                <span class="w-1 h-5 sm:h-6 bg-[#58a6ff] rounded"></span>
                 最新资讯
               </h2>
-              <NuxtLink to="/articles" class="text-[#58a6ff] hover:text-[#79c0ff] font-medium text-sm flex items-center gap-1 transition-colors">
+              <NuxtLink to="/articles" class="text-[#58a6ff] hover:text-[#79c0ff] font-medium text-xs sm:text-sm flex items-center gap-1 transition-colors">
                 查看更多 <span>→</span>
               </NuxtLink>
             </div>
@@ -89,32 +89,29 @@
               <article 
                 v-for="(article, index) in articles" 
                 :key="index"
-                class="bg-[#161b22] border border-[#30363d] rounded-lg p-5 hover:border-[#58a6ff] transition-all cursor-pointer group"
+                class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 sm:p-5 hover:border-[#58a6ff] transition-all cursor-pointer group"
               >
-                <div class="flex items-start justify-between gap-4">
-                  <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-3">
-                      <span :class="getCategoryTagStyle(article.category)" class="text-xs px-3 py-1 rounded-full font-medium">
+                <div class="flex flex-col gap-3">
+                  <div>
+                    <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3 flex-wrap">
+                      <span :class="getCategoryTagStyle(article.category)" class="text-xs px-2 sm:px-3 py-1 rounded-full font-medium">
                         {{ article.category }}
                       </span>
                       <span class="text-[#8b949e] text-xs">{{ article.date }}</span>
                     </div>
-                    <h3 class="text-lg font-bold text-white group-hover:text-[#58a6ff] transition-colors mb-2">
+                    <h3 class="text-base sm:text-lg font-bold text-white group-hover:text-[#58a6ff] transition-colors mb-2 leading-snug">
                       {{ article.title }}
                     </h3>
-                    <p class="text-[#8b949e] text-sm leading-relaxed mb-3">
+                    <p class="text-[#8b949e] text-xs sm:text-sm leading-relaxed mb-3 line-clamp-2">
                       {{ article.summary }}
                     </p>
-                    <div class="flex items-center gap-6 text-xs text-[#8b949e]">
+                    <div class="flex items-center gap-4 sm:gap-6 text-xs text-[#8b949e]">
                       <span>👁️ {{ article.views }}</span>
                       <span>💬 {{ article.comments }}</span>
                       <span>🔥 {{ article.hot }}</span>
                     </div>
                   </div>
-                  <div class="hidden sm:block text-right">
-                    <div class="text-[#3fb950] text-sm font-medium mb-1">{{ article.change }}</div>
-                    <div class="text-[#8b949e] text-xs">{{ article.impact }}</div>
-                  </div>
+                  <div class="sm:hidden text-xs text-[#3fb950] font-medium">{{ article.change }} · {{ article.impact }}</div>
                 </div>
               </article>
             </div>
@@ -122,31 +119,31 @@
 
           <!-- 热门话题 -->
           <section>
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                <span class="w-1 h-6 bg-[#f0883e] rounded"></span>
+            <div class="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                <span class="w-1 h-5 sm:h-6 bg-[#f0883e] rounded"></span>
                 热门话题
               </h2>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div 
                 v-for="topic in topics" 
                 :key="topic.id"
-                class="bg-[#161b22] border border-[#30363d] rounded-lg p-5 hover:border-[#f0883e] transition-all cursor-pointer group"
+                class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 sm:p-5 hover:border-[#f0883e] transition-all cursor-pointer group"
               >
                 <div class="flex items-start justify-between mb-3">
-                  <h3 class="text-base font-bold text-white group-hover:text-[#f0883e] transition-colors">
+                  <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-[#f0883e] transition-colors leading-snug">
                     {{ topic.title }}
                   </h3>
-                  <span class="bg-[#f0883e]/10 text-[#f0883e] text-xs px-2 py-1 rounded font-medium">
+                  <span class="bg-[#f0883e]/10 text-[#f0883e] text-xs px-2 py-1 rounded font-medium flex-shrink-0 ml-2">
                     TOP {{ topic.rank }}
                   </span>
                 </div>
-                <p class="text-[#8b949e] text-sm mb-4 line-clamp-2">
+                <p class="text-[#8b949e] text-xs sm:text-sm mb-4 line-clamp-2">
                   {{ topic.summary }}
                 </p>
                 <div class="flex items-center justify-between text-xs text-[#8b949e]">
-                  <div class="flex items-center gap-4">
+                  <div class="flex items-center gap-3 sm:gap-4">
                     <span>🔥 {{ topic.hot }}热度</span>
                     <span>📈 {{ topic.trend }}</span>
                   </div>
@@ -157,15 +154,15 @@
           </section>
         </main>
 
-        <!-- 右侧边栏 -->
-        <aside class="w-80 flex-shrink-0">
+        <!-- 右侧边栏（移动端在底部，桌面端在右侧） -->
+        <aside class="w-full lg:w-80 flex-shrink-0 order-1 lg:order-2 space-y-4 lg:space-y-6">
           <!-- 搜索框 -->
-          <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 mb-6 sticky top-20">
+          <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-4">
             <div class="relative mb-4">
               <input 
                 type="text" 
                 placeholder="搜索资讯、职业、工具..."
-                class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 pl-10 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
+                class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2.5 sm:py-3 pl-10 text-sm sm:text-base text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
               />
               <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#8b949e]">🔍</span>
             </div>
@@ -189,7 +186,7 @@
           </div>
 
           <!-- 热门排行 -->
-          <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 mb-6">
+          <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-4">
             <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
               <span class="text-[#f0883e]">🔥</span> 热门排行
             </h3>
@@ -202,7 +199,7 @@
                 <span :class="getRankStyle(index)" class="text-sm font-bold w-5 flex-shrink-0">
                   {{ index + 1 }}
                 </span>
-                <div class="flex-1">
+                <div class="flex-1 min-w-0">
                   <h4 class="text-sm text-[#8b949e] group-hover:text-[#58a6ff] transition-colors line-clamp-2 mb-1">
                     {{ item.title }}
                   </h4>
@@ -273,63 +270,38 @@ const handleLogout = async () => {
 }
 
 // 资讯数据
-const articles = ref([
-  {
-    category: '大模型',
-    date: '2026-03-30',
-    title: 'OpenAI 发布 GPT-5：性能提升 10 倍，支持多模态和实时交互能力',
-    summary: 'OpenAI 正式发布 GPT-5，在推理能力、代码生成、多语言支持等方面取得重大突破，支持实时语音和视频交互...',
-    views: '12.3k',
-    comments: '234',
-    hot: '9.8k',
-    change: '+15.2%',
-    impact: '影响行业：教育、客服、内容创作'
-  },
-  {
-    category: '行业动态',
-    date: '2026-03-29',
-    title: 'AI 替代传统岗位速度超预期：70% 的重复性工作可实现自动化',
-    summary: '麦肯锡最新报告显示，AI 技术在金融、法律、医疗等领域的应用加速，大量重复性工作将被自动化替代...',
-    views: '8.7k',
-    comments: '156',
-    hot: '7.2k',
-    change: '+8.5%',
-    impact: '影响行业：金融、法律、医疗'
-  },
-  {
-    category: '技术突破',
-    date: '2026-03-28',
-    title: 'LLM 推理效率突破：新架构使 AI 系统性能提升 10 倍',
-    summary: '斯坦福大学研究团队提出新型 Transformer 架构，大幅降低计算成本，使大规模 AI 部署更加经济高效...',
-    views: '6.5k',
-    comments: '89',
-    hot: '5.1k',
-    change: '+12.3%',
-    impact: '影响行业：云计算、芯片制造'
-  },
-  {
-    category: '产品发布',
-    date: '2026-03-27',
-    title: 'Cursor 2.0 发布：AI 编程助手迎来重大更新，支持全文件理解',
-    summary: 'Cursor 发布 2.0 版本，新增对整个代码库的理解能力，可以更准确地提供代码建议和重构方案...',
-    views: '5.2k',
-    comments: '67',
-    hot: '4.3k',
-    change: '+6.7%',
-    impact: '影响行业：软件开发'
-  },
-  {
-    category: '大模型',
-    date: '2026-03-26',
-    title: 'Google DeepMind 发布 Gemini 2.0：在多项基准测试中超越 GPT-4',
-    summary: 'Google 最新多模态大模型 Gemini 2.0 正式发布，在数学推理、科学问答等领域表现优异...',
-    views: '9.1k',
-    comments: '178',
-    hot: '8.5k',
-    change: '+10.1%',
-    impact: '影响行业：搜索、广告、内容推荐'
+const articles = ref([])
+
+// 从API获取最新资讯
+onMounted(async () => {
+  try {
+    const res = await fetch('/api/articles?page=1&page_size=5')
+    const data = await res.json()
+    if (data && data.articles) {
+      articles.value = data.articles.map(article => ({
+        category: article.category_name || '资讯',
+        date: article.published_at?.split('T')[0] || '',
+        title: article.title,
+        summary: article.summary,
+        views: formatNumber(article.view_count),
+        comments: String(article.comment_count),
+        hot: formatNumber(article.like_count || 0),
+        change: '+0%',
+        impact: `来源：${article.source_name || ''}`
+      }))
+    }
+  } catch (error) {
+    console.error('Failed to fetch articles:', error)
   }
-])
+})
+
+const formatNumber = (num) => {
+  if (!num) return '0'
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'k'
+  }
+  return String(num)
+}
 
 // 话题数据
 const topics = ref([

@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // 使用 import.meta.env 直接读取环境变量（Nuxt 3 规范）
-const API_BASE_URL = import.meta.env.NUXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+const API_BASE_URL = import.meta.env.NUXT_PUBLIC_API_URL || 'http://localhost/api'
 
 // eslint-disable-next-line no-console
 console.log('[API] Using baseURL:', API_BASE_URL)
@@ -78,6 +78,9 @@ setupInterceptors(apiClient)
 
 // 导出 API 方法
 export const articleApi = {
+  getCategories() {
+    return apiClient.get('/articles/categories')
+  },
   getList(params?: { page?: number; pageSize?: number; category?: string }) {
     return apiClient.get('/articles', { params })
   },

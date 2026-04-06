@@ -2,34 +2,34 @@
   <div class="min-h-screen bg-[#0d1117]">
     <!-- 顶部导航栏 -->
     <header class="border-b border-[#30363d] bg-[#161b22]/80 backdrop-blur-sm sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-8">
-            <NuxtLink to="/" class="text-2xl font-bold text-white flex items-center gap-2">
-              <span class="text-3xl">🤖</span>
+          <div class="flex items-center gap-4 sm:gap-8">
+            <NuxtLink to="/" class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+              <span class="text-2xl sm:text-3xl">🤖</span>
               <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">AI 热点追踪</span>
             </NuxtLink>
             <NuxtLink 
               to="/" 
-              class="text-[#8b949e] hover:text-white transition-colors font-medium flex items-center gap-2"
+              class="text-[#8b949e] hover:text-white transition-colors font-medium flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
               </svg>
-              <span>返回主页</span>
+              <span class="hidden sm:inline">返回主页</span>
             </NuxtLink>
           </div>
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2 sm:gap-4">
             <template v-if="user">
               <NuxtLink to="/profile" class="flex items-center gap-2 text-[#8b949e] hover:text-white transition-colors">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold text-sm">
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
                   {{ user.nickname?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U' }}
                 </div>
-                <span class="font-medium hidden sm:block">{{ user.nickname || user.email }}</span>
+                <span class="font-medium text-sm hidden sm:block">{{ user.nickname || user.email }}</span>
               </NuxtLink>
               <button 
                 @click="handleLogout"
-                class="text-[#8b949e] hover:text-white transition-colors font-medium text-sm"
+                class="text-[#8b949e] hover:text-white transition-colors font-medium text-xs sm:text-sm"
               >
                 退出
               </button>
@@ -39,8 +39,8 @@
       </div>
     </header>
 
-    <div class="max-w-4xl mx-auto px-6 py-8">
-      <h1 class="text-3xl font-bold text-white mb-8">个人中心</h1>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <h1 class="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">个人中心</h1>
 
       <!-- 错误提示 -->
       <div v-if="loadError" class="mb-6 p-4 bg-red-900/20 border border-red-800 rounded-md flex items-start gap-3">
@@ -59,42 +59,42 @@
 
       <!-- 加载状态 -->
       <div v-if="loading && !profileLoaded" class="text-center py-12">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#58a6ff]"></div>
+        <div class="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-[#58a6ff]"></div>
         <p class="text-[#8b949e] mt-4">加载中...</p>
       </div>
 
-      <div v-else class="space-y-6">
+      <div v-else class="space-y-4 sm:space-y-6">
         <!-- 基本信息卡片 -->
-        <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-6">
-          <h2 class="text-xl font-bold text-white mb-6">基本信息</h2>
+        <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 sm:p-6">
+          <h2 class="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">基本信息</h2>
           
-          <div class="flex items-center space-x-4 mb-6">
-            <div class="h-20 w-20 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-2xl font-bold text-white">
+          <div class="flex items-center space-x-3 sm:space-x-4 mb-4 sm:mb-6">
+            <div class="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-xl sm:text-2xl font-bold text-white flex-shrink-0">
               {{ user?.nickname?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U' }}
             </div>
-            <div>
-              <h3 class="text-xl font-bold text-white mb-1">{{ user?.nickname }}</h3>
-              <p class="text-[#8b949e]">{{ user?.email }}</p>
+            <div class="min-w-0">
+              <h3 class="text-base sm:text-xl font-bold text-white mb-1 truncate">{{ user?.nickname }}</h3>
+              <p class="text-[#8b949e] text-xs sm:text-sm truncate">{{ user?.email }}</p>
             </div>
           </div>
 
           <form @submit.prevent="updateProfile" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-[#8b949e] mb-2">昵称</label>
+              <label class="block text-xs sm:text-sm font-medium text-[#8b949e] mb-2">昵称</label>
               <input
                 v-model="profileForm.nickname"
                 type="text"
-                class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
+                class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
                 placeholder="请输入昵称"
               />
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-[#8b949e] mb-2">个人简介</label>
+              <label class="block text-xs sm:text-sm font-medium text-[#8b949e] mb-2">个人简介</label>
               <textarea
                 v-model="profileForm.bio"
                 rows="3"
-                class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
+                class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
                 placeholder="介绍一下自己吧..."
               ></textarea>
             </div>
@@ -102,7 +102,7 @@
             <button
               type="submit"
               :disabled="submitting"
-              class="w-full bg-[#238636] hover:bg-[#2ea043] disabled:bg-[#30363d] disabled:cursor-not-allowed text-white font-medium py-3 rounded-md transition-all shadow-lg hover:shadow-xl"
+              class="w-full bg-[#238636] hover:bg-[#2ea043] disabled:bg-[#30363d] disabled:cursor-not-allowed text-white font-medium py-2.5 sm:py-3 rounded-md text-sm sm:text-base transition-all shadow-lg hover:shadow-xl"
             >
               {{ submitting ? '保存中...' : '保存修改' }}
             </button>
@@ -110,41 +110,41 @@
         </div>
 
         <!-- 修改密码卡片 -->
-        <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-6">
-          <h2 class="text-xl font-bold text-white mb-6">修改密码</h2>
+        <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 sm:p-6">
+          <h2 class="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">修改密码</h2>
           
           <form @submit.prevent="changePassword" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-[#8b949e] mb-2">当前密码</label>
+              <label class="block text-xs sm:text-sm font-medium text-[#8b949e] mb-2">当前密码</label>
               <input
                 v-model="passwordForm.old_password"
                 type="password"
                 required
-                class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
+                class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
                 placeholder="请输入当前密码"
               />
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-[#8b949e] mb-2">新密码</label>
+              <label class="block text-xs sm:text-sm font-medium text-[#8b949e] mb-2">新密码</label>
               <input
                 v-model="passwordForm.new_password"
                 type="password"
                 required
                 minlength="8"
-                class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
+                class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
                 placeholder="至少 8 位，包含大写字母、小写字母、数字和特殊字符"
               />
             </div>
 
             <div v-if="passwordError" class="p-3 bg-red-900/20 border border-red-800 rounded-md">
-              <p class="text-red-400 text-sm">{{ passwordError }}</p>
+              <p class="text-red-400 text-xs sm:text-sm">{{ passwordError }}</p>
             </div>
 
             <button
               type="submit"
               :disabled="submitting"
-              class="w-full bg-[#238636] hover:bg-[#2ea043] disabled:bg-[#30363d] disabled:cursor-not-allowed text-white font-medium py-3 rounded-md transition-all shadow-lg hover:shadow-xl"
+              class="w-full bg-[#238636] hover:bg-[#2ea043] disabled:bg-[#30363d] disabled:cursor-not-allowed text-white font-medium py-2.5 sm:py-3 rounded-md text-sm sm:text-base transition-all shadow-lg hover:shadow-xl"
             >
               {{ submitting ? '修改中...' : '修改密码' }}
             </button>

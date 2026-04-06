@@ -59,5 +59,10 @@ export default defineNuxtConfig({
   // Nitro
   nitro: {
     compressPublicAssets: true,
+    routeRules: {
+      '/api/**': {
+        proxy: 'http://localhost/api/**'
+      }
+    }
   },
 })

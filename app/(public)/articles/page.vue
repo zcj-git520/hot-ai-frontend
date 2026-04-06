@@ -25,18 +25,23 @@
         :key="category.id"
         :class="[
           'px-4 py-2 rounded-full text-sm font-medium transition',
-          activeCategory === category.id 
+          activeCategory === category.code 
             ? 'bg-blue-600 text-white' 
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         ]"
-        @click="activeCategory = category.id"
+        @click="activeCategory = category.code"
       >
         {{ category.name }}
       </button>
     </div>
 
+    <!-- 加载状态 -->
+    <div v-if="loading" class="text-center py-12">
+      <p class="text-gray-500">加载中...</p>
+    </div>
+
     <!-- 文章列表 -->
-    <div class="space-y-6">
+    <div v-else-if="articles && articles.length > 0" class="space-y-6">
       <article 
         v-for="article in articles"
         :key="article.id"
@@ -47,16 +52,16 @@
             <span 
               :class="[
                 'px-3 py-1 rounded-full text-xs font-medium',
-                getCategoryColor(article.category)
+                getCategoryColor(article.category_code || article.category_name)
               ]"
             >
-              {{ article.category }}
+              {{ article.category_name }}
             </span>
-            <span class="text-sm text-gray-500">{{ article.publishedAt }}</span>
+            <span class="text-sm text-gray-500">{{ article.published_at }}</span>
           </div>
           <div class="flex items-center gap-4 text-sm text-gray-500">
-            <span>👁️ {{ article.viewCount }}</span>
-            <span>💬 {{ article.commentCount }}</span>
+            <span> {{ article.view_count }}</span>
+            <span> {{ article.comment_count }}</span>
           </div>
         </div>
         <h2 class="text-xl font-semibold mb-3">
@@ -70,7 +75,7 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="text-sm text-gray-500">来源：</span>
-            <span class="text-sm text-gray-700">{{ article.source }}</span>
+            <span class="text-sm text-gray-700">{{ article.source_name }}</span>
           </div>
           <div class="flex gap-2">
             <NuxtLink 
@@ -82,6 +87,11 @@
           </div>
         </div>
       </article>
+    </div>
+
+    <!-- 空状态 -->
+    <div v-else class="text-center py-12">
+      <p class="text-gray-500">暂无文章数据</p>
     </div>
 
     <!-- 分页 -->
@@ -105,56 +115,64 @@ definePageMeta({
 })
 
 const activeCategory = ref('all')
+const loading = ref(false)
 
-const categories = [
-  { id: 'dynamic', name: 'AI 动态' },
-  { id: 'career', name: '职业影响' },
-  { id: 'learning', name: '学习资源' },
-  { id: 'tool', name: '工具产品' }
-]
-
-// 模拟数据
-const articles = ref([
-  {
-    id: 1,
-    title: 'GPT-5 发布：AI 能力再次飞跃，这些职业将受到影响',
-    summary: 'OpenAI 今日发布 GPT-5，在多个基准测试中取得突破性进展。专家分析，文案、设计、客服等岗位将面临更大挑战...',
-    category: 'AI 动态',
-    source: '机器之心',
-    publishedAt: '2026-03-30',
-    viewCount: '1,234',
-    commentCount: 23
-  },
-  {
-    id: 2,
-    title: '设计师如何应对 AI 冲击？这份转型指南请收好',
-    summary: 'AI 绘图工具的崛起让设计师群体倍感压力。本文采访了 5 位成功转型的设计师，分享他们的经验和建议...',
-    category: '职业影响',
-    source: '知乎 AI',
-    publishedAt: '2026-03-29',
-    viewCount: '2,456',
-    commentCount: 45
-  },
-  {
-    id: 3,
-    title: '零基础学习 AI 的完整路线图（2026 年版）',
-    summary: '从 Python 基础到深度学习，从理论到实践，这份学习路线图为初学者提供了清晰的学习路径...',
-    category: '学习资源',
-    source: '量子位',
-    publishedAt: '2026-03-28',
-    viewCount: '3,789',
-    commentCount: 67
+// 获取分类列表 - 使用useFetch在SSR和客户端都执行
+const { data: categories } = await useFetch('/api/articles/categories', {
+  transform: (data) => {
+    console.log('[API] 分类数据:', data)
+    return data || []
   }
-])
+})
 
-const getCategoryColor = (category: string) => {
-  const colors: Record<string, string> = {
-    'AI 动态': 'bg-blue-100 text-blue-800',
-    '职业影响': 'bg-orange-100 text-orange-800',
-    '学习资源': 'bg-green-100 text-green-800',
-    '工具产品': 'bg-purple-100 text-purple-800'
+// 构建查询参数
+const buildQuery = () => {
+  const params: any = {
+    page: 1,
+    page_size: 10
   }
-  return colors[category] || 'bg-gray-100 text-gray-800'
+  if (activeCategory.value !== 'all') {
+    params.category = activeCategory.value
+  }
+  return params
+}
+
+// 获取文章列表 - 使用useFetch在SSR和客户端都执行
+const { data: articles, refresh: refreshArticles } = await useFetch('/api/articles', {
+  query: buildQuery(),
+  transform: (data) => {
+    console.log('[API] 文章数据:', data)
+    return data?.articles || []
+  }
+})
+
+// 监听分类变化
+watch(activeCategory, async (newCategory) => {
+  loading.value = true
+  const params: any = {
+    page: 1,
+    page_size: 10
+  }
+  if (newCategory !== 'all') {
+    params.category = newCategory
+  }
+  
+  const { data } = await useFetch('/api/articles', {
+    query: params,
+    transform: (res) => res?.articles || []
+  })
+  articles.value = data.value
+  loading.value = false
+})
+
+const getCategoryColor = (code: string) => {
+  const colorMap: Record<string, string> = {
+    'news': 'bg-blue-100 text-blue-800',
+    'impact': 'bg-orange-100 text-orange-800',
+    'learn': 'bg-green-100 text-green-800',
+    'tool': 'bg-purple-100 text-purple-800'
+  }
+  return colorMap[code] || 'bg-gray-100 text-gray-800'
 }
 </script>
 

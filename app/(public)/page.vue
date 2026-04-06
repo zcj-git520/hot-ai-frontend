@@ -34,24 +34,27 @@
           查看更多 →
         </NuxtLink>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div v-if="loading" class="text-center py-12">
+        <p class="text-gray-500">加载中...</p>
+      </div>
+      <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <article 
-          v-for="i in 3" 
-          :key="i"
+          v-for="article in latestArticles" 
+          :key="article.id"
           class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition"
         >
-          <div class="text-sm text-gray-500 mb-2">2026-03-30 · AI 动态</div>
+          <div class="text-sm text-gray-500 mb-2">{{ article.published_at }} · {{ article.category_name }}</div>
           <h3 class="text-lg font-semibold mb-3">
-            <NuxtLink to="/articles/demo" class="hover:text-blue-600">
-              GPT-5 发布：AI 能力再次飞跃，这些职业将受到影响
+            <NuxtLink :to="`/articles/${article.id}`" class="hover:text-blue-600">
+              {{ article.title }}
             </NuxtLink>
           </h3>
-          <p class="text-gray-600 text-sm mb-4">
-            OpenAI 今日发布 GPT-5，在多个基准测试中取得突破性进展。专家分析，文案、设计、客服等岗位将面临更大挑战...
+          <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+            {{ article.summary }}
           </p>
           <div class="flex items-center text-sm text-gray-500">
-            <span class="mr-4">👁️ 1,234 阅读</span>
-            <span>💬 23 评论</span>
+            <span class="mr-4">👁️ {{ article.view_count }} 阅读</span>
+            <span>💬 {{ article.comment_count }} 评论</span>
           </div>
         </article>
       </div>
@@ -140,5 +143,17 @@
 // 首页组件
 definePageMeta({
   layout: 'default'
+})
+
+// 获取最新资讯 - 使用useFetch在SSR和客户端都执行
+const { data: latestArticles } = await useFetch('/api/articles', {
+  query: {
+    page: 1,
+    page_size: 3
+  },
+  transform: (data) => {
+    console.log('[API] 首页最新资讯:', data)
+    return data?.articles || []
+  }
 })
 </script>

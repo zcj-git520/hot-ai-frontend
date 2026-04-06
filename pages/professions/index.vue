@@ -2,14 +2,14 @@
   <div class="min-h-screen bg-[#0d1117]">
     <!-- 顶部导航栏 -->
     <header class="border-b border-[#30363d] bg-[#161b22]/80 backdrop-blur-sm sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-8">
-            <NuxtLink to="/" class="text-2xl font-bold text-white flex items-center gap-2">
-              <span class="text-3xl">🤖</span>
+          <div class="flex items-center gap-4 sm:gap-8">
+            <NuxtLink to="/" class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+              <span class="text-2xl sm:text-3xl">🤖</span>
               <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">AI 热点追踪</span>
             </NuxtLink>
-            <nav class="hidden md:flex items-center gap-6">
+            <nav class="hidden lg:flex items-center gap-6">
               <NuxtLink to="/" class="text-[#8b949e] hover:text-white transition-colors font-medium">首页</NuxtLink>
               <NuxtLink to="/articles" class="text-[#8b949e] hover:text-white transition-colors font-medium">资讯</NuxtLink>
               <NuxtLink to="/professions" class="text-white font-medium">职业风险</NuxtLink>
@@ -17,27 +17,27 @@
               <NuxtLink to="/tools" class="text-[#8b949e] hover:text-white transition-colors font-medium">工具库</NuxtLink>
             </nav>
           </div>
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2 sm:gap-4">
             <!-- 登录状态 -->
-            <div v-if="user" class="flex items-center gap-4">
+            <div v-if="user" class="flex items-center gap-2 sm:gap-4">
               <NuxtLink to="/profile" class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white font-medium text-sm">
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white font-medium text-xs sm:text-sm">
                   {{ user.nickname?.charAt(0).toUpperCase() || 'U' }}
                 </div>
-                <span class="text-white font-medium hidden md:block">{{ user.nickname || user.email }}</span>
+                <span class="text-white font-medium text-sm hidden md:block">{{ user.nickname || user.email }}</span>
               </NuxtLink>
               <button 
                 @click="handleLogout"
-                class="text-[#8b949e] hover:text-white transition-colors font-medium"
+                class="text-[#8b949e] hover:text-white transition-colors font-medium text-xs sm:text-sm"
               >
                 退出
               </button>
             </div>
             
             <!-- 未登录状态 -->
-            <div v-else class="flex items-center gap-4">
-              <NuxtLink to="/login" class="text-[#8b949e] hover:text-white transition-colors font-medium">登录</NuxtLink>
-              <NuxtLink to="/register" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-md font-medium transition-all shadow-lg hover:shadow-xl">
+            <div v-else class="flex items-center gap-2 sm:gap-4">
+              <NuxtLink to="/login" class="text-[#8b949e] hover:text-white transition-colors font-medium text-sm">登录</NuxtLink>
+              <NuxtLink to="/register" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md font-medium text-xs sm:text-sm transition-all shadow-lg hover:shadow-xl">
                 注册
               </NuxtLink>
             </div>
@@ -46,59 +46,59 @@
       </div>
     </header>
 
-    <div class="max-w-7xl mx-auto px-6 py-12">
-      <div class="text-center mb-12">
-        <h1 class="text-4xl font-bold text-white mb-4">职业风险查询</h1>
-        <p class="text-[#8b949e] text-lg mb-8">了解你的职业受 AI 影响的程度和转型建议</p>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
+      <div class="text-center mb-8 sm:mb-12">
+        <h1 class="text-2xl sm:text-4xl font-bold text-white mb-3 sm:mb-4">职业风险查询</h1>
+        <p class="text-[#8b949e] text-base sm:text-lg mb-6 sm:mb-8">了解你的职业受 AI 影响的程度和转型建议</p>
         
         <!-- 搜索框 -->
-        <div class="max-w-2xl mx-auto mb-12">
+        <div class="max-w-2xl mx-auto mb-8 sm:mb-12">
           <div class="relative">
             <input 
               type="text" 
               placeholder="搜索职业，例如：设计师、程序员、运营..."
-              class="w-full bg-[#161b22] border border-[#30363d] rounded-lg px-6 py-4 pl-12 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-2 focus:ring-[#58a6ff] transition-all text-lg"
+              class="w-full bg-[#161b22] border border-[#30363d] rounded-lg px-4 sm:px-6 py-3 sm:py-4 pl-10 sm:pl-12 text-sm sm:text-lg text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-2 focus:ring-[#58a6ff] transition-all"
             />
-            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#8b949e] text-xl">🔍</span>
+            <span class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[#8b949e] text-lg sm:text-xl">🔍</span>
           </div>
         </div>
       </div>
 
       <!-- 职业分类 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <NuxtLink 
           v-for="profession in professions" 
           :key="profession.id"
           :to="profession.link"
-          class="bg-[#161b22] border border-[#30363d] rounded-lg p-6 hover:border-[#58a6ff] transition-all cursor-pointer group"
+          class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 sm:p-6 hover:border-[#58a6ff] transition-all cursor-pointer group"
         >
-          <div class="flex items-start justify-between mb-4">
-            <span class="text-4xl">{{ profession.icon }}</span>
-            <span :class="getRiskLevelStyle(profession.riskLevel)" class="text-xs px-3 py-1.5 rounded-full font-bold">
+          <div class="flex items-start justify-between mb-3 sm:mb-4">
+            <span class="text-3xl sm:text-4xl">{{ profession.icon }}</span>
+            <span :class="getRiskLevelStyle(profession.riskLevel)" class="text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full font-bold">
               {{ profession.riskLevel }}
             </span>
           </div>
-          <h3 class="text-xl font-bold text-white group-hover:text-[#58a6ff] transition-colors mb-2">
+          <h3 class="text-lg sm:text-xl font-bold text-white group-hover:text-[#58a6ff] transition-colors mb-2 leading-snug">
             {{ profession.name }}
           </h3>
-          <p class="text-[#8b949e] text-sm mb-4 line-clamp-2">
+          <p class="text-[#8b949e] text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
             {{ profession.description }}
           </p>
           <div class="flex items-center justify-between">
-            <div class="text-sm">
+            <div class="text-xs sm:text-sm">
               <div class="text-[#8b949e] mb-1">风险指数</div>
               <div class="flex items-center gap-2">
-                <div class="w-24 h-2 bg-[#21262d] rounded-full overflow-hidden">
+                <div class="w-20 sm:w-24 h-2 bg-[#21262d] rounded-full overflow-hidden">
                   <div 
                     :class="getRiskColor(profession.riskScore)" 
                     class="h-full rounded-full" 
                     :style="{ width: profession.riskScore + '%' }"
                   ></div>
                 </div>
-                <span class="text-white font-bold">{{ profession.riskScore }}%</span>
+                <span class="text-white font-bold text-xs sm:text-sm">{{ profession.riskScore }}%</span>
               </div>
             </div>
-            <span class="text-[#58a6ff] font-medium">详情 →</span>
+            <span class="text-[#58a6ff] font-medium text-xs sm:text-sm">详情 →</span>
           </div>
         </NuxtLink>
       </div>
