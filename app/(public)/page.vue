@@ -35,7 +35,8 @@
         </NuxtLink>
       </div>
       <div v-if="loading" class="text-center py-12">
-        <p class="text-gray-500">加载中...</p>
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <p class="text-gray-500 mt-2">加载中...</p>
       </div>
       <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <article 
@@ -43,18 +44,58 @@
           :key="article.id"
           class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition"
         >
-          <div class="text-sm text-gray-500 mb-2">{{ article.published_at }} · {{ article.category_name }}</div>
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span 
+                :class="[
+                  'px-2 py-1 rounded text-xs font-medium',
+                  getCategoryColor(article.category_code)
+                ]"
+              >
+                {{ article.category_name }}
+              </span>
+              <span class="flex items-center text-xs text-gray-500">
+                <Icons name="calendar" class="mr-1" />
+                {{ formatDate(article.published_at) }}
+              </span>
+            </div>
+          </div>
+          
           <h3 class="text-lg font-semibold mb-3">
             <NuxtLink :to="`/articles/${article.id}`" class="hover:text-blue-600">
               {{ article.title }}
             </NuxtLink>
           </h3>
+          
           <p class="text-gray-600 text-sm mb-4 line-clamp-2">
             {{ article.summary }}
           </p>
-          <div class="flex items-center text-sm text-gray-500">
-            <span class="mr-4">👁️ {{ article.view_count }} 阅读</span>
-            <span>💬 {{ article.comment_count }} 评论</span>
+          
+          <!-- 统计信息 -->
+          <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
+            <span class="flex items-center gap-1">
+              <Icons name="eye" class="text-gray-400" />
+              {{ formatNumber(article.view_count || 0) }}
+            </span>
+            <span class="flex items-center gap-1">
+              <Icons name="chat" class="text-gray-400" />
+              {{ formatNumber(article.comment_count || 0) }}
+            </span>
+            <span class="flex items-center gap-1">
+              <Icons name="heart" class="text-gray-400" />
+              {{ formatNumber(article.like_count || 0) }}
+            </span>
+          </div>
+          
+          <!-- 来源 -->
+          <div class="flex items-center justify-between pt-3 border-t text-xs text-gray-500">
+            <span>来源：{{ article.source_name }}</span>
+            <NuxtLink 
+              :to="`/articles/${article.id}`"
+              class="text-blue-600 hover:text-blue-700 font-medium"
+            >
+              阅读 →
+            </NuxtLink>
           </div>
         </article>
       </div>

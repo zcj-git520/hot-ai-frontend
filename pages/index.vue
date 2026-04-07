@@ -90,6 +90,7 @@
                 v-for="(article, index) in articles" 
                 :key="index"
                 class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 sm:p-5 hover:border-[#58a6ff] transition-all cursor-pointer group"
+                @click="navigateTo(`/articles/${article.id}`)"
               >
                 <div class="flex flex-col gap-3">
                   <div>
@@ -279,6 +280,7 @@ onMounted(async () => {
     const data = await res.json()
     if (data && data.articles) {
       articles.value = data.articles.map(article => ({
+        id: article.id,
         category: article.category_name || '资讯',
         date: article.published_at?.split('T')[0] || '',
         title: article.title,
