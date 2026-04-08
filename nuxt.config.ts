@@ -14,12 +14,12 @@ export default defineNuxtConfig({
   // CSS
   css: ['~/assets/css/main.css'],
 
-  // 运行时配置
+  // 运行时配置 - 通过Nginx代理访问微服务
   runtimeConfig: {
     jwtSecret: process.env.JWT_SECRET || 'your-default-jwt-secret-change-in-production',
     jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || 'your-default-refresh-secret',
     public: {
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_URL ,
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost/api',
       siteName: process.env.NUXT_SITE_NAME || 'AI 热点追踪平台',
     },
   },
@@ -56,13 +56,8 @@ export default defineNuxtConfig({
     strict: true,
   },
 
-  // Nitro - API 代理到 nginx (port 80)
+  // Nitro 配置
   nitro: {
     compressPublicAssets: true,
-    routeRules: {
-      '/api/**': {
-        proxy: 'http://localhost:80/**'
-      }
-    }
   },
 })

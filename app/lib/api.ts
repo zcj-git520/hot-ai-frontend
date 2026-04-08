@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-// 使用 import.meta.env 直接读取环境变量（Nuxt 3 规范）
+// 通过Nginx代理统一访问微服务
 const API_BASE_URL = import.meta.env.NUXT_PUBLIC_API_URL || 'http://localhost/api'
 
 // eslint-disable-next-line no-console
@@ -24,7 +24,7 @@ const setupInterceptors = (client: typeof apiClient) => {
         config.headers.Authorization = `Bearer ${token}`
         console.log('[API Request]', config.method?.toUpperCase(), config.url, 'Token:', token.substring(0, 20) + '...')
       } else {
-        console.warn('[API Request] No token found for:', config.url)
+        console.log('[API Request]', config.method?.toUpperCase(), config.url)
       }
       return config
     },

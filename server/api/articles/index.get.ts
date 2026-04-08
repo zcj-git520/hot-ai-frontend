@@ -1,4 +1,7 @@
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
+  const API_BASE_URL = config.public.apiBaseUrl || 'http://localhost/api'
+  
   const query = getQuery(event)
   const params = new URLSearchParams()
 
@@ -7,7 +10,7 @@ export default defineEventHandler(async (event) => {
   if (query.category) params.set('category', String(query.category))
   if (query.keyword) params.set('keyword', String(query.keyword))
 
-  const url = `http://localhost:8001/api/articles?${params.toString()}`
+  const url = `${API_BASE_URL}/articles?${params.toString()}`
   const res = await fetch(url)
   const data = await res.json()
 

@@ -1,4 +1,7 @@
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
+  const API_BASE_URL = config.public.apiBaseUrl || 'http://localhost/api'
+  
   const id = getRouterParam(event, 'id')
   if (!id) {
     throw createError({
@@ -7,7 +10,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const url = `http://localhost:8002/api/professions/${id}`
+  const url = `${API_BASE_URL}/professions/${id}`
   const res = await fetch(url)
   
   if (!res.ok) {
