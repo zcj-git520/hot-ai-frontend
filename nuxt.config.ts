@@ -56,12 +56,12 @@ export default defineNuxtConfig({
     strict: true,
   },
 
-  // Nitro
+  // Nitro - API 代理到 nginx (port 80)
   nitro: {
     compressPublicAssets: true,
     routeRules: {
       '/api/**': {
-        proxy: 'http://localhost/api/**'
+        proxy: 'http://localhost:80/**'
       }
     }
   },

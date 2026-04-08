@@ -111,11 +111,67 @@ export const professionApi = {
 }
 
 export const learningPathApi = {
+  // 获取学习路径列表
   getList(params?: { page?: number; pageSize?: number; difficulty?: string }) {
     return apiClient.get('/learning-paths', { params })
   },
-  getById(id: string) {
-    return apiClient.get(`/learning-paths/${id}`)
+  // 获取推荐路径
+  getFeatured(limit?: number) {
+    return apiClient.get('/learning-paths/featured', { params: { limit } })
+  },
+  // 获取难度等级信息
+  getLevels() {
+    return apiClient.get('/learning-paths/levels')
+  },
+  // 根据 ID 获取学习路径详情
+  getById(id: string | number) {
+    return apiClient.get(`/learning-paths/id/${id}`)
+  },
+  // 根据 slug 获取学习路径详情
+  getBySlug(slug: string) {
+    return apiClient.get(`/learning-paths/slug/${slug}`)
+  },
+  // 获取路径的所有章节
+  getChapters(pathId: string | number) {
+    return apiClient.get(`/learning-paths/${pathId}/chapters`)
+  },
+  // 根据章节 ID 获取详情
+  getChapterById(chapterId: string | number) {
+    return apiClient.get(`/chapters/${chapterId}`)
+  },
+  // 根据 slug 获取章节详情
+  getChapterBySlug(pathSlug: string, chapterSlug: string) {
+    return apiClient.get(`/learning-paths/${pathSlug}/chapters/${chapterSlug}`)
+  },
+  // 获取路径学习仪表盘
+  getDashboard(pathId: string | number, userId?: string) {
+    return apiClient.get('/learning-paths/dashboard', {
+      params: { path_id: pathId, user_id: userId }
+    })
+  },
+  // 获取用户的学习进度
+  getProgress(pathId: string | number, userId?: string) {
+    return apiClient.get('/learning-paths/progress', {
+      params: { path_id: pathId, user_id: userId }
+    })
+  },
+  // 获取用户已完成的章节列表
+  getCompletedChapters(pathId: string | number, userId?: string) {
+    return apiClient.get('/learning-paths/completed-chapters', {
+      params: { path_id: pathId, user_id: userId }
+    })
+  },
+  // 保存学习进度
+  saveProgress(data: {
+    user_id: string
+    session_id?: string
+    path_id: number
+    chapter_id: number
+    status: 'in_progress' | 'completed'
+    time_spent?: number
+    notes?: string
+  }) {
+    return apiClient.post('/learning-paths/save-progress', data)
   },
 }
 
