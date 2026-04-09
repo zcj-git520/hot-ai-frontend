@@ -201,7 +201,7 @@ const route = useRoute()
 const id = route.params.id as string
 
 // 获取学习路径详情
-const { data: learningPath, error, pending: loading } = await useFetch(`/api/learning-paths/${id}`, {
+const { data: learningPath, error, pending: loading } = await useFetch(`/api/learning-paths/id/${id}`, {
   transform: (res: any) => {
     if (!res) return null
     // 后端直接返回对象
