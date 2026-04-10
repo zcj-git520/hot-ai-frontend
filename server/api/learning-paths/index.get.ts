@@ -1,7 +1,4 @@
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
-  const API_BASE_URL = config.public.apiBaseUrl || 'http://localhost/api'
-
   const query = getQuery(event)
   const params = new URLSearchParams()
 
@@ -9,8 +6,12 @@ export default defineEventHandler(async (event) => {
   if (query.page_size) params.set('page_size', String(query.page_size))
   if (query.difficulty) params.set('difficulty', String(query.difficulty))
 
-  const url = `${API_BASE_URL}/learning-paths?${params.toString()}`
+  const url = `http://localhost:8003/api/learning-paths?${params.toString()}`
   const res = await fetch(url)
-  const data = await res.json()
-  return data
+
+  if (!res.ok) {
+    throw createError({ statusCode: res.status, message: '获取学习路径列表失败' })
+  }
+
+  return res.json()
 })

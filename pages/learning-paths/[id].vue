@@ -127,8 +127,9 @@
           <span>📚</span> 课程章节
         </h2>
         <div class="space-y-3">
-          <div v-for="chapter in chapters" :key="chapter.id" 
-               class="flex items-center justify-between bg-[#21262d] hover:bg-[#30363d] rounded-lg px-5 py-4 transition-colors group">
+          <NuxtLink v-for="chapter in chapters" :key="chapter.id" 
+               :to="`/learning-paths/${id}/chapters/${chapter.id}`"
+               class="flex items-center justify-between bg-[#21262d] hover:bg-[#30363d] rounded-lg px-5 py-4 transition-colors group block">
             <div class="flex items-center gap-4 flex-1 min-w-0">
               <span class="flex-shrink-0 w-8 h-8 rounded-full bg-[#58a6ff]/20 text-[#58a6ff] flex items-center justify-center text-sm font-bold">
                 {{ chapter.order_index }}
@@ -145,8 +146,11 @@
               <span :class="getContentTypeStyle(chapter.content_type)" class="px-2 py-1 rounded text-xs">
                 {{ getContentTypeName(chapter.content_type) }}
               </span>
+              <svg class="w-5 h-5 text-[#8b949e] group-hover:text-[#58a6ff] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
             </div>
-          </div>
+          </NuxtLink>
         </div>
       </div>
 
@@ -201,7 +205,7 @@ const route = useRoute()
 const id = route.params.id as string
 
 // 获取学习路径详情
-const { data: learningPath, error, pending: loading } = await useFetch(`/api/learning-paths/id/${id}`, {
+const { data: learningPath, error, pending: loading } = await useFetch(`/api/learning-paths/${id}`, {
   transform: (res: any) => {
     if (!res) return null
     // 后端直接返回对象
