@@ -44,6 +44,43 @@ export default defineNuxtConfig({
     optimizeDeps: {
       include: ['axios'],
     },
+    // 开发服务器代理配置
+    server: {
+      proxy: {
+        '/api/home': {
+          target: 'http://localhost:8000',
+          changeOrigin: true,
+        },
+        '/api/auth': {
+          target: 'http://localhost:8000',
+          changeOrigin: true,
+        },
+        '/api/user': {
+          target: 'http://localhost:8000',
+          changeOrigin: true,
+        },
+        '/api/articles': {
+          target: 'http://localhost:8001',
+          changeOrigin: true,
+        },
+        '/api/professions': {
+          target: 'http://localhost:8002',
+          changeOrigin: true,
+        },
+        '/api/learning-paths': {
+          target: 'http://localhost:8003',
+          changeOrigin: true,
+        },
+        '/api/chapters': {
+          target: 'http://localhost:8003',
+          changeOrigin: true,
+        },
+        '/api/tools': {
+          target: 'http://localhost:8004',
+          changeOrigin: true,
+        },
+      },
+    },
   },
 
   // 开发服务器

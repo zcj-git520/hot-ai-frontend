@@ -26,7 +26,7 @@
                 </div>
                 <span class="font-medium text-sm hidden sm:block">{{ user.nickname || user.email }}</span>
               </NuxtLink>
-              <button 
+              <button
                 @click="handleLogout"
                 class="text-[#8b949e] hover:text-white transition-colors font-medium text-xs sm:text-sm"
               >
@@ -54,23 +54,23 @@
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
             <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 sm:p-4 hover:border-[#58a6ff] transition-all cursor-pointer group">
               <div class="text-[#8b949e] text-xs sm:text-sm mb-1 sm:mb-2">📰 资讯总数</div>
-              <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">1,234</div>
-              <div class="text-[#3fb950] text-xs sm:text-sm mt-1">↑ 12% 较上周</div>
+              <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">{{ stats.articles }}</div>
+              <div class="text-[#3fb950] text-xs sm:text-sm mt-1">↑ {{ stats.articlesGrowth }} 较上周</div>
             </div>
             <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 sm:p-4 hover:border-[#58a6ff] transition-all cursor-pointer group">
               <div class="text-[#8b949e] text-xs sm:text-sm mb-1 sm:mb-2">💼 职业分析</div>
-              <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">567</div>
-              <div class="text-[#3fb950] text-xs sm:text-sm mt-1">↑ 8% 较上周</div>
+              <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">{{ stats.professions }}</div>
+              <div class="text-[#3fb950] text-xs sm:text-sm mt-1">↑ {{ stats.professionsGrowth }} 较上周</div>
             </div>
             <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 sm:p-4 hover:border-[#58a6ff] transition-all cursor-pointer group">
               <div class="text-[#8b949e] text-xs sm:text-sm mb-1 sm:mb-2">🎓 学习路径</div>
-              <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">89</div>
-              <div class="text-[#3fb950] text-xs sm:text-sm mt-1">↑ 5% 较上周</div>
+              <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">{{ stats.learningPaths }}</div>
+              <div class="text-[#3fb950] text-xs sm:text-sm mt-1">↑ {{ stats.learningPathsGrowth }} 较上周</div>
             </div>
             <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 sm:p-4 hover:border-[#58a6ff] transition-all cursor-pointer group">
               <div class="text-[#8b949e] text-xs sm:text-sm mb-1 sm:mb-2">👥 活跃用户</div>
-              <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">12.5k</div>
-              <div class="text-[#3fb950] text-xs sm:text-sm mt-1">↑ 23% 较上周</div>
+              <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-[#58a6ff] transition-colors">{{ stats.users }}</div>
+              <div class="text-[#3fb950] text-xs sm:text-sm mt-1">↑ {{ stats.usersGrowth }} 较上周</div>
             </div>
           </div>
 
@@ -86,9 +86,9 @@
               </NuxtLink>
             </div>
             <div class="space-y-3">
-              <article 
-                v-for="(article, index) in articles" 
-                :key="index"
+              <article
+                v-for="(article, index) in articles"
+                :key="article.id"
                 class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 sm:p-5 hover:border-[#58a6ff] transition-all cursor-pointer group"
                 @click="navigateTo(`/articles/${article.id}`)"
               >
@@ -127,8 +127,8 @@
               </h2>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div 
-                v-for="topic in topics" 
+              <div
+                v-for="topic in topics"
                 :key="topic.id"
                 class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 sm:p-5 hover:border-[#f0883e] transition-all cursor-pointer group"
               >
@@ -160,14 +160,14 @@
           <!-- 搜索框 -->
           <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-4">
             <div class="relative mb-4">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="搜索资讯、职业、工具..."
                 class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2.5 sm:py-3 pl-10 text-sm sm:text-base text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
               />
               <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#8b949e]">🔍</span>
             </div>
-            
+
             <!-- 热门查询标签 -->
             <div class="flex flex-wrap gap-2">
               <span class="text-xs text-[#8b949e] mr-2">热门：</span>
@@ -192,9 +192,9 @@
               <span class="text-[#f0883e]">🔥</span> 热门排行
             </h3>
             <div class="space-y-3">
-              <div 
-                v-for="(item, index) in rankings" 
-                :key="index"
+              <div
+                v-for="(item, index) in rankings"
+                :key="item.id"
                 class="flex items-start gap-3 group cursor-pointer"
               >
                 <span :class="getRankStyle(index)" class="text-sm font-bold w-5 flex-shrink-0">
@@ -216,8 +216,8 @@
               <span>🛠️</span> 推荐工具
             </h3>
             <div class="space-y-3">
-              <NuxtLink 
-                v-for="tool in tools" 
+              <NuxtLink
+                v-for="tool in tools"
                 :key="tool.id"
                 :to="tool.link"
                 class="flex items-center justify-between p-3 bg-[#21262d] hover:bg-[#30363d] rounded-md transition-all group"
@@ -242,6 +242,7 @@
 </template>
 
 <script setup lang="ts">
+import { articleApi, toolApi } from '~/app/lib/api'
 import { ref, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { useToast } from '~/composables/useToast'
@@ -270,30 +271,92 @@ const handleLogout = async () => {
   }
 }
 
+// 状态数据
+const stats = ref({
+  articles: 0,
+  professions: 0,
+  learningPaths: 0,
+  users: 0,
+  articlesGrowth: '0%',
+  professionsGrowth: '0%',
+  learningPathsGrowth: '0%',
+  usersGrowth: '0%'
+})
+
 // 资讯数据
 const articles = ref([])
 
-// 从API获取最新资讯
+// 热门话题数据
+const topics = ref([])
+
+// 热门排行数据
+const rankings = ref([])
+
+// 推荐工具数据
+const tools = ref([])
+
+// 从 API 获取首页数据
 onMounted(async () => {
   try {
-    const res = await fetch('/api/articles?page=1&page_size=5')
-    const data = await res.json()
-    if (data && data.articles) {
-      articles.value = data.articles.map(article => ({
-        id: article.id,
-        category: article.category_name || '资讯',
-        date: article.published_at?.split('T')[0] || '',
-        title: article.title,
-        summary: article.summary,
-        views: formatNumber(article.view_count),
-        comments: String(article.comment_count),
-        hot: formatNumber(article.like_count || 0),
-        change: '+0%',
-        impact: `来源：${article.source_name || ''}`
-      }))
+    // 获取统计数据 - 使用 Nuxt devProxy
+    const statsRes = await fetch('/api/home/stats')
+    if (statsRes.ok) {
+      const statsData = await statsRes.json()
+      stats.value = statsData
+    }
+
+    // 获取最新资讯 - 使用封装的 API
+    try {
+      const articlesData = await articleApi.getList({ page: 1, pageSize: 5 })
+      if (articlesData && articlesData.articles) {
+        articles.value = articlesData.articles.map((article: any) => ({
+          id: article.id,
+          category: article.category_name || '资讯',
+          date: article.published_at?.split('T')[0] || '',
+          title: article.title,
+          summary: article.summary,
+          views: formatNumber(article.view_count),
+          comments: String(article.comment_count),
+          hot: formatNumber(article.like_count || 0),
+          change: '+0%',
+          impact: `来源：${article.source_name || ''}`
+        }))
+      }
+    } catch (error) {
+      console.error('Failed to load articles:', error)
+    }
+
+    // 获取热门话题 - 使用 Nuxt devProxy
+    const topicsRes = await fetch('/api/home/topics')
+    if (topicsRes.ok) {
+      const topicsData = await topicsRes.json()
+      topics.value = topicsData.topics || []
+    }
+
+    // 获取热门排行 - 使用 Nuxt devProxy
+    const rankingsRes = await fetch('/api/home/rankings')
+    if (rankingsRes.ok) {
+      const rankingsData = await rankingsRes.json()
+      rankings.value = rankingsData.items || []
+    }
+
+    // 获取推荐工具 - 使用封装的 API
+    try {
+      const toolsData = await toolApi.getList({ page: 1, pageSize: 3 })
+      if (toolsData && toolsData.list) {
+        tools.value = toolsData.list.map((tool: any) => ({
+          id: tool.id,
+          name: tool.name,
+          icon: tool.icon || '🛠️',
+          desc: tool.description,
+          link: `/tools/${tool.slug}`
+        }))
+      }
+    } catch (error) {
+      console.error('Failed to load tools:', error)
     }
   } catch (error) {
-    console.error('Failed to fetch articles:', error)
+    console.error('Failed to fetch home data:', error)
   }
 })
 
@@ -304,42 +367,6 @@ const formatNumber = (num) => {
   }
   return String(num)
 }
-
-// 话题数据
-const topics = ref([
-  {
-    id: 1,
-    title: 'AI 编程助手会取代程序员吗？',
-    summary: '随着 Cursor、GitHub Copilot 等工具的普及，程序员的工作方式正在发生深刻变化。是辅助工具还是替代者？',
-    hot: '15.2k',
-    trend: '上升 25%',
-    rank: 1
-  },
-  {
-    id: 2,
-    title: '2026 年最值得学习的 AI 技能',
-    summary: '从提示词工程到 AI 应用开发，盘点今年最具价值的 AI 相关技能和职业发展路径。',
-    hot: '12.8k',
-    trend: '上升 18%',
-    rank: 2
-  }
-])
-
-// 排行数据
-const rankings = ref([
-  { title: 'GPT-5 发布：AI 能力再次飞跃', hot: '25.3k' },
-  { title: 'AI 绘画工具对比：Midjourney vs Stable Diffusion', hot: '18.7k' },
-  { title: '提示词工程入门指南', hot: '15.2k' },
-  { title: 'AI 如何改变软件开发行业', hot: '12.5k' },
-  { title: '2026 年 AI 投资趋势分析', hot: '10.8k' }
-])
-
-// 工具数据
-const tools = ref([
-  { id: 1, name: 'Cursor', icon: '💻', desc: 'AI 编程助手', link: '/tools' },
-  { id: 2, name: 'Midjourney', icon: '🎨', desc: 'AI 绘画工具', link: '/tools' },
-  { id: 3, name: 'Notion AI', icon: '📝', desc: '智能写作助手', link: '/tools' }
-])
 
 // 获取分类标签样式
 const getCategoryTagStyle = (category: string) => {

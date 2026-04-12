@@ -51,6 +51,27 @@
         <h1 class="text-2xl sm:text-4xl font-bold text-white mb-3 sm:mb-4">学习路径</h1>
         <p class="text-[#8b949e] text-base sm:text-lg mb-6 sm:mb-8">系统学习 AI 技能，提升职业竞争力</p>
 
+        <!-- 搜索栏 -->
+        <div class="mb-6">
+          <div class="relative max-w-xl mx-auto">
+            <input
+              v-model="searchKeyword"
+              @keyup.enter="handleSearch"
+              type="text"
+              placeholder="搜索学习路径标题或描述..."
+              class="w-full bg-[#161b22] border border-[#30363d] rounded-full py-2.5 sm:py-3 px-4 sm:px-5 pr-12 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all text-sm"
+            />
+            <button
+              @click="handleSearch"
+              class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#58a6ff] hover:bg-[#388bfd] text-white w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-colors"
+            >
+              <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
         <!-- 难度筛选 -->
         <div class="flex flex-wrap justify-center gap-2 sm:gap-4">
           <button
@@ -169,6 +190,13 @@ const error = ref<string | null>(null)
 const currentPage = ref(1)
 const selectedDifficulty = ref<string>('all')
 const total = ref(0)
+const searchKeyword = ref('')
+
+// 搜索处理
+const handleSearch = () => {
+  currentPage.value = 1
+  loadPaths()
+}
 
 // 计算属性
 const totalPages = computed(() => {
@@ -198,6 +226,9 @@ const loadPaths = async () => {
     }
     if (selectedDifficulty.value !== 'all') {
       params.difficulty = selectedDifficulty.value
+    }
+    if (searchKeyword.value) {
+      params.search = searchKeyword.value
     }
 
     const query = new URLSearchParams(params as any)
