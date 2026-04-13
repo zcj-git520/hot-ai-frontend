@@ -182,7 +182,7 @@ const testSendRegistrationCode = async () => {
     await authApi.sendRegistrationCode(testEmail.value)
     registrationCodeResult.value = '验证码已发送，请检查邮箱'
   } catch (err: any) {
-    registrationCodeResult.value = `错误：${err.data?.message || err.response?.data?.message || '发送失败'}`
+    registrationCodeResult.value = `错误：${err.message || '发送失败'}`
   } finally {
     sendingCode.value = false
   }
@@ -206,7 +206,7 @@ const testRegister = async () => {
     })
     registerResult.value = '注册成功！请登录'
   } catch (err: any) {
-    registerResult.value = `错误：${err.data?.message || err.response?.data?.message || '注册失败'}`
+    registerResult.value = `错误：${err.message || '注册失败'}`
   } finally {
     registering.value = false
   }
@@ -227,7 +227,7 @@ const testLogin = async () => {
     await setUser(data.user)
     loginResult.value = data
   } catch (err: any) {
-    alert(`登录失败：${err.data?.message || err.response?.data?.message || '请检查邮箱和密码'}`)
+    alert(`登录失败：${err.message || '请检查邮箱和密码'}`)
   } finally {
     loggingIn.value = false
   }
@@ -241,7 +241,7 @@ const testGetProfile = async () => {
     const profile = await userApi.getProfile()
     profileResult.value = profile
   } catch (err: any) {
-    profileResult.value = { error: err.data?.message || err.response?.data?.message || '获取失败' }
+    profileResult.value = { error: err.message || '获取失败' }
   } finally {
     loadingProfile.value = false
   }
@@ -256,7 +256,7 @@ const testLogout = async () => {
     clearAuth()
     logoutResult.value = '登出成功'
   } catch (err: any) {
-    logoutResult.value = `错误：${err.data?.message || err.response?.data?.message || '登出失败'}`
+    logoutResult.value = `错误：${err.message || '登出失败'}`
   } finally {
     loggingOut.value = false
   }

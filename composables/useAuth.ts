@@ -61,12 +61,13 @@ export const useAuth = () => {
   // 刷新 Token
   const refreshAccessToken = async () => {
     if (!refreshToken.value) return false
-    
+
     try {
       const { authApi } = await import('~/app/lib/api')
       const response = await authApi.refreshToken(refreshToken.value as string)
-      
-      if (response.access_token) {
+
+      // 响应拦截器已经处理了 {code, data, message} 格式，直接返回 data
+      if (response && response.access_token) {
         setToken(response.access_token, refreshToken.value as string)
         return true
       }

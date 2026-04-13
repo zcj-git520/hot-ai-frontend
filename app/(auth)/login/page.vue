@@ -92,12 +92,13 @@ const handleLogin = async () => {
   try {
     const data = await authApi.login(form.value.email, form.value.password)
 
+    // 响应拦截器已经处理了 {code, data, message} 格式，直接返回 data
     await setToken(data.access_token, data.refresh_token)
     await setUser(data.user)
 
     navigateTo('/')
   } catch (err: any) {
-    error.value = err.data?.message || err.response?.data?.message || '登录失败，请检查邮箱和密码'
+    error.value = err.message || '登录失败，请检查邮箱和密码'
   } finally {
     loading.value = false
   }

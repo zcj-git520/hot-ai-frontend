@@ -36,18 +36,18 @@
     </header>
 
     <!-- 章节进度条 -->
-    <div v-if="chapter && allChapters.length > 0" class="bg-[#0d1117] border-b border-white/5">
+    <div v-if="chapter && allChaptersRaw && allChaptersRaw.length > 0" class="bg-[#0d1117] border-b border-white/5">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
         <div class="flex items-center justify-between gap-4">
           <div class="flex items-center gap-3 flex-1 min-w-0">
             <div class="flex items-center gap-2 text-sm text-[#8b949e]">
               <span class="text-[#58a6ff] font-medium">{{ chapter.order_index }}</span>
               <span>/</span>
-              <span>{{ allChapters.length }}</span>
+              <span>{{ allChaptersRaw.length }}</span>
             </div>
             <div class="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
               <div class="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500" 
-                   :style="{ width: `${(chapter.order_index / allChapters.length) * 100}%` }"></div>
+                   :style="{ width: `${(chapter.order_index / allChaptersRaw.length) * 100}%` }"></div>
             </div>
           </div>
           <NuxtLink :to="`/learning-paths/${id}`" class="text-sm text-[#8b949e] hover:text-white transition-colors flex-shrink-0">
@@ -239,40 +239,50 @@ const route = useRoute()
 const id = route.params.pathId as string
 const chapterId = route.params.chapterId as string
 
-// 获取章节详情（包含 prev 和 next）
-const { data: chapterResponse, error, pending: loading } = await useFetch(`/api/learning-paths/${id}/chapters/${chapterId}`, {
+// 获取学习路径详情（包含所有章节）
+const { data: learningPath, pending: lpLoading } = await useFetch(`/api/learning-paths/${id}`, {
   transform: (res: any) => {
     if (!res) return null
-    if (res.chapter) return res
-    if (res.title) return { chapter: res, prev: null, next: null }
-    if (res.data && res.data.title) return { chapter: res.data, prev: null, next: null }
+    const responseData = res?.data || res
+    if (!responseData) return null
+    if (responseData.title) return responseData
     return null
   }
 })
 
-const chapter = computed(() => chapterResponse.value?.chapter || null)
-const prevChapter = computed(() => chapterResponse.value?.prev || null)
-const nextChapter = computed(() => chapterResponse.value?.next || null)
-
-// 获取学习路径信息
-const { data: learningPath } = await useFetch(`/api/learning-paths/${id}`, {
-  transform: (res: any) => {
-    if (!res) return null
-    if (res.title) return res
-    if (res.data && res.data.title) return res.data
-    return null
-  }
-})
-
-// 获取所有章节用于进度条
-const { data: allChapters } = await useFetch(`/api/learning-paths/${id}/chapters`, {
+// 获取所有章节（后端没有单个章节详情接口，需要从列表中找到）
+const { data: allChaptersRaw, pending: chaptersLoading } = await useFetch(`/api/learning-paths/${id}/chapters`, {
   transform: (res: any) => {
     if (!res) return []
-    if (Array.isArray(res)) return res
-    if (res.data && Array.isArray(res.data)) return res.data
-    if (res.chapters && Array.isArray(res.chapters)) return res.chapters
+    const responseData = res?.data || res
+    if (!responseData) return []
+    if (Array.isArray(responseData)) return responseData
+    if (responseData.chapters && Array.isArray(responseData.chapters)) return responseData.chapters
     return []
   }
+})
+
+const loading = computed(() => lpLoading.value || chaptersLoading.value)
+
+// 从章节列表中找到当前章节，并计算 prev/next
+const chapter = computed(() => {
+  if (!allChaptersRaw.value || !chapterId) return null
+  return allChaptersRaw.value.find((ch: any) => String(ch.id) === String(chapterId)) || null
+})
+
+const chapterIndex = computed(() => {
+  if (!allChaptersRaw.value || !chapter.value) return -1
+  return allChaptersRaw.value.findIndex((ch: any) => String(ch.id) === String(chapterId))
+})
+
+const prevChapter = computed(() => {
+  if (!allChaptersRaw.value || chapterIndex.value <= 0) return null
+  return allChaptersRaw.value[chapterIndex.value - 1]
+})
+
+const nextChapter = computed(() => {
+  if (!allChaptersRaw.value || chapterIndex.value >= allChaptersRaw.value.length - 1) return null
+  return allChaptersRaw.value[chapterIndex.value + 1]
 })
 
 // 渲染 Markdown 内容

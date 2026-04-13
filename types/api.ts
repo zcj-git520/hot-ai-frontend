@@ -1,4 +1,8 @@
 // API 响应类型定义
+// 后端统一返回格式: { code: number, data: T, message: string }
+// - code: 200 或 0 表示成功，其他值表示错误
+// - data: 成功时包含业务数据，失败时可能为 null 或包含错误详情
+// - message: 提示信息
 
 export interface UserInfo {
   id: string

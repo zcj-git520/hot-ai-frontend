@@ -173,7 +173,9 @@ onMounted(async () => {
 
   try {
     const res = await fetch(`/api/articles/${id}`)
-    const data = await res.json()
+    const raw = await res.json()
+    // 后端返回 {code, data, message},提取 data 字段
+    const data = raw?.data || raw
     if (data && data.id) {
       article.value = data
     }

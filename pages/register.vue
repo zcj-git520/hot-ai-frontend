@@ -241,7 +241,7 @@ const sendVerificationCode = async () => {
     }, 1000)
   } catch (err: any) {
     console.error('Failed to send verification code:', err)
-    errorMessage.value = err.response?.data?.message || '验证码发送失败，请稍后重试'
+    errorMessage.value = err.message || '验证码发送失败，请稍后重试'
   } finally {
     sendingCode.value = false
   }
@@ -341,12 +341,10 @@ const handleRegister = async () => {
   } catch (err: any) {
     console.error('Registration failed:', err)
     
-    // 处理后端返回的验证错误
-    const backendError = err.response?.data
-    if (backendError?.errors) {
-      // 如果是字段级别的错误，映射到对应的字段
-      Object.keys(backendError.errors).forEach(field => {
-        const messages = backendError.errors[field]
+    // 处理后端返回的验证错误（响应拦截器已将 data 挂载到 err.data）
+    if (err.data?.errors) {
+      Object.keys(err.data.errors).forEach(field => {
+        const messages = err.data.errors[field]
         // 将后端的 password_confirm 映射到前端的 confirmPassword
         fieldErrors.value[field === 'password_confirm' ? 'confirmPassword' : field] = 
           Array.isArray(messages) ? messages[0] : messages
@@ -354,7 +352,7 @@ const handleRegister = async () => {
     }
     
     // 设置通用错误信息
-    errorMessage.value = backendError?.message || '注册失败，请稍后重试'
+    errorMessage.value = err.message || '注册失败，请稍后重试'
   } finally {
     loading.value = false
   }

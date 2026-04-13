@@ -252,8 +252,11 @@ const loading = ref(false)
 // 获取分类列表
 const { data: categories } = await useFetch('/api/articles/categories', {
   transform: (data) => {
-    console.log('[API] 分类数据:', data)
-    return data || []
+    console.log('[API] 分类原始数据:', data)
+    // 后端返回 {code, data, message},提取 data 字段
+    const responseData = data?.data || data
+    console.log('[API] 分类数据:', responseData)
+    return responseData || []
   }
 })
 
@@ -279,10 +282,13 @@ const fetchArticles = async () => {
     const { data } = await useFetch('/api/articles', {
       query: buildQuery(),
       transform: (res) => {
-        console.log('[API] 文章数据:', res)
-        totalCount.value = res?.total || 0
-        totalPages.value = res?.total_pages || 0
-        return res?.articles || []
+        console.log('[API] 文章原始数据:', res)
+        // 后端返回 {code, data, message},提取 data 字段
+        const responseData = res?.data || res
+        console.log('[API] 文章数据:', responseData)
+        totalCount.value = responseData?.total || 0
+        totalPages.value = responseData?.total_pages || 0
+        return responseData?.articles || []
       }
     })
     articles.value = data.value || []
@@ -297,10 +303,13 @@ const fetchArticles = async () => {
 const { data: articles } = await useFetch('/api/articles', {
   query: buildQuery(),
   transform: (res) => {
-    console.log('[API] 文章数据:', res)
-    totalCount.value = res?.total || 0
-    totalPages.value = res?.total_pages || 0
-    return res?.articles || []
+    console.log('[API] 文章原始数据:', res)
+    // 后端返回 {code, data, message},提取 data 字段
+    const responseData = res?.data || res
+    console.log('[API] 文章数据:', responseData)
+    totalCount.value = responseData?.total || 0
+    totalPages.value = responseData?.total_pages || 0
+    return responseData?.articles || []
   }
 })
 

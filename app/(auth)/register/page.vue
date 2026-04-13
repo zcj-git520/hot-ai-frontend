@@ -67,7 +67,8 @@ const sendVerificationCode = async () => {
       }
     }, 1000)
   } catch (err: any) {
-    error.value = err.data?.message || err.response?.data?.message || '验证码发送失败，请稍后重试'
+    // 响应拦截器已经处理了错误，err.message 包含后端返回的消息
+    error.value = err.message || '验证码发送失败，请稍后重试'
     codeSent.value = false
   } finally {
     sendingCode.value = false
@@ -167,19 +168,18 @@ const handleRegister = async () => {
       navigateTo('/login')
     }, 1000)
   } catch (err: any) {
-    // 处理后端返回的验证错误
-    const backendError = err.data || err.response?.data
-    if (backendError?.errors) {
-      // 如果是字段级别的错误，映射到对应的字段
-      Object.keys(backendError.errors).forEach(field => {
-        const messages = backendError.errors[field]
-        fieldErrors.value[field === 'password_confirm' ? 'confirmPassword' : field] = 
+    // 响应拦截器已经处理了错误
+    // 如果后端返回字段级别的错误信息（在 err.data.errors 中）
+    if (err.data?.errors) {
+      Object.keys(err.data.errors).forEach(field => {
+        const messages = err.data.errors[field]
+        fieldErrors.value[field === 'password_confirm' ? 'confirmPassword' : field] =
           Array.isArray(messages) ? messages[0] : messages
       })
     }
-    
+
     // 设置通用错误信息
-    error.value = backendError?.message || err.response?.data?.message || '注册失败，请稍后重试'
+    error.value = err.message || '注册失败，请稍后重试'
   } finally {
     loading.value = false
   }

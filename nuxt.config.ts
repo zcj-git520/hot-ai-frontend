@@ -44,39 +44,27 @@ export default defineNuxtConfig({
     optimizeDeps: {
       include: ['axios'],
     },
-    // 开发服务器代理配置
+    // 开发服务器代理配置 - 统一转发到 nginx (localhost:80),由 nginx 按路径分发到各微服务
     server: {
       proxy: {
-        '/api/home': {
-          target: 'http://localhost:8000',
+        '/api': {
+          target: 'http://localhost',
           changeOrigin: true,
         },
-        '/api/auth': {
-          target: 'http://localhost:8000',
+        '/auth': {
+          target: 'http://localhost',
           changeOrigin: true,
         },
-        '/api/user': {
-          target: 'http://localhost:8000',
+        '/user': {
+          target: 'http://localhost',
           changeOrigin: true,
         },
-        '/api/articles': {
-          target: 'http://localhost:8001',
+        '/learning-paths': {
+          target: 'http://localhost',
           changeOrigin: true,
         },
-        '/api/professions': {
-          target: 'http://localhost:8002',
-          changeOrigin: true,
-        },
-        '/api/learning-paths': {
-          target: 'http://localhost:8003',
-          changeOrigin: true,
-        },
-        '/api/chapters': {
-          target: 'http://localhost:8003',
-          changeOrigin: true,
-        },
-        '/api/tools': {
-          target: 'http://localhost:8004',
+        '/chapters': {
+          target: 'http://localhost',
           changeOrigin: true,
         },
       },

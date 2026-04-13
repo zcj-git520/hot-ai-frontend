@@ -189,9 +189,11 @@ const fetchProfessions = async () => {
     const { data } = await useFetch('/api/professions', {
       query: params,
       transform: (res: any) => {
-        totalCount.value = res?.total || 0
-        totalPages.value = res?.total_pages || 0
-        return res?.professions || []
+        // 后端返回 {code, data, message},提取 data 字段
+        const responseData = res?.data || res
+        totalCount.value = responseData?.total || 0
+        totalPages.value = responseData?.total_pages || 0
+        return responseData?.professions || []
       }
     })
     professions.value = data.value || []
@@ -206,9 +208,11 @@ const fetchProfessions = async () => {
 const { data: professions } = await useFetch('/api/professions', {
   query: { page: 1, page_size: 12 },
   transform: (res: any) => {
-    totalCount.value = res?.total || 0
-    totalPages.value = res?.total_pages || 0
-    return res?.professions || []
+    // 后端返回 {code, data, message},提取 data 字段
+    const responseData = res?.data || res
+    totalCount.value = responseData?.total || 0
+    totalPages.value = responseData?.total_pages || 0
+    return responseData?.professions || []
   }
 })
 

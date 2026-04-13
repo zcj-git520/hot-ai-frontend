@@ -33,16 +33,42 @@ const setupInterceptors = (client: typeof apiClient) => {
     }
   )
 
-  // 响应拦截器
+  // 响应拦截器 - 处理后端返回的 {code, data, message} 格式
   client.interceptors.response.use(
     (response) => {
       console.log('[API Response]', response.config.url, 'Success')
-      return response.data
+      const responseData = response.data
+
+      // 如果响应包含 code、data、message 字段，说明是标准格式
+      if (responseData && typeof responseData === 'object' && 'code' in responseData) {
+        // 成功响应 (code === 200 或 0)
+        if (responseData.code === 200 || responseData.code === 0) {
+          return responseData.data
+        } else {
+          // 业务错误
+          const error: any = new Error(responseData.message || '请求失败')
+          error.code = responseData.code
+          error.data = responseData.data
+          return Promise.reject(error)
+        }
+      }
+
+      // 兼容旧格式或非标准格式，直接返回数据
+      return responseData
     },
     (error) => {
       console.error('[API Error]', error.config?.url, error.response?.status, error.response?.data)
-      // 处理常见错误
+
+      // 处理 HTTP 错误
       if (error.response) {
+        const responseData = error.response.data
+
+        // 如果错误响应也包含标准格式
+        if (responseData && typeof responseData === 'object' && 'code' in responseData) {
+          error.code = responseData.code
+          error.message = responseData.message || error.message
+        }
+
         switch (error.response.status) {
           case 401:
             // 未授权，清除本地认证信息并跳转到登录页

@@ -250,7 +250,7 @@ const updateProfile = async () => {
     toastSuccess('个人资料已更新')
   } catch (err: any) {
     console.error('更新个人资料失败:', err)
-    toastError(err.response?.data?.message || err.data?.message || '更新失败', '更新错误')
+    toastError(err.message || '更新失败', '更新错误')
   } finally {
     submitting.value = false
   }
@@ -270,7 +270,7 @@ const changePassword = async () => {
     toastSuccess('密码已修改')
     passwordForm.value = { old_password: '', new_password: '' }
   } catch (err: any) {
-    passwordError.value = err.data?.message || err.response?.data?.message || '修改失败'
+    passwordError.value = err.message || '修改失败'
   } finally {
     submitting.value = false
   }

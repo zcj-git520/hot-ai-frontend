@@ -208,10 +208,11 @@ const id = route.params.id as string
 const { data: learningPath, error, pending: loading } = await useFetch(`/api/learning-paths/${id}`, {
   transform: (res: any) => {
     if (!res) return null
+    // 后端返回 {code, data, message},提取 data 字段
+    const responseData = res?.data || res
+    if (!responseData) return null
     // 后端直接返回对象
-    if (res.title) return res
-    // 尝试从 data 字段获取
-    if (res.data && res.data.title) return res.data
+    if (responseData.title) return responseData
     return null
   }
 })
@@ -220,9 +221,11 @@ const { data: learningPath, error, pending: loading } = await useFetch(`/api/lea
 const { data: chapters } = await useFetch(`/api/learning-paths/${id}/chapters`, {
   transform: (res: any) => {
     if (!res) return []
-    if (Array.isArray(res)) return res
-    if (res.data && Array.isArray(res.data)) return res.data
-    if (res.chapters && Array.isArray(res.chapters)) return res.chapters
+    // 后端返回 {code, data, message},提取 data 字段
+    const responseData = res?.data || res
+    if (!responseData) return []
+    if (Array.isArray(responseData)) return responseData
+    if (responseData.chapters && Array.isArray(responseData.chapters)) return responseData.chapters
     return []
   }
 })

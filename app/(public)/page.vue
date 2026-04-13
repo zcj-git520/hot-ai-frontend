@@ -193,8 +193,11 @@ const { data: latestArticles } = await useFetch('/api/articles', {
     page_size: 3
   },
   transform: (data) => {
-    console.log('[API] 首页最新资讯:', data)
-    return data?.articles || []
+    console.log('[API] 首页最新资讯原始数据:', data)
+    // 后端返回 {code, data, message},提取 data 字段
+    const responseData = data?.data || data
+    console.log('[API] 首页最新资讯:', responseData)
+    return responseData?.articles || []
   }
 })
 </script>

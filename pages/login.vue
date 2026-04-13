@@ -111,7 +111,7 @@ const handleLogin = async () => {
     navigateTo('/')
   } catch (err: any) {
     console.error('Login failed:', err)
-    error.value = err.response?.data?.message || '登录失败，请检查邮箱和密码'
+    error.value = err.message || '登录失败，请检查邮箱和密码'
   } finally {
     loading.value = false
   }
