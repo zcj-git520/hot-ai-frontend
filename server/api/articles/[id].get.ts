@@ -1,6 +1,8 @@
 export default defineEventHandler(async (event) => {
-  const id = event.context.params?.id
-  const url = `http://localhost:8001/api/articles/${id}`
+  const config = useRuntimeConfig()
+  const apiUrl = config.public.apiBaseUrl as string
+  const id = getRouterParam(event, 'id')
+  const url = `${apiUrl}/articles/${id}`
   const res = await fetch(url)
   return await res.json()
 })

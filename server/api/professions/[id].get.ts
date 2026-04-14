@@ -1,8 +1,8 @@
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const apiUrl = config.public.apiBaseUrl as string
-  const chapterId = getRouterParam(event, 'chapterId')
-  const url = `${apiUrl}/learning-paths/chapters/${chapterId}`
+  const id = getRouterParam(event, 'id')
+  const url = `${apiUrl}/professions/${id}`
   const res = await fetch(url)
   return await res.json()
 })
