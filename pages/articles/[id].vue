@@ -109,7 +109,8 @@
             返回列表
           </NuxtLink>
           <a
-            :href="article.url"
+            v-if="article.original_url"
+            :href="article.original_url"
             target="_blank"
             rel="noopener noreferrer"
             class="flex items-center gap-2 px-4 py-2 bg-[#238636] hover:bg-[#2ea043] text-white rounded-md text-sm font-medium transition-colors"

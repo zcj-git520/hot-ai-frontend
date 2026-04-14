@@ -146,7 +146,19 @@
             <!-- 来源 -->
             <div class="flex items-center justify-between text-xs text-[#8b949e] pt-3 border-t border-[#30363d]">
               <span>来源：{{ article.source_name }}</span>
-              <span class="text-[#58a6ff] group-hover:text-[#79c0ff] transition-colors">阅读全文 →</span>
+              <div class="flex items-center gap-2">
+                <a
+                  v-if="article.original_url"
+                  :href="article.original_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-green-400 hover:text-green-300 transition-colors"
+                  @click.stop
+                >
+                  查看原文 →
+                </a>
+                <span class="text-[#58a6ff] group-hover:text-[#79c0ff] transition-colors">阅读全文 →</span>
+              </div>
             </div>
           </article>
         </div>
