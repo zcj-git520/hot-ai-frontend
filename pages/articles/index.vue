@@ -132,7 +132,7 @@
             <h3 class="text-base sm:text-lg font-bold text-white group-hover:text-[#58a6ff] transition-colors mb-2 sm:mb-3 leading-snug">
               {{ article.title }}
             </h3>
-            <p class="text-[#8b949e] text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-3" v-html="article.summary"></p>
+            <div class="text-[#8b949e] text-xs sm:text-sm mb-3 sm:mb-4" v-html="article.summary"></div>
             
             <!-- 统计信息 - 与首页统一使用 emoji -->
             <div class="flex items-center gap-3 sm:gap-4 text-xs text-[#8b949e] mb-3">

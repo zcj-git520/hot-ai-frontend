@@ -9,6 +9,8 @@
               <span class="text-2xl sm:text-3xl">🤖</span>
               <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">AI 热点追踪</span>
             </NuxtLink>
+            
+            <!-- 桌面端导航 -->
             <nav class="hidden lg:flex items-center gap-6">
               <NuxtLink to="/" class="text-white hover:text-[#58a6ff] transition-colors font-medium">首页</NuxtLink>
               <NuxtLink to="/articles" class="text-[#8b949e] hover:text-white transition-colors font-medium">资讯</NuxtLink>
@@ -17,7 +19,19 @@
               <NuxtLink to="/tools" class="text-[#8b949e] hover:text-white transition-colors font-medium">工具库</NuxtLink>
             </nav>
           </div>
+          
           <div class="flex items-center gap-2 sm:gap-4">
+            <!-- 移动端汉堡菜单按钮 -->
+            <button 
+              @click="mobileMenuOpen = !mobileMenuOpen"
+              class="lg:hidden text-[#8b949e] hover:text-white transition-colors p-2"
+            >
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path v-if="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
             <template v-if="user">
               <!-- 已登录：显示用户信息 -->
               <NuxtLink to="/profile" class="flex items-center gap-2 text-[#8b949e] hover:text-white transition-colors">
@@ -41,6 +55,17 @@
               </NuxtLink>
             </template>
           </div>
+        </div>
+        
+        <!-- 移动端下拉菜单 -->
+        <div v-if="mobileMenuOpen" class="lg:hidden mt-4 pt-4 border-t border-[#30363d]">
+          <nav class="flex flex-col gap-3">
+            <NuxtLink to="/" class="text-white hover:text-[#58a6ff] transition-colors font-medium py-2" @click="mobileMenuOpen = false">首页</NuxtLink>
+            <NuxtLink to="/articles" class="text-[#8b949e] hover:text-white transition-colors font-medium py-2" @click="mobileMenuOpen = false">资讯</NuxtLink>
+            <NuxtLink to="/professions" class="text-[#8b949e] hover:text-white transition-colors font-medium py-2" @click="mobileMenuOpen = false">职业风险</NuxtLink>
+            <NuxtLink to="/learning-paths" class="text-[#8b949e] hover:text-white transition-colors font-medium py-2" @click="mobileMenuOpen = false">学习路径</NuxtLink>
+            <NuxtLink to="/tools" class="text-[#8b949e] hover:text-white transition-colors font-medium py-2" @click="mobileMenuOpen = false">工具库</NuxtLink>
+          </nav>
         </div>
       </div>
     </header>
@@ -103,9 +128,8 @@
                     <h3 class="text-base sm:text-lg font-bold text-white group-hover:text-[#58a6ff] transition-colors mb-2 leading-snug">
                       {{ article.title }}
                     </h3>
-                    <p class="text-[#8b949e] text-xs sm:text-sm leading-relaxed mb-3 line-clamp-2">
-                      {{ article.summary }}
-                    </p>
+                    <div class="text-[#8b949e] text-xs sm:text-sm leading-relaxed mb-3" v-html="article.summary">
+                    </div>
                     <div class="flex items-center gap-4 sm:gap-6 text-xs text-[#8b949e]">
                       <span>👁️ {{ article.views }}</span>
                       <span>💬 {{ article.comments }}</span>
@@ -269,6 +293,7 @@ const handleLogout = async () => {
 }
 
 // 状态数据
+const mobileMenuOpen = ref(false)
 const stats = ref({
   articles: 0,
   professions: 0,
