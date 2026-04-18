@@ -72,9 +72,6 @@
           <h1 class="text-2xl sm:text-3xl font-bold text-white mb-4 leading-tight">
             {{ article.title }}
           </h1>
-          <p v-if="article.summary" class="text-[#8b949e] text-base leading-relaxed">
-            {{ article.summary }}
-          </p>
         </div>
 
         <!-- 统计栏 -->

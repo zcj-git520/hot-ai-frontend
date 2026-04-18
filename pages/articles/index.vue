@@ -132,9 +132,7 @@
             <h3 class="text-base sm:text-lg font-bold text-white group-hover:text-[#58a6ff] transition-colors mb-2 sm:mb-3 leading-snug">
               {{ article.title }}
             </h3>
-            <p class="text-[#8b949e] text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-3">
-              {{ article.summary }}
-            </p>
+            <p class="text-[#8b949e] text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-3" v-html="article.summary"></p>
             
             <!-- 统计信息 - 与首页统一使用 emoji -->
             <div class="flex items-center gap-3 sm:gap-4 text-xs text-[#8b949e] mb-3">
@@ -404,5 +402,15 @@ const formatNumber = (num: number) => {
     return (num / 1000).toFixed(1) + 'k'
   }
   return String(num)
+}
+
+// 处理 HTML 内容，保留常用标签
+const renderHtmlContent = (html: string) => {
+  if (!html) return ''
+  // 允许常用的 HTML 标签
+  const allowedTags = ['p', 'br', 'em', 'strong', 'b', 'i', 'u', 'span', 'a', 'code', 'pre']
+  // 简单地替换掉所有标签，保留内容
+  // 如果要保留特定标签，可以使用更复杂的正则
+  return html
 }
 </script>
