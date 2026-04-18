@@ -132,6 +132,17 @@
               <Icons name="bookmark" />
               <span class="text-sm">{{ article.is_favorited ? '已收藏' : '收藏' }}</span>
             </button>
+            <a
+              v-if="article.original_url"
+              :href="article.original_url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center gap-1 text-green-600 hover:text-green-700 text-sm font-medium"
+              @click.stop
+            >
+              查看原文
+              <Icons name="external-link" />
+            </a>
             <NuxtLink 
               :to="`/articles/${article.id}`"
               class="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium"

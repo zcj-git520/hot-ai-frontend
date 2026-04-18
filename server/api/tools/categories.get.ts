@@ -1,5 +1,7 @@
 export default defineEventHandler(async () => {
-  const url = 'http://localhost:8004/api/tools/categories'
+  const config = useRuntimeConfig()
+  const apiUrl = config.public.apiBaseUrl as string
+  const url = `${apiUrl}/tools/categories`
   const res = await fetch(url)
   return await res.json()
 })
