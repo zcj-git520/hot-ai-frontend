@@ -273,4 +273,88 @@ export const userApi = {
   },
 }
 
+// Admin API - 管理后台接口
+export const adminApi = {
+  learningPath: {
+    // 获取学习路径列表
+    getList(params?: {
+      page?: number
+      pageSize?: number
+      difficulty?: string
+      status?: number
+      search?: string
+    }) {
+      const backendParams: any = {}
+      if (params?.page) backendParams.page = params.page
+      if (params?.pageSize) backendParams.page_size = params.pageSize
+      if (params?.difficulty) backendParams.difficulty = params.difficulty
+      if (params?.status !== undefined) backendParams.status = params.status
+      if (params?.search) backendParams.search = params.search
+      return apiClient.get('/admin/learning-paths', { params: backendParams })
+    },
+
+    // 获取学习路径详情
+    getById(id: string | number) {
+      return apiClient.get(`/admin/learning-paths/${id}`)
+    },
+
+    // 创建学习路径
+    create(data: any) {
+      return apiClient.post('/admin/learning-paths', data)
+    },
+
+    // 更新学习路径
+    update(id: string | number, data: any) {
+      return apiClient.put(`/admin/learning-paths/${id}`, data)
+    },
+
+    // 删除学习路径 (软删除)
+    delete(id: string | number) {
+      return apiClient.delete(`/admin/learning-paths/${id}`)
+    },
+
+    // 发布
+    publish(id: string | number) {
+      return apiClient.post(`/admin/learning-paths/${id}/publish`)
+    },
+
+    // 下架
+    unpublish(id: string | number) {
+      return apiClient.post(`/admin/learning-paths/${id}/unpublish`)
+    },
+
+    // 设置推荐
+    setFeatured(id: string | number, featured: boolean) {
+      return apiClient.post(`/admin/learning-paths/${id}/feature`, { featured })
+    },
+  },
+
+  chapter: {
+    // 获取章节列表
+    getListByPath(pathId: string | number) {
+      return apiClient.get(`/admin/learning-paths/${pathId}/chapters`)
+    },
+
+    // 获取章节详情
+    getById(id: string | number) {
+      return apiClient.get(`/admin/chapters/${id}`)
+    },
+
+    // 创建章节
+    create(pathId: string | number, data: any) {
+      return apiClient.post(`/admin/learning-paths/${pathId}/chapters`, data)
+    },
+
+    // 更新章节
+    update(id: string | number, data: any) {
+      return apiClient.put(`/admin/chapters/${id}`, data)
+    },
+
+    // 删除章节 (软删除)
+    delete(id: string | number) {
+      return apiClient.delete(`/admin/chapters/${id}`)
+    },
+  },
+}
+
 export default apiClient

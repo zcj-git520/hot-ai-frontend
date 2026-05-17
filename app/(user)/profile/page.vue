@@ -1,155 +1,192 @@
 <template>
-  <div class="min-h-screen bg-[#0d1117]">
-    <!-- 顶部导航栏 -->
-    <header class="border-b border-[#30363d] bg-[#161b22]/80 backdrop-blur-sm sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-6 py-4">
-        <div class="flex items-center justify-between">
-          <NuxtLink to="/" class="text-2xl font-bold text-white flex items-center gap-2">
-            <span class="text-3xl">🤖</span>
-            <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">AI 热点追踪</span>
-          </NuxtLink>
-          <div class="flex items-center gap-4">
-            <template v-if="user">
-              <NuxtLink to="/profile" class="flex items-center gap-2 text-[#8b949e] hover:text-white transition-colors">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold text-sm">
-                  {{ user.nickname?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U' }}
-                </div>
-                <span class="font-medium hidden sm:block">{{ user.nickname || user.email }}</span>
-              </NuxtLink>
-              <button 
-                @click="handleLogout"
-                class="text-[#8b949e] hover:text-white transition-colors font-medium text-sm"
+  <div class="min-h-screen">
+    <!-- 页面标题 -->
+    <div class="mb-8">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-1 h-8 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></div>
+        <h1 class="font-tech text-3xl font-bold tracking-wider">个人中心</h1>
+      </div>
+      <p class="text-gray-500 font-mono text-sm ml-4">
+        <span class="text-cyan-400">//</span> 管理你的个人信息和账户设置 <span class="text-cyan-400">//</span>
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- 侧边栏 -->
+      <div class="lg:col-span-1">
+        <div class="glass-card neon-border p-6 sticky top-24">
+          <!-- 用户头像 -->
+          <div class="text-center mb-6">
+            <div class="relative inline-block">
+              <div class="w-24 h-24 rounded-full bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center text-3xl font-tech font-bold text-white mx-auto mb-4">
+                {{ user?.nickname?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U' }}
+              </div>
+              <div class="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-[var(--bg-card)]"></div>
+            </div>
+            <h2 class="text-xl font-semibold text-white">{{ user?.nickname || '用户' }}</h2>
+            <p class="text-sm text-gray-500">{{ user?.email }}</p>
+          </div>
+
+          <!-- 状态 -->
+          <div class="flex items-center justify-center gap-2 py-3 border-t border-b border-cyan-500/10 mb-6">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span class="text-xs text-gray-500 font-mono">ONLINE</span>
+          </div>
+
+          <!-- 菜单 -->
+          <nav class="space-y-1">
+            <a href="#profile" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              个人资料
+            </a>
+            <a href="#password" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-500 hover:text-cyan-400 hover:bg-cyan-500/5 transition-all">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+              </svg>
+              修改密码
+            </a>
+          </nav>
+
+          <!-- 返回首页 -->
+          <div class="mt-6 pt-6 border-t border-cyan-500/10">
+            <NuxtLink to="/" class="flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-cyan-400 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+              返回首页
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+
+      <!-- 主内容 -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- 错误提示 -->
+        <div v-if="loadError" class="glass-card p-4 border border-red-500/30">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-red-400 text-sm flex-1">{{ loadError }}</p>
+            <button @click="loadError = ''" class="text-gray-500 hover:text-red-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 加载状态 -->
+        <div v-if="loading && !profileLoaded" class="glass-card p-12 text-center">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-2 border-cyan-500/30 border-t-cyan-500 mb-4"></div>
+          <p class="text-gray-500">加载中...</p>
+        </div>
+
+        <template v-else>
+          <!-- 基本信息卡片 -->
+          <div id="profile" class="glass-card neon-border p-6">
+            <h3 class="font-tech text-lg font-semibold text-white mb-6 flex items-center gap-2">
+              <span class="text-cyan-400">01</span>
+              基本信息
+            </h3>
+
+            <form @submit.prevent="updateProfile" class="space-y-5">
+              <div>
+                <label class="block text-sm font-mono text-gray-400 mb-2">
+                  <span class="text-cyan-400">//</span> 昵称
+                </label>
+                <input
+                  v-model="profileForm.nickname"
+                  type="text"
+                  class="input-cyber"
+                  placeholder="your_nickname"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-mono text-gray-400 mb-2">
+                  <span class="text-cyan-400">//</span> 个人简介
+                </label>
+                <textarea
+                  v-model="profileForm.bio"
+                  rows="3"
+                  class="input-cyber resize-none"
+                  placeholder="介绍一下自己..."
+                ></textarea>
+              </div>
+
+              <button
+                type="submit"
+                :disabled="submitting"
+                class="btn-cyber disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                退出
+                {{ submitting ? '保存中...' : '保存修改' }}
               </button>
-            </template>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <div class="max-w-4xl mx-auto px-6 py-8">
-      <h1 class="text-3xl font-bold text-white mb-8">个人中心</h1>
-
-      <!-- 错误提示 -->
-      <div v-if="loadError" class="mb-6 p-4 bg-red-900/20 border border-red-800 rounded-md flex items-start gap-3">
-        <svg class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        <div class="flex-1">
-          <p class="text-red-400 text-sm">{{ loadError }}</p>
-        </div>
-        <button @click="loadError = ''" class="text-red-400 hover:text-red-300 flex-shrink-0">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-      </div>
-
-      <!-- 加载状态 -->
-      <div v-if="loading && !profileLoaded" class="text-center py-12">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#58a6ff]"></div>
-        <p class="text-[#8b949e] mt-4">加载中...</p>
-      </div>
-
-      <div v-else class="space-y-6">
-        <!-- 基本信息卡片 -->
-        <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-6">
-          <h2 class="text-xl font-bold text-white mb-6">基本信息</h2>
-          
-          <div class="flex items-center space-x-4 mb-6">
-            <div class="h-20 w-20 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-2xl font-bold text-white">
-              {{ user?.nickname?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U' }}
-            </div>
-            <div>
-              <h3 class="text-xl font-bold text-white mb-1">{{ user?.nickname }}</h3>
-              <p class="text-[#8b949e]">{{ user?.email }}</p>
-            </div>
+            </form>
           </div>
 
-          <form @submit.prevent="updateProfile" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-[#8b949e] mb-2">昵称</label>
-              <input
-                v-model="profileForm.nickname"
-                type="text"
-                class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
-                placeholder="请输入昵称"
-              />
-            </div>
+          <!-- 修改密码卡片 -->
+          <div id="password" class="glass-card neon-border p-6">
+            <h3 class="font-tech text-lg font-semibold text-white mb-6 flex items-center gap-2">
+              <span class="text-cyan-400">02</span>
+              修改密码
+            </h3>
 
-            <div>
-              <label class="block text-sm font-medium text-[#8b949e] mb-2">个人简介</label>
-              <textarea
-                v-model="profileForm.bio"
-                rows="3"
-                class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
-                placeholder="介绍一下自己吧..."
-              ></textarea>
-            </div>
+            <form @submit.prevent="changePassword" class="space-y-5">
+              <div>
+                <label class="block text-sm font-mono text-gray-400 mb-2">
+                  <span class="text-cyan-400">//</span> 当前密码
+                </label>
+                <input
+                  v-model="passwordForm.old_password"
+                  type="password"
+                  required
+                  class="input-cyber"
+                  placeholder="••••••••"
+                />
+              </div>
 
-            <button
-              type="submit"
-              :disabled="submitting"
-              class="w-full bg-[#238636] hover:bg-[#2ea043] disabled:bg-[#30363d] disabled:cursor-not-allowed text-white font-medium py-3 rounded-md transition-all shadow-lg hover:shadow-xl"
-            >
-              {{ submitting ? '保存中...' : '保存修改' }}
-            </button>
-          </form>
-        </div>
+              <div>
+                <label class="block text-sm font-mono text-gray-400 mb-2">
+                  <span class="text-cyan-400">//</span> 新密码
+                </label>
+                <input
+                  v-model="passwordForm.new_password"
+                  type="password"
+                  required
+                  minlength="8"
+                  class="input-cyber"
+                  placeholder="至少 8 位"
+                />
+              </div>
 
-        <!-- 修改密码卡片 -->
-        <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-6">
-          <h2 class="text-xl font-bold text-white mb-6">修改密码</h2>
-          
-          <form @submit.prevent="changePassword" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-[#8b949e] mb-2">当前密码</label>
-              <input
-                v-model="passwordForm.old_password"
-                type="password"
-                required
-                class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
-                placeholder="请输入当前密码"
-              />
-            </div>
+              <div v-if="passwordError" class="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+                <p class="text-xs text-red-400 font-mono">{{ passwordError }}</p>
+              </div>
 
-            <div>
-              <label class="block text-sm font-medium text-[#8b949e] mb-2">新密码</label>
-              <input
-                v-model="passwordForm.new_password"
-                type="password"
-                required
-                minlength="8"
-                class="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all"
-                placeholder="至少 8 位，包含大写字母、小写字母、数字和特殊字符"
-              />
-            </div>
-
-            <div v-if="passwordError" class="p-3 bg-red-900/20 border border-red-800 rounded-md">
-              <p class="text-red-400 text-sm">{{ passwordError }}</p>
-            </div>
-
-            <button
-              type="submit"
-              :disabled="submitting"
-              class="w-full bg-[#238636] hover:bg-[#2ea043] disabled:bg-[#30363d] disabled:cursor-not-allowed text-white font-medium py-3 rounded-md transition-all shadow-lg hover:shadow-xl"
-            >
-              {{ submitting ? '修改中...' : '修改密码' }}
-            </button>
-          </form>
-        </div>
+              <button
+                type="submit"
+                :disabled="submitting"
+                class="btn-cyber disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {{ submitting ? '修改中...' : '修改密码' }}
+              </button>
+            </form>
+          </div>
+        </template>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
 import { userApi } from '~/app/lib/api'
 import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({
+  layout: 'default',
   middleware: 'auth'
 })
 
@@ -171,43 +208,32 @@ const passwordForm = ref({
   new_password: ''
 })
 
-// 加载用户信息
 onMounted(async () => {
   loading.value = true
   loadError.value = ''
-  
+
   try {
-    // 先从本地 user 状态加载，如果没有再调用 API
     if (user.value) {
       profileForm.value.nickname = user.value.nickname || ''
       profileForm.value.bio = user.value.bio || ''
       profileLoaded.value = true
     }
-    
-    // 尝试从 API 获取最新数据
+
     try {
       const userData = await userApi.getProfile()
-      console.log('获取用户信息成功:', userData)
       profileForm.value.nickname = userData.nickname || ''
       profileForm.value.bio = userData.bio || ''
       profileLoaded.value = true
     } catch (apiError: any) {
-      console.error('API 获取用户信息失败:', apiError)
-      // 如果 API 失败但有本地数据，不显示错误
       if (!user.value) {
-        loadError.value = apiError.response?.data?.message || apiError.data?.message || '加载用户信息失败，请重新登录'
-        
-        // 如果是 401 错误，跳转到登录页
+        loadError.value = apiError.data?.message || '加载用户信息失败'
         if (apiError.response?.status === 401) {
-          setTimeout(() => {
-            navigateTo('/login')
-          }, 2000)
+          setTimeout(() => navigateTo('/login'), 2000)
         }
       }
     }
   } catch (err: any) {
-    console.error('加载用户信息失败:', err)
-    loadError.value = '加载失败，请刷新页面重试'
+    loadError.value = '加载失败'
   } finally {
     loading.value = false
   }
@@ -217,15 +243,13 @@ const updateProfile = async () => {
   submitting.value = true
   try {
     await userApi.updateProfile(profileForm.value)
-    // 更新本地用户状态
     if (user.value) {
       user.value.nickname = profileForm.value.nickname
       user.value.bio = profileForm.value.bio
     }
     alert('个人资料已更新')
   } catch (err: any) {
-    console.error('更新个人资料失败:', err)
-    alert(err.response?.data?.message || err.data?.message || '更新失败')
+    alert(err.data?.message || '更新失败')
   } finally {
     submitting.value = false
   }
@@ -245,7 +269,7 @@ const changePassword = async () => {
     alert('密码已修改')
     passwordForm.value = { old_password: '', new_password: '' }
   } catch (err: any) {
-    passwordError.value = err.data?.message || err.response?.data?.message || '修改失败'
+    passwordError.value = err.data?.message || '修改失败'
   } finally {
     submitting.value = false
   }

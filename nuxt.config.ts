@@ -37,6 +37,8 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       ],
     },
+    // Enable file-based routing using pages directory
+    pages: 'auto',
   },
 
   // Vite 配置
@@ -55,8 +57,6 @@ export default defineNuxtConfig({
           '/api': { target, changeOrigin: true },
           '/auth': { target, changeOrigin: true },
           '/user': { target, changeOrigin: true },
-          '/learning-paths': { target, changeOrigin: true },
-          '/chapters': { target, changeOrigin: true },
         }
       })(),
     },
@@ -75,5 +75,8 @@ export default defineNuxtConfig({
   // Nitro 配置
   nitro: {
     compressPublicAssets: true,
+    routeRules: {
+      '/admin/**': { ssr: false },
+    },
   },
 })

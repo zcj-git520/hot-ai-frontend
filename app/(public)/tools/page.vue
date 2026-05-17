@@ -1,30 +1,37 @@
 <template>
   <div>
+    <!-- 页面标题 -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-4">AI 工具库</h1>
-      <p class="text-gray-600">
-        汇总最新、最实用的 AI 工具，助你提升工作效率
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-1 h-8 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></div>
+        <h1 class="font-tech text-3xl font-bold tracking-wider">AI 工具库</h1>
+      </div>
+      <p class="text-gray-500 font-mono text-sm ml-4">
+        <span class="text-cyan-400">//</span> 汇总最新、最实用的 AI 工具，助你提升工作效率 <span class="text-cyan-400">//</span>
       </p>
     </div>
 
-    <!-- 搜索和筛选区域 -->
-    <div class="bg-white rounded-xl shadow-sm border p-6 mb-8">
+    <!-- 搜索和筛选 -->
+    <div class="glass-card neon-border p-6 mb-8">
       <div class="flex flex-col md:flex-row gap-4">
         <!-- 搜索框 -->
-        <div class="flex-1">
+        <div class="relative flex-1">
+          <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
           <input
             v-model="searchQuery"
             type="text"
             placeholder="搜索工具，例如：ChatGPT、Midjourney..."
-            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="input-cyber pl-12"
           />
         </div>
 
         <!-- 类别筛选 -->
-        <div class="relative">
+        <div class="relative min-w-[160px]">
           <select
             v-model="selectedCategory"
-            class="px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+            class="input-cyber appearance-none pr-10 cursor-pointer"
           >
             <option value="">全部类别</option>
             <option
@@ -35,76 +42,85 @@
               {{ category.name }}
             </option>
           </select>
-          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-              <path d="M9.293 12.95l.707.707c.293.293.767.293 1.06 0l.707-.707c.293-.293.293-.767 0-1.06s-.767-.293-1.06 0l-.707.707-1.868-1.868c-.275-.275-.685-.4-.934-.503s-.583-.17-.745-.099s-.28.36-.26.839l1.868 1.868z"/>
-            </svg>
-          </div>
+          <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
         </div>
 
         <!-- 排序 -->
-        <div class="relative">
+        <div class="relative min-w-[160px]">
           <select
             v-model="sortBy"
-            class="px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+            class="input-cyber appearance-none pr-10 cursor-pointer"
           >
             <option value="popularity">热门排序</option>
             <option value="rating">评分排序</option>
             <option value="update_time">更新时间</option>
           </select>
-          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-              <path d="M9.293 12.95l.707.707c.293.293.767.293 1.06 0l.707-.707c.293-.293.293-.767 0-1.06s-.767-.293-1.06 0l-.707.707-1.868-1.868c-.275-.275-.685-.4-.934-.503s-.583-.17-.745-.099s-.28.36-.26.839l1.868 1.868z"/>
-            </svg>
-          </div>
+          <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
         </div>
       </div>
     </div>
 
+    <!-- 加载状态 -->
+    <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-for="i in 6" :key="i" class="glass-card p-6">
+        <div class="skeleton h-6 w-24 mb-4"></div>
+        <div class="skeleton h-6 w-full mb-2"></div>
+        <div class="skeleton h-4 w-3/4 mb-4"></div>
+        <div class="skeleton h-4 w-full"></div>
+      </div>
+    </div>
+
+    <!-- 错误状态 -->
+    <div v-else-if="error" class="glass-card p-6 border border-red-500/30">
+      <p class="text-red-400 text-center">{{ error }}</p>
+    </div>
+
     <!-- 工具列表 -->
-    <div v-if="loading" class="text-center py-12">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      <p class="text-gray-500 mt-2">加载中...</p>
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <NuxtLink
+        v-for="tool in tools"
+        :key="tool.id"
+        :to="`/tools/${tool.slug}`"
+        class="glass-card card-decoration p-6 group hover:border-cyan-400/50 transition-all duration-300"
+      >
+        <ToolCard :tool="tool" />
+      </NuxtLink>
     </div>
 
-    <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-      {{ error }}
+    <!-- 空状态 -->
+    <div v-if="!loading && tools.length === 0" class="glass-card p-12 text-center">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center">
+        <svg class="w-8 h-8 text-cyan-500/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </div>
+      <p class="text-gray-400">未找到工具</p>
     </div>
 
-    <div v-else>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <NuxtLink
-          v-for="tool in tools"
-          :key="tool.id"
-          :to="`/tools/${tool.slug}`"
-          class="block"
-        >
-          <ToolCard :tool="tool" />
-        </NuxtLink>
-      </div>
-
-      <!-- 分页 -->
-      <div class="flex justify-center items-center gap-4 mb-8">
-        <button
-          @click="currentPage--"
-          :disabled="currentPage <= 1"
-          class="px-4 py-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-        >
-          上一页
-        </button>
-
-        <span class="text-gray-700">
-          {{ currentPage }} / {{ totalPages }}
-        </span>
-
-        <button
-          @click="currentPage++"
-          :disabled="currentPage >= totalPages"
-          class="px-4 py-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-        >
-          下一页
-        </button>
-      </div>
+    <!-- 分页 -->
+    <div v-if="totalPages > 1 && !loading" class="flex justify-center items-center gap-4">
+      <button
+        @click="currentPage--"
+        :disabled="currentPage <= 1"
+        class="btn-cyber-ghost disabled:opacity-30 disabled:cursor-not-allowed"
+      >
+        上一页
+      </button>
+      <span class="text-sm text-gray-500 font-mono">
+        {{ currentPage }} / {{ totalPages }}
+      </span>
+      <button
+        @click="currentPage++"
+        :disabled="currentPage >= totalPages"
+        class="btn-cyber-ghost disabled:opacity-30 disabled:cursor-not-allowed"
+      >
+        下一页
+      </button>
     </div>
   </div>
 </template>
@@ -114,11 +130,9 @@ definePageMeta({
   layout: 'default'
 })
 
-// 导入工具类型
 import type { Tool, ToolCategory } from '~/types/tool'
 import ToolCard from '~/components/ToolCard.vue'
 
-// 定义响应式数据
 const searchQuery = ref('')
 const selectedCategory = ref('')
 const sortBy = ref('popularity')
@@ -130,7 +144,6 @@ const loading = ref(false)
 const error = ref('')
 const totalPages = ref(1)
 
-// 获取工具类别 - 使用Nuxt 3的API调用方式
 const fetchCategories = async () => {
   try {
     const response = await $fetch('/api/tools/categories')
@@ -139,11 +152,9 @@ const fetchCategories = async () => {
     }
   } catch (err) {
     error.value = '获取工具类别失败'
-    console.error('获取工具类别失败:', err)
   }
 }
 
-// 获取工具列表 - 使用Nuxt 3的API调用方式
 const fetchTools = async () => {
   loading.value = true
   error.value = ''
@@ -173,25 +184,21 @@ const fetchTools = async () => {
     }
   } catch (err) {
     error.value = '网络错误，获取工具列表失败'
-    console.error('获取工具列表失败:', err)
   } finally {
     loading.value = false
   }
 }
 
-// 初始化数据
 onMounted(() => {
   fetchCategories()
   fetchTools()
 })
 
-// 监听搜索和筛选条件变化
 watch([searchQuery, selectedCategory, sortBy], () => {
   currentPage.value = 1
   fetchTools()
 })
 
-// 监听分页变化
 watch(currentPage, () => {
   if (currentPage.value >= 1) {
     fetchTools()
