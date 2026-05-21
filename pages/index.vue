@@ -21,6 +21,10 @@
           </div>
           
           <div class="flex items-center gap-2 sm:gap-4">
+            <NuxtLink to="/admin" class="flex items-center gap-2 text-[#8b949e] hover:text-white transition-colors bg-[#238636] hover:bg-[#2ea043] px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium">
+              管理后台
+            </NuxtLink>
+
             <!-- 移动端汉堡菜单按钮 -->
             <button 
               @click="mobileMenuOpen = !mobileMenuOpen"

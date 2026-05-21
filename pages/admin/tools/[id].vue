@@ -27,17 +27,6 @@
             <p class="mt-4"><span class="text-gray-500">描述:</span> {{ tool.description || '-' }}</p>
           </div>
 
-          <!-- 同类别对比 -->
-          <div v-if="similarTools.length" class="mb-8">
-            <h2 class="text-lg font-semibold mb-4">同类别已有工具</h2>
-            <div class="grid grid-cols-3 gap-4">
-              <div v-for="t in similarTools" :key="t.id" class="border rounded p-4">
-                <div class="font-medium">{{ t.name }}</div>
-                <div class="text-sm text-gray-500">{{ t.pricing || '-' }}</div>
-              </div>
-            </div>
-          </div>
-
           <!-- 审核历史 -->
           <div class="mb-8">
             <h2 class="text-lg font-semibold mb-4">审核历史</h2>
@@ -53,7 +42,7 @@
 
           <!-- 操作按钮 -->
           <div class="flex gap-4 items-start">
-            <button @click="approve" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <button @click="handleApprove" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
               通过
             </button>
             <button @click="showRejectModal = true" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
@@ -72,7 +61,7 @@
             <textarea v-model="rejectReason" class="w-full border p-2 rounded mb-4" rows="4" placeholder="请输入拒绝原因"></textarea>
             <div class="flex justify-end gap-2">
               <button @click="showRejectModal = false" class="px-4 py-2 border rounded">取消</button>
-              <button @click="reject" class="px-4 py-2 bg-red-600 text-white rounded">确定拒绝</button>
+              <button @click="handleReject" class="px-4 py-2 bg-red-600 text-white rounded">确定拒绝</button>
             </div>
           </div>
         </div>
@@ -84,7 +73,7 @@
             <textarea v-model="revisionReason" class="w-full border p-2 rounded mb-4" rows="4" placeholder="请输入退回原因"></textarea>
             <div class="flex justify-end gap-2">
               <button @click="showRevisionModal = false" class="px-4 py-2 border rounded">取消</button>
-              <button @click="requestRevision" class="px-4 py-2 bg-yellow-500 text-white rounded">确定退回</button>
+              <button @click="handleRequestRevision" class="px-4 py-2 bg-yellow-500 text-white rounded">确定退回</button>
             </div>
           </div>
         </div>
@@ -94,13 +83,14 @@
 </template>
 
 <script setup lang="ts">
+import { adminApi } from '~/lib/api'
+
 const route = useRoute()
 const toolId = route.params.id as string
 
 const loading = ref(true)
 const tool = ref<any>(null)
 const reviews = ref<any[]>([])
-const similarTools = ref<any[]>([])
 const showRejectModal = ref(false)
 const showRevisionModal = ref(false)
 const rejectReason = ref('')
@@ -108,14 +98,9 @@ const revisionReason = ref('')
 
 async function fetchToolDetail() {
   try {
-    const response = await fetch(`/api/admin/tools/${toolId}`)
-    const result = await response.json()
-
-    if (result.code === 0) {
-      tool.value = result.data.tool
-      reviews.value = result.data.reviews || []
-      // TODO: 获取同类别工具
-    }
+    const data = await adminApi.tool.getToolDetail(toolId)
+    tool.value = data.tool
+    reviews.value = data.reviews || []
   } catch (error) {
     console.error('获取工具详情失败:', error)
   } finally {
@@ -141,64 +126,39 @@ function formatAction(action: string) {
   return map[action] || action
 }
 
-async function approve() {
+async function handleApprove() {
   try {
-    const response = await fetch(`/api/admin/tools/${toolId}/approve`, {
-      method: 'POST'
-    })
-    const result = await response.json()
-    if (result.code === 0) {
-      alert('审核通过')
-      navigateTo('/admin/tools/pending')
-    } else {
-      alert(result.message || '操作失败')
-    }
+    await adminApi.tool.approveTool(toolId)
+    alert('审核通过')
+    navigateTo('/admin/tools/pending')
   } catch (error) {
     alert('操作失败')
   }
 }
 
-async function reject() {
+async function handleReject() {
   if (!rejectReason.value.trim()) {
     alert('请输入拒绝原因')
     return
   }
   try {
-    const response = await fetch(`/api/admin/tools/${toolId}/reject`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reason: rejectReason.value })
-    })
-    const result = await response.json()
-    if (result.code === 0) {
-      alert('已拒绝')
-      navigateTo('/admin/tools/pending')
-    } else {
-      alert(result.message || '操作失败')
-    }
+    await adminApi.tool.rejectTool(toolId, rejectReason.value)
+    alert('已拒绝')
+    navigateTo('/admin/tools/pending')
   } catch (error) {
     alert('操作失败')
   }
 }
 
-async function requestRevision() {
+async function handleRequestRevision() {
   if (!revisionReason.value.trim()) {
     alert('请输入退回原因')
     return
   }
   try {
-    const response = await fetch(`/api/admin/tools/${toolId}/request-revision`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reason: revisionReason.value })
-    })
-    const result = await response.json()
-    if (result.code === 0) {
-      alert('已退回修改')
-      navigateTo('/admin/tools/pending')
-    } else {
-      alert(result.message || '操作失败')
-    }
+    await adminApi.tool.requestRevision(toolId, revisionReason.value)
+    alert('已退回修改')
+    navigateTo('/admin/tools/pending')
   } catch (error) {
     alert('操作失败')
   }

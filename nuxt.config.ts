@@ -57,6 +57,17 @@ export default defineNuxtConfig({
           '/api': { target, changeOrigin: true },
           '/auth': { target, changeOrigin: true },
           '/user': { target, changeOrigin: true },
+          '/admin': {
+            target: 'http://localhost:8006',
+            changeOrigin: true,
+            bypass(req) {
+              // 页面请求走 Nuxt，API 请求走代理到 admin-svc
+              const accept = req.headers.accept || ''
+              if (accept.includes('text/html')) {
+                return req.url || '/admin'
+              }
+            },
+          },
         }
       })(),
     },

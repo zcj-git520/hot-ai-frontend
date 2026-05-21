@@ -329,6 +329,37 @@ export const adminApi = {
     },
   },
 
+  tool: {
+    // 获取待审核工具列表
+    getPendingTools(params?: { page?: number; pageSize?: number; search?: string }) {
+      const backendParams: any = {}
+      if (params?.page) backendParams.page = params.page
+      if (params?.pageSize) backendParams.page_size = params.pageSize
+      if (params?.search) backendParams.search = params.search
+      return apiClient.get('/admin/tools/pending', { params: backendParams })
+    },
+
+    // 获取工具详情（含审核历史）
+    getToolDetail(id: string | number) {
+      return apiClient.get(`/admin/tools/${id}`)
+    },
+
+    // 审核通过
+    approveTool(id: string | number) {
+      return apiClient.post(`/admin/tools/${id}/approve`)
+    },
+
+    // 审核拒绝
+    rejectTool(id: string | number, reason: string) {
+      return apiClient.post(`/admin/tools/${id}/reject`, { reason })
+    },
+
+    // 退回修改
+    requestRevision(id: string | number, reason: string) {
+      return apiClient.post(`/admin/tools/${id}/request-revision`, { reason })
+    },
+  },
+
   chapter: {
     // 获取章节列表
     getListByPath(pathId: string | number) {

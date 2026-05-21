@@ -75,6 +75,8 @@
 </template>
 
 <script setup lang="ts">
+import { adminApi } from '~/lib/api'
+
 const pendingTools = ref([])
 const searchQuery = ref('')
 const page = ref(1)
@@ -85,28 +87,19 @@ const totalPages = computed(() => Math.ceil(total.value / pageSize.value))
 
 async function fetchPendingTools() {
   try {
-    const params = new URLSearchParams({
-      page: page.value.toString(),
-      page_size: pageSize.value.toString(),
+    const data = await adminApi.tool.getPendingTools({
+      page: page.value,
+      pageSize: pageSize.value,
+      search: searchQuery.value || undefined,
     })
-    if (searchQuery.value) {
-      params.append('search', searchQuery.value)
-    }
-
-    const response = await fetch(`/api/admin/tools/pending?${params}`)
-    const result = await response.json()
-
-    if (result.code === 0) {
-      pendingTools.value = result.data.list || []
-      total.value = result.data.total || 0
-    }
+    pendingTools.value = data.list || []
+    total.value = data.total || 0
   } catch (error) {
     console.error('获取待审核工具失败:', error)
   }
 }
 
 function getCategoryName(categoryId: number) {
-  // TODO: 从类别映射获取
   return `类别 ${categoryId}`
 }
 

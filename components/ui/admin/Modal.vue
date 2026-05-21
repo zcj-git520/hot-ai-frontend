@@ -7,7 +7,7 @@
         @click.self="handleClose"
       >
         <Transition name="modal-scale" appear>
-          <div class="modal-container" v-if="modelValue">
+          <div class="modal-container" v-if="modelValue" :style="{ maxWidth: sizeClasses[size] }">
             <!-- Header -->
             <div class="modal-header">
               <h3 class="modal-title">{{ title }}</h3>
@@ -33,10 +33,13 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: boolean
   title: string
-}>()
+  size?: 'sm' | 'md' | 'lg' | 'xl'
+}>(), {
+  size: 'md'
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
@@ -44,6 +47,13 @@ const emit = defineEmits<{
 
 const handleClose = () => {
   emit('update:modelValue', false)
+}
+
+const sizeClasses = {
+  sm: '520px',
+  md: '640px',
+  lg: '800px',
+  xl: '1000px'
 }
 </script>
 
@@ -56,22 +66,19 @@ const handleClose = () => {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(2px);
 }
 
 .modal-container {
   width: 100%;
-  max-width: 560px;
-  max-height: 90vh;
-  background: #1a1a21;
+  max-width: 520px;
+  max-height: 85vh;
+  background: #1a1a2e;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.05),
-    0 24px 48px rgba(0, 0, 0, 0.5),
-    0 0 80px rgba(234, 179, 8, 0.05);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
 }
 
 /* Header */
@@ -79,15 +86,15 @@ const handleClose = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .modal-title {
-  font-family: 'Noto Serif SC', serif;
-  font-size: 1.125rem;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1rem;
   font-weight: 600;
-  color: #f5f5f5;
+  color: #ffffff;
   margin: 0;
 }
 
@@ -95,32 +102,36 @@ const handleClose = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   background: rgba(255, 255, 255, 0.04);
-  border: none;
-  border-radius: 8px;
-  color: #6b6b73;
-  font-size: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: #c0c0cc;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .modal-close:hover {
   background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
   color: #ef4444;
 }
 
 /* Body */
 .modal-body {
-  padding: 1.5rem;
+  padding: 1.25rem;
   overflow-y: auto;
-  max-height: calc(90vh - 140px);
+  max-height: calc(85vh - 120px);
 }
 
 /* Footer */
 .modal-footer {
-  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
   background: rgba(0, 0, 0, 0.2);
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
@@ -128,7 +139,7 @@ const handleClose = () => {
 /* Transitions */
 .modal-fade-enter-active,
 .modal-fade-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.15s ease;
 }
 
 .modal-fade-enter-from,
@@ -137,7 +148,7 @@ const handleClose = () => {
 }
 
 .modal-scale-enter-active {
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.2s ease;
 }
 
 .modal-scale-leave-active {
@@ -147,6 +158,6 @@ const handleClose = () => {
 .modal-scale-enter-from,
 .modal-scale-leave-to {
   opacity: 0;
-  transform: scale(0.92) translateY(10px);
+  transform: scale(0.95);
 }
 </style>

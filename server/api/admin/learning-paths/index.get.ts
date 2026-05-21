@@ -1,8 +1,17 @@
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
 
+  // Build query params including filters
+  const params = new URLSearchParams({
+    page: String(query.page || 1),
+    page_size: String(query.page_size || 20)
+  })
+  if (query.keyword) params.append('search', String(query.keyword))
+  if (query.difficulty) params.append('difficulty', String(query.difficulty))
+  if (query.status) params.append('status', String(query.status))
+
   // Forward to backend admin-svc
-  const url = `http://localhost:8006/admin/learning-paths?page=${query.page || 1}&page_size=${query.page_size || 20}`
+  const url = `http://localhost:8006/admin/learning-paths?${params.toString()}`
 
   try {
     const data = await $fetch(url, {

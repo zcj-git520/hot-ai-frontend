@@ -89,8 +89,8 @@ const handleLogout = async () => {
 .admin-sidebar {
   width: 260px;
   min-height: 100vh;
-  background: linear-gradient(180deg, #0c0c0f 0%, #141419 100%);
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  background: #1a1a2e;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -103,14 +103,14 @@ const handleLogout = async () => {
   left: 0;
   right: 0;
   height: 200px;
-  background: radial-gradient(ellipse at top, rgba(234, 179, 8, 0.08) 0%, transparent 70%);
+  background: radial-gradient(ellipse at top, rgba(245, 158, 11, 0.1) 0%, transparent 70%);
   pointer-events: none;
 }
 
 /* Header */
 .sidebar-header {
   padding: 1.5rem 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .logo-link {
@@ -133,13 +133,13 @@ const handleLogout = async () => {
   font-family: 'Noto Serif SC', serif;
   font-size: 1rem;
   font-weight: 700;
-  color: #f5f5f5;
+  color: #ffffff;
   line-height: 1.2;
 }
 
 .logo-subtitle {
-  font-size: 0.7rem;
-  color: #6b6b73;
+  font-size: 0.75rem;
+  color: #b8b8c8;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -159,9 +159,9 @@ const handleLogout = async () => {
   display: block;
   padding: 0 1.25rem;
   margin-bottom: 0.5rem;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  color: #6b6b73;
+  color: #a0a0b0;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -172,21 +172,22 @@ const handleLogout = async () => {
   gap: 0.75rem;
   padding: 0.75rem 1.25rem;
   margin: 0.125rem 0.5rem;
-  color: #a0a0a8;
+  color: #d8d8e8;
   text-decoration: none;
   border-radius: 8px;
   transition: all 0.15s ease;
   position: relative;
+  font-weight: 500;
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  color: #f5f5f5;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
 }
 
 .nav-item-active {
-  background: rgba(234, 179, 8, 0.1);
-  color: #eab308;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
 }
 
 .nav-item-active::before {
@@ -197,7 +198,7 @@ const handleLogout = async () => {
   transform: translateY(-50%);
   width: 3px;
   height: 24px;
-  background: #eab308;
+  background: #f59e0b;
   border-radius: 0 3px 3px 0;
 }
 
@@ -214,10 +215,10 @@ const handleLogout = async () => {
 }
 
 .nav-badge {
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   padding: 0.2rem 0.4rem;
-  background: rgba(255, 255, 255, 0.06);
-  color: #6b6b73;
+  background: rgba(255, 255, 255, 0.08);
+  color: #9898a8;
   border-radius: 4px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -226,7 +227,7 @@ const handleLogout = async () => {
 /* Footer */
 .sidebar-footer {
   padding: 1.25rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .user-card {
@@ -234,8 +235,8 @@ const handleLogout = async () => {
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   margin-bottom: 0.75rem;
 }
@@ -244,7 +245,7 @@ const handleLogout = async () => {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #eab308 0%, #f59e0b 100%);
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
   color: #000;
   font-weight: 700;
   font-size: 1rem;
@@ -263,15 +264,15 @@ const handleLogout = async () => {
 .user-name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #f5f5f5;
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .user-role {
-  font-size: 0.7rem;
-  color: #6b6b73;
+  font-size: 0.75rem;
+  color: #b8b8c8;
 }
 
 .logout-btn {
@@ -281,11 +282,12 @@ const handleLogout = async () => {
   gap: 0.5rem;
   width: 100%;
   padding: 0.625rem;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
   border-radius: 8px;
-  color: #a0a0a8;
-  font-size: 0.8rem;
+  color: #ef4444;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
 }

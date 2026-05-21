@@ -196,13 +196,13 @@ onMounted(async () => {
   font-family: 'Bricolage Grotesque', system-ui, sans-serif;
   font-size: 1.75rem;
   font-weight: 700;
-  color: #f5f5f5;
+  color: #ffffff;
   margin: 0 0 0.375rem 0;
 }
 
 .dashboard-subtitle {
   font-size: 0.875rem;
-  color: #6b6b73;
+  color: #c0c0cc;
   margin: 0;
 }
 
@@ -227,14 +227,14 @@ onMounted(async () => {
   align-items: center;
   gap: 1rem;
   padding: 1.25rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
   transition: all 0.2s ease;
 }
 
 .stat-card:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.08);
   transform: translateY(-2px);
 }
 
@@ -265,13 +265,13 @@ onMounted(async () => {
   font-family: 'Bricolage Grotesque', system-ui, sans-serif;
   font-size: 1.75rem;
   font-weight: 700;
-  color: #f5f5f5;
+  color: #ffffff;
   line-height: 1;
 }
 
 .stat-label {
-  font-size: 0.8rem;
-  color: #6b6b73;
+  font-size: 0.875rem;
+  color: #c0c0cc;
 }
 
 .stat-trend {
@@ -289,25 +289,25 @@ onMounted(async () => {
 }
 
 .stat-trend.up {
-  background: rgba(52, 211, 153, 0.15);
-  color: #34d399;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
 }
 
 .stat-badge {
-  font-size: 0.7rem;
-  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  padding: 0.375rem 0.75rem;
   border-radius: 6px;
   font-weight: 500;
 }
 
 .stat-badge.published {
-  background: rgba(52, 211, 153, 0.15);
-  color: #34d399;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
 }
 
 .stat-badge.draft {
-  background: rgba(234, 179, 8, 0.15);
-  color: #eab308;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
 }
 
 /* Section Title */
@@ -315,7 +315,7 @@ onMounted(async () => {
   font-family: 'Bricolage Grotesque', system-ui, sans-serif;
   font-size: 1.125rem;
   font-weight: 600;
-  color: #f5f5f5;
+  color: #ffffff;
   margin: 0 0 1rem 0;
 }
 
@@ -379,22 +379,22 @@ onMounted(async () => {
 .action-title {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: #f5f5f5;
+  color: #ffffff;
 }
 
 .action-desc {
   font-size: 0.8125rem;
-  color: #6b6b73;
+  color: #c0c0cc;
 }
 
 .action-arrow {
-  color: #6b6b73;
+  color: #c0c0cc;
   transition: transform 0.2s ease;
 }
 
 .action-card:hover .action-arrow {
   transform: translateX(4px);
-  color: #eab308;
+  color: #f59e0b;
 }
 
 .action-arrow svg {
@@ -423,7 +423,7 @@ onMounted(async () => {
 
 .view-all {
   font-size: 0.8125rem;
-  color: #eab308;
+  color: #f59e0b;
   text-decoration: none;
   transition: color 0.15s ease;
 }
@@ -474,7 +474,7 @@ onMounted(async () => {
 .recent-title {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #f5f5f5;
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -482,7 +482,7 @@ onMounted(async () => {
 
 .recent-meta {
   font-size: 0.75rem;
-  color: #6b6b73;
+  color: #c0c0cc;
 }
 
 .recent-status {
@@ -495,7 +495,7 @@ onMounted(async () => {
 
 .recent-status.published {
   background: rgba(52, 211, 153, 0.15);
-  color: #34d399;
+  color: #22c55e;
 }
 
 .recent-status.draft {
