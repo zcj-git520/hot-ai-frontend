@@ -273,8 +273,61 @@ export const userApi = {
   },
 }
 
-// Admin API - 管理后台接口
+// Admin API client - 不带 token 认证
+const adminApiClient = axios.create({
+  baseURL: '/api/admin',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// Admin API - 管理后台接口 (无需认证)
 export const adminApi = {
+  user: {
+    // 获取用户列表
+    getList(params?: {
+      page?: number
+      pageSize?: number
+      search?: string
+      role?: string
+      status?: string
+    }) {
+      const backendParams: any = {}
+      if (params?.page) backendParams.page = params.page
+      if (params?.pageSize) backendParams.page_size = params.pageSize
+      if (params?.search) backendParams.search = params.search
+      if (params?.role) backendParams.role = params.role
+      if (params?.status) backendParams.status = params.status
+      return adminApiClient.get('/users', { params: backendParams })
+    },
+
+    // 获取用户详情
+    getById(id: string | number) {
+      return adminApiClient.get(`/users/${id}`)
+    },
+
+    // 更新用户角色
+    updateRole(id: string | number, data: { role: 'admin' | 'user' }) {
+      return adminApiClient.put(`/users/${id}/role`, data)
+    },
+
+    // 禁用用户
+    disable(id: string | number) {
+      return adminApiClient.post(`/users/${id}/disable`)
+    },
+
+    // 启用用户
+    enable(id: string | number) {
+      return adminApiClient.post(`/users/${id}/enable`)
+    },
+
+    // 获取用户操作日志
+    getLogs(id: string | number) {
+      return adminApiClient.get(`/users/${id}/logs`)
+    },
+  },
+
   learningPath: {
     // 获取学习路径列表
     getList(params?: {
@@ -290,42 +343,42 @@ export const adminApi = {
       if (params?.difficulty) backendParams.difficulty = params.difficulty
       if (params?.status !== undefined) backendParams.status = params.status
       if (params?.search) backendParams.search = params.search
-      return apiClient.get('/admin/learning-paths', { params: backendParams })
+      return adminApiClient.get('/learning-paths', { params: backendParams })
     },
 
     // 获取学习路径详情
     getById(id: string | number) {
-      return apiClient.get(`/admin/learning-paths/${id}`)
+      return adminApiClient.get(`/learning-paths/${id}`)
     },
 
     // 创建学习路径
     create(data: any) {
-      return apiClient.post('/admin/learning-paths', data)
+      return adminApiClient.post('/learning-paths', data)
     },
 
     // 更新学习路径
     update(id: string | number, data: any) {
-      return apiClient.put(`/admin/learning-paths/${id}`, data)
+      return adminApiClient.put(`/learning-paths/${id}`, data)
     },
 
     // 删除学习路径 (软删除)
     delete(id: string | number) {
-      return apiClient.delete(`/admin/learning-paths/${id}`)
+      return adminApiClient.delete(`/learning-paths/${id}`)
     },
 
     // 发布
     publish(id: string | number) {
-      return apiClient.post(`/admin/learning-paths/${id}/publish`)
+      return adminApiClient.post(`/learning-paths/${id}/publish`)
     },
 
     // 下架
     unpublish(id: string | number) {
-      return apiClient.post(`/admin/learning-paths/${id}/unpublish`)
+      return adminApiClient.post(`/learning-paths/${id}/unpublish`)
     },
 
     // 设置推荐
     setFeatured(id: string | number, featured: boolean) {
-      return apiClient.post(`/admin/learning-paths/${id}/feature`, { featured })
+      return adminApiClient.post(`/learning-paths/${id}/feature`, { featured })
     },
   },
 
@@ -336,54 +389,54 @@ export const adminApi = {
       if (params?.page) backendParams.page = params.page
       if (params?.pageSize) backendParams.page_size = params.pageSize
       if (params?.search) backendParams.search = params.search
-      return apiClient.get('/admin/tools/pending', { params: backendParams })
+      return adminApiClient.get('/tools/pending', { params: backendParams })
     },
 
     // 获取工具详情（含审核历史）
     getToolDetail(id: string | number) {
-      return apiClient.get(`/admin/tools/${id}`)
+      return adminApiClient.get(`/tools/${id}`)
     },
 
     // 审核通过
     approveTool(id: string | number) {
-      return apiClient.post(`/admin/tools/${id}/approve`)
+      return adminApiClient.post(`/tools/${id}/approve`)
     },
 
     // 审核拒绝
     rejectTool(id: string | number, reason: string) {
-      return apiClient.post(`/admin/tools/${id}/reject`, { reason })
+      return adminApiClient.post(`/tools/${id}/reject`, { reason })
     },
 
     // 退回修改
     requestRevision(id: string | number, reason: string) {
-      return apiClient.post(`/admin/tools/${id}/request-revision`, { reason })
+      return adminApiClient.post(`/tools/${id}/request-revision`, { reason })
     },
   },
 
   chapter: {
     // 获取章节列表
     getListByPath(pathId: string | number) {
-      return apiClient.get(`/admin/learning-paths/${pathId}/chapters`)
+      return adminApiClient.get(`/learning-paths/${pathId}/chapters`)
     },
 
     // 获取章节详情
     getById(id: string | number) {
-      return apiClient.get(`/admin/chapters/${id}`)
+      return adminApiClient.get(`/chapters/${id}`)
     },
 
     // 创建章节
     create(pathId: string | number, data: any) {
-      return apiClient.post(`/admin/learning-paths/${pathId}/chapters`, data)
+      return adminApiClient.post(`/learning-paths/${pathId}/chapters`, data)
     },
 
     // 更新章节
     update(id: string | number, data: any) {
-      return apiClient.put(`/admin/chapters/${id}`, data)
+      return adminApiClient.put(`/chapters/${id}`, data)
     },
 
     // 删除章节 (软删除)
     delete(id: string | number) {
-      return apiClient.delete(`/admin/chapters/${id}`)
+      return adminApiClient.delete(`/chapters/${id}`)
     },
   },
 }
