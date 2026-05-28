@@ -2,9 +2,7 @@ import http from 'http'
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
-  const body = await readBody(event)
-
-  const urlString = `http://localhost/api/admin/chapters/${id}`
+  const urlString = `http://localhost/api/admin/tools/${id}/offline`
   const url = new URL(urlString)
 
   return new Promise((resolve, reject) => {
@@ -12,10 +10,10 @@ export default defineEventHandler(async (event) => {
       hostname: url.hostname,
       port: url.port,
       path: url.pathname,
-      method: 'PUT',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(JSON.stringify(body))
+        ...getHeaders(event)
       }
     }, (res) => {
       let data = ''
@@ -30,7 +28,7 @@ export default defineEventHandler(async (event) => {
         } else {
           reject(createError({
             statusCode: res.statusCode || 502,
-            statusMessage: 'Failed to update chapter: ' + data
+            statusMessage: 'Failed to set tool offline: ' + data
           }))
         }
       })
@@ -38,10 +36,9 @@ export default defineEventHandler(async (event) => {
     req.on('error', (e) => {
       reject(createError({
         statusCode: 502,
-        statusMessage: 'Failed to update chapter: ' + e.message
+        statusMessage: 'Failed to set tool offline: ' + e.message
       }))
     })
-    req.write(JSON.stringify(body))
     req.end()
   })
 })
