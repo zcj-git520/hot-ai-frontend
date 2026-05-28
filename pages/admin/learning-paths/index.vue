@@ -701,6 +701,7 @@ const getContentTypeText = (type: string) => {
 // Load list
 const loadList = async () => {
   loading.value = true
+  console.log('[Admin Learning Paths] Starting to load list...')
   try {
     const params = new URLSearchParams({
       page: String(currentPage.value),
@@ -710,13 +711,22 @@ const loadList = async () => {
     if (filterDifficulty.value) params.append('difficulty', filterDifficulty.value)
     if (filterStatus.value) params.append('status', filterStatus.value)
 
-    const response = await fetch('/api/admin/learning-paths?' + params.toString())
+    const url = '/api/admin/learning-paths?' + params.toString()
+    console.log('[Admin Learning Paths] Fetching:', url)
+    const response = await fetch(url)
+    console.log('[Admin Learning Paths] Response status:', response.status)
     const result = await response.json()
+    console.log('[Admin Learning Paths] Response data:', result)
+
     if (result.data) {
       list.value = result.data.list || []
       totalCount.value = result.data.total || 0
+      console.log('[Admin Learning Paths] Loaded', list.value.length, 'items, total:', totalCount.value)
+    } else {
+      console.log('[Admin Learning Paths] No data in result:', result)
     }
   } catch (error: any) {
+    console.error('[Admin Learning Paths] Error:', error)
     toastError(error.message || '加载失败')
   } finally {
     loading.value = false

@@ -211,7 +211,7 @@
               </button>
 
               <button
-                v-if="article.status === 'draft'"
+                v-if="article.status === 0"
                 @click="handleApprove(article.id)"
                 class="action-btn action-approve"
                 title="通过审核"
@@ -223,7 +223,7 @@
               </button>
 
               <button
-                v-if="article.status === 'draft'"
+                v-if="article.status === 0"
                 @click="openRejectModal(article)"
                 class="action-btn action-reject"
                 title="拒绝"
@@ -235,7 +235,7 @@
               </button>
 
               <button
-                v-if="article.status === 'published'"
+                v-if="article.status === 1"
                 @click="handleUnpublish(article.id)"
                 class="action-btn action-unpublish"
                 title="取消发布"
@@ -246,7 +246,7 @@
               </button>
 
               <button
-                v-if="article.status === 'rejected'"
+                v-if="article.status === 3"
                 @click="handleApprove(article.id)"
                 class="action-btn action-approve"
                 title="重新通过"
@@ -258,7 +258,7 @@
               </button>
 
               <button
-                v-if="article.status === 'rejected'"
+                v-if="article.status === 3"
                 @click="handlePublish(article.id)"
                 class="action-btn action-publish"
                 title="直接发布"
@@ -362,14 +362,14 @@
       <template #footer>
         <button @click="showDetailsModal = false" class="btn-cancel">关闭</button>
         <button
-          v-if="currentArticle?.status === 'draft'"
+          v-if="currentArticle?.status === 0"
           @click="handleApprove(currentArticle.id); showDetailsModal = false"
           class="btn-submit btn-approve"
         >
           通过审核
         </button>
         <button
-          v-if="currentArticle?.status === 'draft'"
+          v-if="currentArticle?.status === 0"
           @click="openRejectModal(currentArticle); showDetailsModal = false"
           class="btn-submit btn-reject"
         >
@@ -402,7 +402,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { articleApi } from '~/app/lib/api'
+import { adminApi } from '~/app/lib/api'
 
 const { toastSuccess, toastError } = useToast()
 
@@ -412,7 +412,7 @@ interface ArticleListItem {
   title: string
   summary: string
   category: string
-  status: 'draft' | 'published' | 'rejected'
+  status: 0 | 1 | 3  // 0=草稿, 1=已发布, 3=已拒绝
   author: string
   created_at: string
   published_at?: string
@@ -420,79 +420,26 @@ interface ArticleListItem {
   rejection_reason?: string
 }
 
-// Mock data for demo (since admin article API not yet implemented)
-const mockArticles: ArticleListItem[] = [
-  {
-    id: 1,
-    title: '深度学习在自然语言处理中的应用',
-    summary: '本文探讨了深度学习技术在NLP领域的最新进展，包括Transformer架构、BERT模型及其在实际应用中的效果。',
-    category: 'AI技术',
-    status: 'published',
-    author: '张三',
-    created_at: '2026-05-20T10:30:00Z',
-    published_at: '2026-05-21T14:00:00Z'
-  },
-  {
-    id: 2,
-    title: 'AI产品经理的职业发展指南',
-    summary: '作为AI产品经理如何规划职业路径，需要掌握哪些核心技能，以及如何在不同阶段提升自己的能力。',
-    category: '职业发展',
-    status: 'draft',
-    author: '李四',
-    created_at: '2026-05-22T09:00:00Z'
-  },
-  {
-    id: 3,
-    title: '机器学习入门：从零开始掌握基础概念',
-    summary: '为初学者详细讲解机器学习的基本概念、算法分类以及学习路径，帮助你建立扎实的知识基础。',
-    category: '学习指南',
-    status: 'draft',
-    author: '王五',
-    created_at: '2026-05-22T15:30:00Z'
-  },
-  {
-    id: 4,
-    title: '2026年AI行业趋势分析报告',
-    summary: '全面分析2026年AI行业的发展趋势，涵盖技术突破、市场应用、投资热点等多个维度。',
-    category: '行业动态',
-    status: 'rejected',
-    author: '赵六',
-    created_at: '2026-05-19T11:00:00Z',
-    rejection_reason: '内容需要补充更多具体数据和案例'
-  },
-  {
-    id: 5,
-    title: '大语言模型的安全与伦理问题',
-    summary: '探讨大语言模型发展过程中的安全隐患、伦理挑战以及相应的治理措施。',
-    category: 'AI技术',
-    status: 'published',
-    author: '钱七',
-    created_at: '2026-05-18T16:45:00Z',
-    published_at: '2026-05-19T09:00:00Z'
-  },
-  {
-    id: 6,
-    title: '如何选择适合自己的AI学习资源',
-    summary: '盘点各类AI学习资源的优缺点，为不同基础的学习者提供合理的选择建议。',
-    category: '学习指南',
-    status: 'draft',
-    author: '孙八',
-    created_at: '2026-05-23T08:15:00Z'
+// Status text helper
+const getStatusText = (status: number) => {
+  const map: Record<number, string> = {
+    0: '草稿',
+    1: '已发布',
+    3: '已拒绝'
   }
-]
+  return map[status] || String(status)
+}
 
-// List state
+// Stats
+const draftCount = computed(() => list.value.filter(i => i.status === 0).length)
+const publishedCount = computed(() => list.value.filter(i => i.status === 1).length)
+const rejectedCount = computed(() => list.value.filter(i => i.status === 3).length)
 const list = ref<ArticleListItem[]>([])
 const loading = ref(false)
 const currentPage = ref(1)
 const pageSize = 12
-const totalCount = computed(() => list.value.length)
+const totalCount = ref(0)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / pageSize)))
-
-// Stats
-const draftCount = computed(() => list.value.filter(i => i.status === 'draft').length)
-const publishedCount = computed(() => list.value.filter(i => i.status === 'published').length)
-const rejectedCount = computed(() => list.value.filter(i => i.status === 'rejected').length)
 
 // Filters
 const searchQuery = ref('')
@@ -530,15 +477,6 @@ const visiblePages = computed(() => {
 })
 
 // Helpers
-const getStatusText = (status: string) => {
-  const map: Record<string, string> = {
-    draft: '草稿',
-    published: '已发布',
-    rejected: '已拒绝'
-  }
-  return map[status] || status
-}
-
 const formatDate = (dateStr: string) => {
   if (!dateStr) return '未知'
   const date = new Date(dateStr)
@@ -553,34 +491,33 @@ const formatDate = (dateStr: string) => {
 const loadList = async () => {
   loading.value = true
   try {
-    // Try to use the articleApi first
-    const response = await articleApi.getList({ page: currentPage.value, pageSize })
-    const result = (response as any)?.data || (response as any) || {}
+    const params: any = {
+      page: currentPage.value,
+      pageSize
+    }
+    if (searchQuery.value) params.search = searchQuery.value
+    if (filterStatus.value) params.review_status = filterStatus.value
+
+    const response = await adminApi.article.getPendingArticles(params)
+    // adminApi returns the data object directly (interceptor extracts it)
+    const result = response as any
+    console.log('[ArticlesContent] API response:', JSON.stringify(result).substring(0, 500))
 
     if (result?.list && Array.isArray(result.list)) {
       list.value = result.list
-    } else if (Array.isArray(result)) {
-      list.value = result
+      totalCount.value = result.total || result.list.length
+    } else if (Array.isArray(response)) {
+      list.value = response as any[]
+      totalCount.value = list.value.length
     } else {
-      // Fall back to mock data if API not available
-      list.value = [...mockArticles]
-    }
-
-    // Apply filters locally
-    if (searchQuery.value) {
-      const query = searchQuery.value.toLowerCase()
-      list.value = list.value.filter(a => a.title.toLowerCase().includes(query))
-    }
-    if (filterCategory.value) {
-      list.value = list.value.filter(a => a.category === filterCategory.value)
-    }
-    if (filterStatus.value) {
-      list.value = list.value.filter(a => a.status === filterStatus.value)
+      list.value = []
+      totalCount.value = 0
     }
   } catch (error: any) {
     console.error('[ArticlesContent] Error loading list:', error)
-    // Fall back to mock data on error
-    list.value = [...mockArticles]
+    // Don't show toast for load errors, just clear the list
+    list.value = []
+    totalCount.value = 0
   } finally {
     loading.value = false
   }
@@ -645,10 +582,13 @@ const openDetailsModal = async (article: ArticleListItem) => {
 
 // Approve / Review
 const handleApprove = async (id: number) => {
-  // Mock implementation - console log for now
-  console.log('[ArticlesContent] Approve article:', id)
-  toastSuccess('文章已通过审核')
-  loadList()
+  try {
+    await adminApi.article.approveArticle(id)
+    toastSuccess('文章已通过审核')
+    loadList()
+  } catch (error: any) {
+    toastError(error.message || '操作失败')
+  }
 }
 
 // Reject
@@ -660,28 +600,37 @@ const openRejectModal = (article: ArticleListItem) => {
 
 const handleReject = async () => {
   if (!rejectingArticleId.value || !rejectReason.value.trim()) return
-  // Mock implementation - console log for now
-  console.log('[ArticlesContent] Reject article:', rejectingArticleId.value, 'Reason:', rejectReason.value)
-  toastSuccess('已拒绝该文章')
-  showRejectModal.value = false
-  rejectReason.value = ''
-  loadList()
+  try {
+    await adminApi.article.rejectArticle(rejectingArticleId.value, rejectReason.value)
+    toastSuccess('已拒绝该文章')
+    showRejectModal.value = false
+    rejectReason.value = ''
+    loadList()
+  } catch (error: any) {
+    toastError(error.message || '操作失败')
+  }
 }
 
 // Publish
 const handlePublish = async (id: number) => {
-  // Mock implementation - console log for now
-  console.log('[ArticlesContent] Publish article:', id)
-  toastSuccess('文章已发布')
-  loadList()
+  try {
+    await adminApi.article.publishArticle(id)
+    toastSuccess('文章已发布')
+    loadList()
+  } catch (error: any) {
+    toastError(error.message || '操作失败')
+  }
 }
 
 // Unpublish
 const handleUnpublish = async (id: number) => {
-  // Mock implementation - console log for now
-  console.log('[ArticlesContent] Unpublish article:', id)
-  toastSuccess('文章已下架')
-  loadList()
+  try {
+    await adminApi.article.unpublishArticle(id)
+    toastSuccess('文章已下架')
+    loadList()
+  } catch (error: any) {
+    toastError(error.message || '操作失败')
+  }
 }
 
 // Load data on mount

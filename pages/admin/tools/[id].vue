@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { adminApi } from '~/lib/api'
+import { adminApi } from '~/app/lib/api'
 
 const route = useRoute()
 const toolId = route.params.id as string

@@ -416,7 +416,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { professionApi } from '~/app/lib/api'
+import { adminProfessionApi } from '~/app/lib/api'
 
 const { toastSuccess, toastError } = useToast()
 
@@ -502,8 +502,8 @@ const list = ref<ProfessionListItem[]>([])
 const loading = ref(false)
 const currentPage = ref(1)
 const pageSize = 12
-const totalCount = computed(() => list.value.length)
-const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / pageSize)))
+const totalCount = ref(0)
+const totalPages = ref(1)
 
 // Stats
 const lowRiskCount = computed(() => list.value.filter(i => i.risk_level === 'low').length)
@@ -581,27 +581,37 @@ const formatDate = (dateStr: string) => {
 const loadList = async () => {
   loading.value = true
   try {
-    const response = await professionApi.getList({ page: currentPage.value, pageSize })
-    const result = (response as any)?.data || (response as any) || {}
+    const riskLevelMap: Record<string, string> = {
+      'low': 'low',
+      'medium': 'medium',
+      'high': 'high'
+    }
+    const response = await adminProfessionApi.getList({
+      page: currentPage.value,
+      pageSize,
+      risk_level: filterRiskLevel.value ? riskLevelMap[filterRiskLevel.value] : undefined,
+      search: searchQuery.value || undefined
+    })
+    console.log('[loadList] Raw response:', JSON.stringify(response).substring(0, 500))
+    // adminApiClient interceptor returns responseData.data directly on success
+    const result = (response as any) || {}
+    console.log('[loadList] Result:', JSON.stringify(result).substring(0, 500))
 
-    if (result?.list && Array.isArray(result.list)) {
-      list.value = result.list
-    } else if (Array.isArray(result)) {
-      list.value = result
+    if (result?.professions && Array.isArray(result.professions)) {
+      list.value = result.professions.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        description: p.description || '',
+        difficulty: '中级', // 难度字段在后端没有，用默认值
+        risk_level: p.risk_level || 'medium',
+        ai_impact: p.risk_level === 'low' ? '低' : p.risk_level === 'medium' ? '中' : '高',
+        created_at: p.created_at || p.published_at || new Date().toISOString()
+      }))
+      totalCount.value = result.total || list.value.length
+      totalPages.value = result.total_pages || 1
     } else {
+      console.warn('[loadList] No professions in result, using mock data. result:', Object.keys(result))
       list.value = [...mockProfessions]
-    }
-
-    // Apply filters locally
-    if (searchQuery.value) {
-      const query = searchQuery.value.toLowerCase()
-      list.value = list.value.filter(p => p.name.toLowerCase().includes(query))
-    }
-    if (filterDifficulty.value) {
-      list.value = list.value.filter(p => p.difficulty === filterDifficulty.value)
-    }
-    if (filterRiskLevel.value) {
-      list.value = list.value.filter(p => p.risk_level === filterRiskLevel.value)
     }
   } catch (error: any) {
     console.error('[ProfessionsContent] Error loading list:', error)
@@ -679,8 +689,13 @@ const openEditModal = (profession: ProfessionListItem) => {
 
 // Handle form submit
 const handleSubmit = async () => {
+  console.log('[handleSubmit] Starting submission, formData:', JSON.stringify(formData.value))
   if (!formData.value.name.trim()) {
     toastError('请输入职业名称')
+    return
+  }
+  if (!formData.value.description.trim()) {
+    toastError('请输入职业描述')
     return
   }
   if (!formData.value.difficulty) {
@@ -696,17 +711,57 @@ const handleSubmit = async () => {
     return
   }
 
-  // Mock create/update
-  console.log('[ProfessionsContent] Submit form:', isEditing.value ? 'update' : 'create', formData.value)
-
-  if (isEditing.value && editingId.value) {
-    toastSuccess('职业信息已更新')
-  } else {
-    toastSuccess('职业已创建')
+  // risk_level to risk_score mapping
+  const riskScoreMap: Record<string, number> = {
+    '极低': 10,
+    '低': 30,
+    '中等': 55,
+    '高': 70,
+    '极高': 90
   }
 
-  showFormModal.value = false
-  loadList()
+  const riskLevelMap: Record<string, string> = {
+    '低': 'low',
+    '中': 'medium',
+    '高': 'high'
+  }
+
+  // Generate slug from name
+  const generateSlug = (name: string) => {
+    return name.toLowerCase()
+      .replace(/[^a-z0-9一-龥]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+  }
+
+  try {
+    const submitData = {
+      name: formData.value.name,
+      slug: generateSlug(formData.value.name),
+      icon: '💼',
+      description: formData.value.description || '',
+      category_id: 1, // 默认分类
+      risk_level: riskLevelMap[formData.value.ai_impact] || formData.value.risk_level,
+      risk_score: riskScoreMap[formData.value.ai_impact] || 50,
+      sort_order: 0,
+      status: 1
+    }
+    console.log('[handleSubmit] Submitting data:', JSON.stringify(submitData))
+
+    if (isEditing.value && editingId.value) {
+      await adminProfessionApi.update(editingId.value, submitData)
+      toastSuccess('职业信息已更新')
+    } else {
+      const response = await adminProfessionApi.create(submitData)
+      console.log('[handleSubmit] Create response:', JSON.stringify(response).substring(0, 500))
+      toastSuccess('职业已创建')
+    }
+
+    showFormModal.value = false
+    loadList()
+  } catch (error: any) {
+    console.error('[ProfessionsContent] Submit error:', error)
+    toastError(error?.message || '操作失败')
+  }
 }
 
 // Details modal
@@ -716,7 +771,7 @@ const openDetailsModal = async (profession: ProfessionListItem) => {
 
   detailsLoading.value = true
   try {
-    const response = await professionApi.getById(profession.id.toString())
+    const response = await adminProfessionApi.getById(profession.id)
     const result = (response as any)?.data || response
     if (result) {
       currentProfession.value = { ...profession, ...result }
@@ -737,13 +792,16 @@ const openDeleteConfirm = (profession: ProfessionListItem) => {
 const handleDelete = async () => {
   if (!deletingProfession.value) return
 
-  // Mock delete
-  console.log('[ProfessionsContent] Delete profession:', deletingProfession.value.id)
-  toastSuccess('职业已删除')
-
-  showDeleteConfirm.value = false
-  deletingProfession.value = null
-  loadList()
+  try {
+    await adminProfessionApi.delete(deletingProfession.value.id)
+    toastSuccess('职业已删除')
+    showDeleteConfirm.value = false
+    deletingProfession.value = null
+    loadList()
+  } catch (error: any) {
+    console.error('[ProfessionsContent] Delete error:', error)
+    toastError(error?.message || '删除失败')
+  }
 }
 
 // Load data on mount

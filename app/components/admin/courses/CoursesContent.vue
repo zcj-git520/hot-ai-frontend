@@ -619,7 +619,8 @@ const formData = reactive<LearningPathFormData>({
   estimated_days: 30,
   estimated_hours: 60,
   cover_image: '',
-  is_featured: false
+  is_featured: false,
+  sort_order: 0
 })
 
 // For comma-separated inputs
@@ -695,13 +696,14 @@ const loadList = async () => {
       difficulty: filterDifficulty.value || undefined,
       status: filterStatus.value !== '' ? Number(filterStatus.value) as any : undefined
     })
-    const result = response.data
-    if (result?.data) {
-      list.value = result.data.list || []
-      totalCount.value = result.data.total || 0
-    } else if (result?.list) {
+    // API interceptor returns responseData.data for success (code 200), so response IS the data
+    const result = response as any
+    if (result?.list) {
       list.value = result.list || []
       totalCount.value = result.total || 0
+    } else if (result?.data?.list) {
+      list.value = result.data.list || []
+      totalCount.value = result.data.total || 0
     }
   } catch (error: any) {
     console.error('[CoursesContent] Error loading list:', error)
@@ -787,7 +789,7 @@ const openEditModal = (item: LearningPathListItem) => {
     estimated_days: item.estimated_days || 30,
     estimated_hours: item.estimated_hours || 60,
     cover_image: item.cover_image || '',
-    is_featured: item.is_featured,
+    is_featured: !!item.is_featured,
     sort_order: item.sort_order || 0
   })
   learningGoalsInput.value = ''
@@ -893,8 +895,8 @@ const loadChapters = async (pathId: number) => {
   chaptersLoading.value = true
   try {
     const response = await adminApi.chapter.getListByPath(pathId)
-    const result = response.data
-    chapters.value = Array.isArray(result) ? result : (result?.list || [])
+    // After interceptor response is already the data part
+    chapters.value = Array.isArray(response) ? response : (response?.list || [])
   } catch (error: any) {
     toastError(error.message || '加载章节失败')
   } finally {

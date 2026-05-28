@@ -147,8 +147,8 @@
               {{ getCategoryIcon(tool.category) }}
             </div>
             <div class="card-badges">
-              <span class="badge-status" :class="tool.status">
-                {{ getStatusText(tool.status) }}
+              <span class="badge-status" :class="tool.review_status">
+                {{ getStatusText(tool.review_status) }}
               </span>
             </div>
           </div>
@@ -169,7 +169,7 @@
                   <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
-                {{ tool.submitter || '未知' }}
+                {{ tool.submitted_by || '未知' }}
               </span>
             </div>
 
@@ -196,7 +196,7 @@
               </button>
 
               <button
-                v-if="tool.status === 'pending'"
+                v-if="tool.review_status === 'pending'"
                 @click="handleApprove(tool.id)"
                 class="action-btn action-approve"
                 title="通过"
@@ -208,7 +208,7 @@
               </button>
 
               <button
-                v-if="tool.status === 'pending'"
+                v-if="tool.review_status === 'pending'"
                 @click="openRejectModal(tool)"
                 class="action-btn action-reject"
                 title="拒绝"
@@ -220,7 +220,7 @@
               </button>
 
               <button
-                v-if="tool.status === 'pending'"
+                v-if="tool.review_status === 'pending'"
                 @click="openRevisionModal(tool)"
                 class="action-btn action-revision"
                 title="要求修改"
@@ -232,7 +232,7 @@
               </button>
 
               <button
-                v-if="tool.status === 'approved'"
+                v-if="tool.review_status === 'approved'"
                 @click="handleToggleOnline(tool)"
                 class="action-btn action-toggle"
                 :class="{ 'offline': tool.is_online === false }"
@@ -306,8 +306,8 @@
             </div>
             <div class="detail-item">
               <span class="detail-label">状态</span>
-              <span class="detail-value badge-status" :class="currentTool.status">
-                {{ getStatusText(currentTool.status) }}
+              <span class="detail-value badge-status" :class="currentTool.review_status">
+                {{ getStatusText(currentTool.review_status) }}
               </span>
             </div>
             <div class="detail-item">
@@ -363,14 +363,14 @@
       <template #footer>
         <button @click="showDetailsModal = false" class="btn-cancel">关闭</button>
         <button
-          v-if="currentTool?.status === 'pending'"
+          v-if="currentTool?.review_status === 'pending'"
           @click="handleApprove(currentTool.id); showDetailsModal = false"
           class="btn-submit btn-approve"
         >
           通过
         </button>
         <button
-          v-if="currentTool?.status === 'pending'"
+          v-if="currentTool?.review_status === 'pending'"
           @click="openRejectModal(currentTool); showDetailsModal = false"
           class="btn-submit btn-reject"
         >
@@ -433,8 +433,8 @@ interface ToolListItem {
   name: string
   description: string
   category: string
-  status: 'pending' | 'approved' | 'rejected'
-  submitter: string
+  review_status: 'pending' | 'approved' | 'rejected'
+  submitted_by: string
   created_at: string
   website_url?: string
   pricing?: string
@@ -459,9 +459,9 @@ const totalCount = ref(0)
 const totalPages = computed(() => Math.ceil(totalCount.value / pageSize))
 
 // Stats
-const pendingCount = computed(() => list.value.filter(i => i.status === 'pending').length)
-const approvedCount = computed(() => list.value.filter(i => i.status === 'approved').length)
-const rejectedCount = computed(() => list.value.filter(i => i.status === 'rejected').length)
+const pendingCount = computed(() => list.value.filter(i => i.review_status === 'pending').length)
+const approvedCount = computed(() => list.value.filter(i => i.review_status === 'approved').length)
+const rejectedCount = computed(() => list.value.filter(i => i.review_status === 'rejected').length)
 
 // Filters
 const searchQuery = ref('')
@@ -560,7 +560,7 @@ const formatDate = (dateStr: string) => {
 const loadList = async () => {
   loading.value = true
   try {
-    // Build params - when status filter is empty, get all tools by not passing status
+    // Build params
     const params: any = {
       page: currentPage.value,
       pageSize
@@ -571,11 +571,20 @@ const loadList = async () => {
     const result = response.data || response
 
     if (result?.list) {
-      list.value = result.list || []
-      totalCount.value = result.total || 0
+      // Frontend-side filtering since backend doesn't support review_status filter
+      let tools = result.list || []
+      if (filterStatus.value) {
+        tools = tools.filter((t: any) => t.review_status === filterStatus.value)
+      }
+      list.value = tools
+      totalCount.value = result.total || tools.length
     } else if (Array.isArray(result)) {
-      list.value = result
-      totalCount.value = result.length
+      let tools = result
+      if (filterStatus.value) {
+        tools = tools.filter((t: any) => t.review_status === filterStatus.value)
+      }
+      list.value = tools
+      totalCount.value = tools.length
     } else {
       list.value = []
       totalCount.value = 0
@@ -698,8 +707,13 @@ const handleRequestRevision = async () => {
 // Toggle online/offline
 const handleToggleOnline = async (tool: ToolListItem) => {
   try {
-    // This would call an API to toggle online status - placeholder
-    toastSuccess(tool.is_online === false ? '工具已上线' : '工具已下线')
+    if (tool.is_online === false) {
+      await adminApi.tool.setOnline(tool.id)
+      toastSuccess('工具已上线')
+    } else {
+      await adminApi.tool.setOffline(tool.id)
+      toastSuccess('工具已下线')
+    }
     loadList()
   } catch (error: any) {
     toastError(error.message || '操作失败')
