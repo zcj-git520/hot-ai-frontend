@@ -1,7 +1,7 @@
 export default defineEventHandler(async (event) => {
   const pathId = getRouterParam(event, 'path_id')
 
-  const url = `http://localhost:8006/admin/learning-paths/${pathId}/chapters`
+  const url = `http://localhost/api/admin/learning-paths/${pathId}/chapters`
 
   try {
     const data = await $fetch(url, {

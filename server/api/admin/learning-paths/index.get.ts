@@ -6,12 +6,12 @@ export default defineEventHandler(async (event) => {
     page: String(query.page || 1),
     page_size: String(query.page_size || 20)
   })
-  if (query.keyword) params.append('search', String(query.keyword))
+  if (query.search) params.append('search', String(query.search))
   if (query.difficulty) params.append('difficulty', String(query.difficulty))
   if (query.status) params.append('status', String(query.status))
 
   // Forward to backend admin-svc
-  const url = `http://localhost:8006/admin/learning-paths?${params.toString()}`
+  const url = `http://localhost/api/admin/learning-paths?${params.toString()}`
 
   try {
     const data = await $fetch(url, {

@@ -1,22 +1,46 @@
+import http from 'http'
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
 
-  const url = 'http://localhost:8006/admin/learning-paths'
+  const urlString = 'http://localhost/api/admin/learning-paths'
+  const url = new URL(urlString)
 
-  try {
-    const data = await $fetch(url, {
+  return new Promise((resolve, reject) => {
+    const req = http.request({
+      hostname: url.hostname,
+      port: url.port,
+      path: url.pathname,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...getHeaders(event)
-      },
-      body: JSON.stringify(body)
+        'Content-Length': Buffer.byteLength(JSON.stringify(body))
+      }
+    }, (res) => {
+      let data = ''
+      res.on('data', chunk => data += chunk)
+      res.on('end', () => {
+        if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+          try {
+            resolve(JSON.parse(data))
+          } catch {
+            resolve(data)
+          }
+        } else {
+          reject(createError({
+            statusCode: res.statusCode || 502,
+            statusMessage: 'Failed to create: ' + data
+          }))
+        }
+      })
     })
-    return data
-  } catch (err: any) {
-    throw createError({
-      statusCode: 502,
-      statusMessage: 'Failed to create: ' + err.message
+    req.on('error', (e) => {
+      reject(createError({
+        statusCode: 502,
+        statusMessage: 'Failed to create: ' + e.message
+      }))
     })
-  }
+    req.write(JSON.stringify(body))
+    req.end()
+  })
 })
