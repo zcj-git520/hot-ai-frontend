@@ -18,12 +18,12 @@ const addToast = (toast: Omit<Toast, 'id'>) => {
     duration: 3000,
     ...toast
   }
-  
+
   // 触发事件
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('toast:add', { detail: newToast }))
   }
-  
+
   return id
 }
 

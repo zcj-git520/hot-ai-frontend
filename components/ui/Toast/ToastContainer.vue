@@ -89,7 +89,7 @@ const toasts = ref<Toast[]>([])
 
 const addToast = (toast: Toast) => {
   toasts.value.push(toast)
-  
+
   // 自动关闭
   if (toast.duration !== 0) {
     setTimeout(() => {
@@ -110,7 +110,7 @@ onMounted(() => {
   window.addEventListener('toast:add', (event: any) => {
     addToast(event.detail)
   })
-  
+
   window.addEventListener('toast:remove', (event: any) => {
     removeToast(event.detail.id)
   })
