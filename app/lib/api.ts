@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-// 使用相对路径，开发环境通过 Vite proxy 转发，生产环境通过 Nginx 代理
+// 使用相对路径，所有 API 请求通过 Nginx 代理到后端微服务
 const API_BASE_URL = ''
 
 // eslint-disable-next-line no-console
@@ -152,6 +152,57 @@ export const professionApi = {
   },
 }
 
+// Admin Profession API - 管理后台职业接口
+export const adminProfessionApi = {
+  getList(params?: { page?: number; pageSize?: number; risk_level?: string; search?: string }) {
+    const backendParams: any = {
+      page: params?.page || 1,
+      page_size: params?.pageSize || 12,
+    }
+    if (params?.risk_level) backendParams.risk_level = params.risk_level
+    if (params?.search) backendParams.search = params.search
+    return adminApiClient.get('/professions', { params: backendParams })
+  },
+  getById(id: string | number) {
+    return adminApiClient.get(`/professions/${id}`)
+  },
+  create(data: {
+    name: string
+    slug?: string
+    icon?: string
+    description?: string
+    category_id?: number
+    risk_level: string
+    risk_score: number
+    sort_order?: number
+    status?: number
+  }) {
+    return adminApiClient.post('/professions', data)
+  },
+  update(id: string | number, data: {
+    name?: string
+    slug?: string
+    icon?: string
+    description?: string
+    category_id?: number
+    risk_level?: string
+    risk_score?: number
+    sort_order?: number
+    status?: number
+  }) {
+    return adminApiClient.put(`/professions/${id}`, data)
+  },
+  delete(id: string | number) {
+    return adminApiClient.delete(`/professions/${id}`)
+  },
+  getCategories() {
+    return adminApiClient.get('/professions/categories')
+  },
+  getRiskLevels() {
+    return adminApiClient.get('/professions/risk-levels')
+  },
+}
+
 export const learningPathApi = {
   // 获取学习路径列表
   getList(params?: { page?: number; pageSize?: number; difficulty?: string }) {
@@ -239,37 +290,37 @@ export const toolApi = {
 
 export const authApi = {
   sendRegistrationCode(email: string) {
-    return apiClient.post('/auth/send-registration-code', { email })
+    return apiClient.post('/api/auth/send-registration-code', { email })
   },
   register(data: { email: string; password: string; nickname: string; verification_code: string }) {
-    return apiClient.post('/auth/register', data)
+    return apiClient.post('/api/auth/register', data)
   },
   login(email: string, password: string) {
-    return apiClient.post('/auth/login', { email, password })
+    return apiClient.post('/api/auth/login', { email, password })
   },
   refreshToken(refreshToken: string) {
-    return apiClient.post('/auth/refresh', { refresh_token: refreshToken })
+    return apiClient.post('/api/auth/refresh', { refresh_token: refreshToken })
   },
   logout() {
-    return apiClient.post('/auth/logout')
+    return apiClient.post('/api/auth/logout')
   },
   sendVerificationEmail(email: string) {
-    return apiClient.post('/auth/send-verification-email', { email })
+    return apiClient.post('/api/auth/send-verification-email', { email })
   },
 }
 
 export const userApi = {
   getProfile() {
-    return apiClient.get('/user/profile')
+    return apiClient.get('/api/user/profile')
   },
   updateProfile(data: any) {
-    return apiClient.put('/user/profile', data)
+    return apiClient.put('/api/user/profile', data)
   },
   updatePreferences(data: any) {
-    return apiClient.put('/user/preferences', data)
+    return apiClient.put('/api/user/preferences', data)
   },
   changePassword(data: { old_password: string; new_password: string }) {
-    return apiClient.post('/user/change-password', data)
+    return apiClient.post('/api/user/change-password', data)
   },
 }
 
@@ -279,8 +330,38 @@ const adminApiClient = axios.create({
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
+    'Accept-Encoding': 'identity',
   },
 })
+
+// Admin API client uses same response interceptor
+adminApiClient.interceptors.response.use(
+  (response) => {
+    const responseData = response.data
+    if (responseData && typeof responseData === 'object' && 'code' in responseData) {
+      if (responseData.code === 200 || responseData.code === 0) {
+        return responseData.data
+      } else {
+        const error: any = new Error(responseData.message || '请求失败')
+        error.code = responseData.code
+        error.data = responseData.data
+        return Promise.reject(error)
+      }
+    }
+    return responseData
+  },
+  (error) => {
+    console.error('[Admin API Error]', error.config?.url, error.response?.status, error.response?.data)
+    if (error.response) {
+      const responseData = error.response.data
+      if (responseData && typeof responseData === 'object' && 'code' in responseData) {
+        error.code = responseData.code
+        error.message = responseData.message || error.message
+      }
+    }
+    return Promise.reject(error)
+  }
+)
 
 // Admin API - 管理后台接口 (无需认证)
 export const adminApi = {
@@ -325,6 +406,16 @@ export const adminApi = {
     // 获取用户操作日志
     getLogs(id: string | number) {
       return adminApiClient.get(`/users/${id}/logs`)
+    },
+
+    // 创建用户
+    create(data: { email: string; nickname: string; password: string; role?: string }) {
+      return adminApiClient.post('/users', data)
+    },
+
+    // 修改密码
+    updatePassword(id: string | number, data: { password: string }) {
+      return adminApiClient.put(`/users/${id}/password`, data)
     },
   },
 
@@ -383,12 +474,13 @@ export const adminApi = {
   },
 
   tool: {
-    // 获取待审核工具列表
-    getPendingTools(params?: { page?: number; pageSize?: number; search?: string }) {
+    // 获取工具列表
+    getPendingTools(params?: { page?: number; pageSize?: number; search?: string; review_status?: string }) {
       const backendParams: any = {}
       if (params?.page) backendParams.page = params.page
       if (params?.pageSize) backendParams.page_size = params.pageSize
       if (params?.search) backendParams.search = params.search
+      if (params?.review_status) backendParams.review_status = params.review_status
       return adminApiClient.get('/tools/pending', { params: backendParams })
     },
 
@@ -410,6 +502,48 @@ export const adminApi = {
     // 退回修改
     requestRevision(id: string | number, reason: string) {
       return adminApiClient.post(`/tools/${id}/request-revision`, { reason })
+    },
+
+    // 上线工具
+    setOnline(id: string | number) {
+      return adminApiClient.post(`/tools/${id}/online`)
+    },
+
+    // 下线工具
+    setOffline(id: string | number) {
+      return adminApiClient.post(`/tools/${id}/offline`)
+    },
+  },
+
+  article: {
+    // 获取文章列表
+    getPendingArticles(params?: { page?: number; pageSize?: number; search?: string; review_status?: string }) {
+      const backendParams: any = {}
+      if (params?.page) backendParams.page = params.page
+      if (params?.pageSize) backendParams.page_size = params.pageSize
+      if (params?.search) backendParams.search = params.search
+      if (params?.review_status) backendParams.review_status = params.review_status
+      return adminApiClient.get('/articles/pending', { params: backendParams })
+    },
+
+    // 审核通过
+    approveArticle(id: string | number) {
+      return adminApiClient.post(`/articles/${id}/approve`)
+    },
+
+    // 拒绝文章
+    rejectArticle(id: string | number, reason: string) {
+      return adminApiClient.post(`/articles/${id}/reject`, { reason })
+    },
+
+    // 发布文章
+    publishArticle(id: string | number) {
+      return adminApiClient.post(`/articles/${id}/publish`)
+    },
+
+    // 下架文章
+    unpublishArticle(id: string | number) {
+      return adminApiClient.post(`/articles/${id}/unpublish`)
     },
   },
 

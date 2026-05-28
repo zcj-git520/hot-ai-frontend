@@ -99,3 +99,7 @@ NUXT_PUBLIC_API_URL=http://localhost/api    # Backend API address
 NUXT_SITE_NAME=AI 热点追踪平台
 JWT_SECRET=...                              # Backend only
 ```
+
+前端不许使用  Vite 本地代理 ，必须使用nginx代理
+
+再次强调一下：必须走nginx代理 不能直接访问服务，或者通过前端的代理 

@@ -46,31 +46,6 @@ export default defineNuxtConfig({
     optimizeDeps: {
       include: ['axios'],
     },
-    // 开发服务器代理配置 - 通过环境变量配置后端地址，由 nginx 按路径分发到各微服务
-    server: {
-      proxy: (() => {
-        const baseUrl = process.env.NUXT_PUBLIC_API_URL || 'http://localhost/api'
-        // 提取 host 部分 (如 http://localhost -> http://localhost)
-        const url = new URL(baseUrl)
-        const target = `${url.protocol}//${url.host}`
-        return {
-          '/api': { target, changeOrigin: true },
-          '/auth': { target, changeOrigin: true },
-          '/user': { target, changeOrigin: true },
-          '/admin': {
-            target: 'http://localhost:8006',
-            changeOrigin: true,
-            bypass(req) {
-              // 页面请求走 Nuxt，API 请求走代理到 admin-svc
-              const accept = req.headers.accept || ''
-              if (accept.includes('text/html')) {
-                return req.url || '/admin'
-              }
-            },
-          },
-        }
-      })(),
-    },
   },
 
   // 开发服务器
@@ -85,9 +60,10 @@ export default defineNuxtConfig({
 
   // Nitro 配置
   nitro: {
-    compressPublicAssets: true,
+    compressPublicAssets: false,
     routeRules: {
       '/admin/**': { ssr: false },
+      '/api/**': { cors: false, headers: { 'Content-Type': 'application/json' } },
     },
   },
 })

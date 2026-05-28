@@ -176,13 +176,15 @@ const fetchTools = async () => {
     }
 
     const response = await $fetch('/api/tools', { query: params })
-    if (response.code === 0 && response.data) {
-      tools.value = response.data.list || []
+    if ((response.code === 0 || response.code === 200) && response.data) {
+      tools.value = Array.isArray(response.data.list) ? response.data.list : []
       totalPages.value = Math.ceil((response.data.total || 0) / pageSize.value)
     } else {
+      tools.value = []
       error.value = response.message || '获取工具列表失败'
     }
-  } catch (err) {
+  } catch (err: any) {
+    tools.value = []
     error.value = '网络错误，获取工具列表失败'
   } finally {
     loading.value = false
