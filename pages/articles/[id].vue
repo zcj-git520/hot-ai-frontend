@@ -35,7 +35,7 @@
       </div>
     </header>
 
-    <!-- 面包屑导航 -->
+    <!-- 面包屑 -->
     <div class="max-w-4xl mx-auto px-4 sm:px-6 py-4">
       <nav class="flex items-center gap-2 text-sm text-[#8b949e]">
         <NuxtLink to="/" class="hover:text-white transition-colors">首页</NuxtLink>
@@ -52,74 +52,8 @@
       <p class="text-[#8b949e] mt-3">加载中...</p>
     </div>
 
-    <!-- 文章详情 -->
-    <div v-else-if="article" class="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
-      <article class="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden">
-        <!-- 标题区 -->
-        <div class="p-6 sm:p-8 border-b border-[#30363d]">
-          <div class="flex items-center gap-2 mb-4 flex-wrap">
-            <span :class="getCategoryBadgeClass(article.category_name)">
-              {{ article.category_name }}
-            </span>
-            <span class="flex items-center gap-1 text-[#8b949e] text-sm">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              {{ formatDate(article.published_at) }}
-            </span>
-            <span v-if="article.source_name" class="text-[#8b949e] text-sm">来源：{{ article.source_name }}</span>
-          </div>
-          <h1 class="text-2xl sm:text-3xl font-bold text-white mb-4 leading-tight">
-            {{ article.title }}
-          </h1>
-        </div>
-
-        <!-- 统计栏 -->
-        <div class="flex items-center gap-6 px-6 sm:px-8 py-4 border-b border-[#30363d] text-sm text-[#8b949e]">
-          <span>👁️ 阅读 {{ formatNumber(article.view_count || 0) }}</span>
-          <span>💬 评论 {{ formatNumber(article.comment_count || 0) }}</span>
-          <span>🔥 点赞 {{ formatNumber(article.like_count || 0) }}</span>
-        </div>
-
-        <!-- 标签 -->
-        <div v-if="article.tags && article.tags.length > 0" class="flex flex-wrap gap-2 px-6 sm:px-8 py-4 border-b border-[#30363d]">
-          <span v-for="tag in article.tags" :key="tag" class="inline-flex items-center gap-1 bg-[#21262d] text-[#8b949e] text-xs px-3 py-1 rounded-full">
-            {{ tag }}
-          </span>
-        </div>
-
-        <!-- 文章内容 -->
-        <div class="p-6 sm:p-8">
-          <div v-if="article.content" class="text-[#c9d1d9] leading-relaxed text-sm sm:text-base whitespace-pre-line" v-html="formatContent(article.content)"></div>
-          <div v-else class="text-[#8b949e] text-center py-8">
-            <p class="text-lg">暂无正文内容</p>
-            <p class="text-sm mt-2">该文章可能以摘要形式呈现，或请点击下方链接查看原文</p>
-          </div>
-        </div>
-
-        <!-- 操作按钮 -->
-        <div class="flex items-center justify-between px-6 sm:px-8 py-4 border-t border-[#30363d] bg-[#21262d]">
-          <NuxtLink to="/articles" class="flex items-center gap-2 text-[#58a6ff] hover:text-[#79c0ff] text-sm font-medium transition-colors">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-            返回列表
-          </NuxtLink>
-          <a
-            v-if="article.original_url"
-            :href="article.original_url"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex items-center gap-2 px-4 py-2 bg-[#238636] hover:bg-[#2ea043] text-white rounded-md text-sm font-medium transition-colors"
-          >
-            查看原文
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-          </a>
-        </div>
-      </article>
-    </div>
+    <!-- 详情主体 - 委托给 ArticleReader -->
+    <ArticleReader v-else-if="article" :article="article" />
 
     <!-- 错误状态 -->
     <div v-else class="max-w-4xl mx-auto px-4 sm:px-6 py-24 text-center">
@@ -139,14 +73,15 @@
 import { ref, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { useToast } from '~/composables/useToast'
+import { articleApi } from '~/app/lib/api'
+import ArticleReader from '~/app/components/article/ArticleReader.vue'
+import type { Article } from '~/types/article'
 
 const route = useRoute()
 const { user, clearAuth, restoreAuth } = useAuth()
 const { toastSuccess, toastError } = useToast()
 
-onMounted(() => {
-  restoreAuth()
-})
+onMounted(() => { restoreAuth() })
 
 const handleLogout = async () => {
   try {
@@ -162,20 +97,16 @@ const handleLogout = async () => {
   }
 }
 
-const article = ref<any>(null)
+const article = ref<Article | null>(null)
 const loading = ref(true)
 
 onMounted(async () => {
   const id = route.params.id as string
   if (!id) return
-
   try {
-    const res = await fetch(`/api/articles/${id}`)
-    const raw = await res.json()
-    // 后端返回 {code, data, message},提取 data 字段
-    const data = raw?.data || raw
-    if (data && data.id) {
-      article.value = data
+    const data = await articleApi.getById(id)
+    if (data && (data as Article).id) {
+      article.value = data as Article
     }
   } catch (error) {
     console.error('Failed to fetch article:', error)
@@ -183,31 +114,4 @@ onMounted(async () => {
     loading.value = false
   }
 })
-
-const getCategoryBadgeClass = (categoryName: string) => {
-  const classMap: Record<string, string> = {
-    '动态': 'bg-blue-500/10 text-blue-400',
-    '职业': 'bg-orange-500/10 text-orange-400',
-    '学习': 'bg-green-500/10 text-green-400',
-    '工具': 'bg-purple-500/10 text-purple-400'
-  }
-  return `text-xs px-3 py-1 rounded-full font-medium ${classMap[categoryName] || 'bg-gray-500/10 text-gray-400'}`
-}
-
-const formatDate = (dateStr: string) => {
-  if (!dateStr) return ''
-  return dateStr.split('T')[0]
-}
-
-const formatNumber = (num: number) => {
-  if (!num) return '0'
-  if (num >= 10000) return (num / 10000).toFixed(1) + 'w'
-  if (num >= 1000) return (num / 1000).toFixed(1) + 'k'
-  return String(num)
-}
-
-const formatContent = (content: string) => {
-  if (!content) return ''
-  return content.replace(/\n/g, '<br>')
-}
 </script>
