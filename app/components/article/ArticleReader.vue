@@ -68,6 +68,7 @@ import { useReaderPrefs } from '~/app/composables/useReaderPrefs'
 import ReadingProgress from './ReadingProgress.vue'
 import ReaderToolbar from './ReaderToolbar.vue'
 import { enhanceCodeBlocks } from './CodeBlockEnhancer.client'
+import { enhanceImages } from './enhanceImages.client'
 
 const props = withDefaults(
   defineProps<{
@@ -102,7 +103,10 @@ function formatNumber(n: number) {
 
 onMounted(async () => {
   await nextTick()
-  if (bodyEl.value) enhanceCodeBlocks(bodyEl.value)
+  if (bodyEl.value) {
+    enhanceCodeBlocks(bodyEl.value)
+    enhanceImages(bodyEl.value)
+  }
 })
 </script>
 
@@ -192,7 +196,31 @@ onMounted(async () => {
   font-style: italic;
   border-image: linear-gradient(180deg, var(--reader-accent-from), var(--reader-accent-to)) 1;
 }
-.reader-body :deep(img) { max-width: 100%; height: auto; border-radius: 8px; margin: 1em 0; loading: lazy; }
+.reader-body :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1em 0;
+  loading: lazy;
+  background: rgba(13, 17, 23, 0.4);
+  min-height: 60px;
+  display: block;
+}
+.reader-body :deep(img.img-failed) {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(167, 139, 250, 0.08),
+      rgba(167, 139, 250, 0.08) 8px,
+      rgba(34, 211, 238, 0.08) 8px,
+      rgba(34, 211, 238, 0.08) 16px
+    ),
+    rgba(13, 17, 23, 0.6);
+  border: 1px dashed var(--reader-border);
+  min-height: 180px;
+  position: relative;
+}
+.reader-body :deep(video) { max-width: 100%; border-radius: 8px; margin: 1em 0; }
 .reader-body :deep(hr) { border: 0; border-top: 1px solid var(--reader-border); margin: 2em 0; }
 
 /* === 复制按钮 === */
