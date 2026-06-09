@@ -1,10 +1,18 @@
 import axios from 'axios'
 
-// 使用相对路径，所有 API 请求通过 Nginx 代理到后端微服务
-const API_BASE_URL = ''
+// 客户端: baseURL 留空, axios 会把 "/api/..." 拼到当前页面 origin 后面
+//   - 浏览器打开 http://localhost/  → http://localhost/api/...  → nginx → 后端 ✅
+//   - 浏览器打开 http://8.130.23.164/ → http://8.130.23.164/api/... → nginx → 后端 ✅
+//   - 浏览器打开 http://localhost:3000/ (Nuxt dev, 没人这么做) → Nuxt 没 /api → 404
+//     → 强制只能走 nginx, 满足 "必须走nginx代理" 的硬约束
+// SSR: 用 http://localhost (NUXT_PUBLIC_API_URL 兜底) 走 nginx, 仅在 server-side 生效
+const API_BASE_URL =
+  (typeof window !== 'undefined')
+    ? ''  // 浏览器端用相对路径, 跟当前 origin 走
+    : (process.env.NUXT_PUBLIC_API_URL || 'http://localhost')
 
 // eslint-disable-next-line no-console
-console.log('[API] Using baseURL:', API_BASE_URL, 'DEV:', process.dev)
+console.log('[API] Using baseURL:', JSON.stringify(API_BASE_URL) || '(relative)', 'DEV:', process.dev)
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
