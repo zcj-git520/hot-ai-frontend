@@ -1,254 +1,348 @@
 <template>
-  <div>
-    <!-- 页面标题 -->
-    <div class="mb-8">
-      <div class="flex items-center gap-3 mb-2">
-        <div class="w-1 h-8 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></div>
-        <h1 class="font-tech text-3xl font-bold tracking-wider">职业风险查询</h1>
+  <div class="broadsheet">
+
+    <!-- ============================================================
+         卷二首部
+         ============================================================ -->
+    <section class="pt-10 md:pt-16 pb-10">
+      <div class="flex items-center gap-4 mb-6 anim-rise">
+        <span class="seal-square seal-square--tilt-l anim-seal">卷二</span>
+        <span class="kicker kicker--moss">职业风险 · CAREER INDEX</span>
       </div>
-      <p class="text-gray-500 font-mono text-sm ml-4">
-        <span class="text-cyan-400">//</span> 了解你的职业在 AI 时代的风险等级和转型建议 <span class="text-cyan-400">//</span>
+
+      <h1 class="headline headline--xl anim-rise anim-rise-1 text-balance">
+        把抽象的「AI 威胁」<br />
+        换成可读的<em class="not-italic text-vermillion">数字</em>
+      </h1>
+
+      <p class="deck mt-7 max-w-[40rem] text-pretty anim-rise anim-rise-2">
+        本卷收录十二个职业在生成式 AI 浪潮下的真实工作流变化。
+        数字本身不是命运，
+        <span class="zhupi">它只告诉你该把学习预算花在哪里</span>。
       </p>
-    </div>
+    </section>
 
-    <!-- 搜索框 -->
-    <div class="glass-card neon-border p-6 mb-8">
-      <div class="flex flex-col sm:flex-row gap-4">
-        <div class="relative flex-1">
-          <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="搜索职业，例如：设计师、程序员、运营..."
-            class="input-cyber pl-12"
-          />
-        </div>
-        <button class="btn-cyber flex items-center justify-center gap-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          搜索
-        </button>
-      </div>
-    </div>
+    <hr class="rule" />
 
-    <!-- 风险等级说明 -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-      <div
-        v-for="level in riskLevels"
-        :key="level.id"
-        class="glass-card p-4 text-center group hover:border-current transition-all"
-        :class="level.hoverClass"
-      >
-        <div class="text-2xl mb-2">{{ level.icon }}</div>
-        <div class="font-tech text-sm font-semibold mb-1" :class="level.textClass">{{ level.name }}</div>
-        <p class="text-xs text-gray-600">{{ level.description }}</p>
-      </div>
-    </div>
-
-    <!-- 职业列表 -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <NuxtLink
-        v-for="profession in filteredProfessions"
-        :key="profession.id"
-        :to="`/professions/${profession.slug}`"
-        class="glass-card card-decoration p-6 group hover:border-cyan-400/50 transition-all duration-300"
-      >
-        <div class="flex items-start justify-between mb-4">
-          <h3 class="text-lg font-semibold group-hover:text-cyan-400 transition-colors">{{ profession.name }}</h3>
-          <span :class="['tag-cyber', getRiskTagClass(profession.riskLevel)]">
-            {{ getRiskName(profession.riskLevel) }}
-          </span>
-        </div>
-
-        <div class="space-y-3">
-          <div class="flex items-center justify-between text-sm">
-            <span class="text-gray-500">AI 自动化率</span>
-            <span class="font-mono font-semibold" :class="getRiskTextClass(profession.riskLevel)">
-              {{ profession.automationRate }}%
-            </span>
-          </div>
-          <div class="progress-cyber">
-            <div
-              :class="['h-full rounded-full', getRiskProgressClass(profession.riskLevel)]"
-              :style="{ width: profession.automationRate + '%' }"
-            ></div>
-          </div>
-
-          <div class="flex flex-wrap gap-1.5 mt-3">
-            <span
-              v-for="skill in profession.safeSkills.slice(0, 3)"
-              :key="skill"
-              class="px-2 py-1 text-xs rounded bg-green-500/10 border border-green-500/30 text-green-400"
+    <!-- ============================================================
+         搜索 + 风险等级
+         ============================================================ -->
+    <section class="py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        <div class="lg:col-span-7">
+          <label for="profession-search" class="label">检 索 · Search</label>
+          <div class="flex items-end gap-3">
+            <input
+              id="profession-search"
+              v-model="searchKeyword"
+              type="text"
+              class="field flex-1"
+              placeholder="如：设计师 / 程序员 / 运营 / 文案"
+              @keyup.enter="handleSearch"
+            />
+            <button
+              v-if="searchKeyword"
+              type="button"
+              @click="clearSearch"
+              class="btn btn--ghost btn--sm"
             >
-              {{ skill }}
-            </span>
+              清 空
+            </button>
+            <button type="button" @click="handleSearch" class="btn btn--cinnabar btn--sm whitespace-nowrap">
+              检 索
+              <span class="arrow">→</span>
+            </button>
           </div>
         </div>
 
-        <!-- 底部装饰 -->
-        <div class="mt-4 pt-4 border-t border-cyan-500/10 flex items-center justify-between">
-          <span class="text-xs text-gray-600">查看详情</span>
-          <span class="text-xs text-cyan-400 group-hover:translate-x-1 transition-transform">
-            →
-          </span>
+        <div class="lg:col-span-5">
+          <span class="label">风 险 等 级 · Risk Level</span>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              :class="['px-3 py-1.5 text-[12.5px] font-serif border tracking-[0.06em] transition-colors',
+                       activeRiskLevel === 'all' ? 'bg-ink text-paper-soft border-ink' : 'border-ink text-ink hover:bg-ink hover:text-paper-soft']"
+              @click="handleRiskLevelChange('all')"
+            >
+              全 部
+            </button>
+            <button
+              v-for="level in riskLevels"
+              :key="level.id"
+              type="button"
+              :class="['px-3 py-1.5 text-[12.5px] font-serif border tracking-[0.06em] transition-colors flex items-center gap-1.5',
+                       activeRiskLevel === level.level ? 'bg-ink text-paper-soft border-ink' : 'border-ink text-ink hover:bg-ink hover:text-paper-soft']"
+              @click="handleRiskLevelChange(level.level)"
+            >
+              <span class="w-2 h-2 inline-block" :style="{ background: level.dot }"></span>
+              {{ level.name }}
+            </button>
+          </div>
         </div>
-      </NuxtLink>
-    </div>
-
-    <!-- 空状态 -->
-    <div v-if="filteredProfessions.length === 0" class="glass-card p-12 text-center">
-      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center">
-        <svg class="w-8 h-8 text-cyan-500/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
       </div>
-      <p class="text-gray-400">未找到匹配的职业</p>
-    </div>
+    </section>
+
+    <hr class="rule-soft" />
+
+    <!-- ============================================================
+         职业列表（卷二·风险柱卡片）
+         ============================================================ -->
+    <section class="py-10">
+      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12">
+        <div v-for="i in 6" :key="i" class="border-t border-ink pt-7">
+          <div class="h-3 w-16 bg-paper-deep mb-4"></div>
+          <div class="h-6 w-3/4 bg-paper-deep mb-4"></div>
+          <div class="h-3 w-full bg-paper-deep mb-2"></div>
+          <div class="h-3 w-2/3 bg-paper-deep"></div>
+        </div>
+      </div>
+
+      <div v-else-if="professions && professions.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12">
+        <NuxtLink
+          v-for="(p, i) in professions"
+          :key="p.id"
+          :to="`/professions/${p.id}`"
+          class="block group no-underline-on-hover border-t-2 border-ink pt-7 anim-rise"
+          :class="`anim-rise-${(i % 5) + 1}`"
+        >
+          <div class="flex items-end justify-between mb-5">
+            <div class="flex items-end gap-4">
+              <div class="risk-bar__col" :style="`height: ${getBarHeight(p.risk_score)}; background: ${getRiskColor(p.risk_score)}; border-color: ${getRiskColor(p.risk_score)};`"></div>
+              <div>
+                <div class="risk-bar__readout" :style="`color: ${getRiskColor(p.risk_score)};`">{{ p.risk_score }}</div>
+                <div class="risk-bar__caption">{{ getRiskLevelName(p.risk_level) }}</div>
+              </div>
+            </div>
+            <span class="byline">№ {{ String(i + 1).padStart(2, '0') }}</span>
+          </div>
+
+          <h3 class="headline headline--md group-hover:text-vermillion transition-colors text-balance">
+            {{ p.name }}
+          </h3>
+
+          <p class="font-serif text-[14.5px] text-ink-soft leading-[1.9] mt-3 text-pretty line-clamp-2">
+            {{ p.description || `${p.name} 当前的 AI 自动化率约 ${p.automation_rate || '—'}%，市场呈现 ${getRiskTrend(p.risk_level)} 趋势。` }}
+          </p>
+
+          <div class="mt-5 pt-4 border-t border-rule-faint flex items-center justify-between text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute">
+            <span>自 动 化 率 · {{ p.automation_rate || '—' }}%</span>
+            <span class="text-ink flex items-center gap-1 group-hover:gap-2 transition-all">
+              阅 详 情 <span class="arrow">→</span>
+            </span>
+          </div>
+        </NuxtLink>
+      </div>
+
+      <div v-else class="py-20 text-center">
+        <span class="seal-square seal-square--tilt-l">无</span>
+        <p class="mt-5 font-serif italic text-ink-mute">本类暂无职业记录。</p>
+      </div>
+
+      <!-- 分页 -->
+      <div v-if="totalPages > 1" class="mt-12 pt-8 border-t border-rule-soft flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <p class="text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute">
+          第 <span class="text-ink">{{ currentPage }}</span> / {{ totalPages }} 页 · 共 <span class="text-ink">{{ totalCount }}</span> 个
+        </p>
+        <nav class="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            @click="goToPage(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="btn btn--ghost btn--sm disabled:opacity-30"
+          >
+            ← 上一页
+          </button>
+          <template v-for="page in displayPages" :key="page">
+            <span v-if="page === '...'" class="px-2 text-ink-faint font-mono">…</span>
+            <button
+              v-else
+              type="button"
+              @click="goToPage(page as number)"
+              :class="['min-w-[2.5rem] h-9 px-2 text-[13px] font-mono border tracking-wider transition-colors',
+                       currentPage === page
+                         ? 'bg-ink text-paper-soft border-ink'
+                         : 'border-ink text-ink hover:bg-ink hover:text-paper-soft']"
+            >
+              {{ page }}
+            </button>
+          </template>
+          <button
+            type="button"
+            @click="goToPage(currentPage + 1)"
+            :disabled="currentPage === totalPages"
+            class="btn btn--ghost btn--sm disabled:opacity-30"
+          >
+            下一页 →
+          </button>
+        </nav>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         方法论提示
+         ============================================================ -->
+    <section class="py-12 border-t border-rule">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-4">
+          <div class="kicker kicker--ink mb-3">方法论 · METHOD</div>
+          <h2 class="headline headline--md text-balance">
+            一个「零到一百」的指数，<br />是怎么算出来的
+          </h2>
+        </div>
+        <div class="lg:col-span-8">
+          <ol class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-7">
+            <li v-for="(step, i) in methodSteps" :key="i" class="flex gap-4">
+              <span class="font-serif font-black text-vermillion text-[1.6rem] leading-none w-9 shrink-0 tracking-[0.04em]">
+                {{ ['壹','贰','叁','肆'][i] }}
+              </span>
+              <div>
+                <div class="font-serif font-bold text-[15.5px] leading-tight tracking-[0.06em]">{{ step.title }}</div>
+                <p class="font-serif text-[13.5px] text-ink-soft leading-[1.9] mt-2 text-pretty">{{ step.body }}</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
   </div>
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  layout: 'default'
-})
+definePageMeta({ layout: 'default' })
 
-const searchQuery = ref('')
+const searchKeyword = ref('')
+const activeRiskLevel = ref('all')
+const currentPage = ref(1)
+const pageSize = ref(12)
+const totalCount = ref(0)
+const totalPages = ref(0)
+const loading = ref(false)
 
 const riskLevels = [
-  {
-    id: 'extreme',
-    name: '极高风险',
-    icon: '⚠️',
-    description: '高度重复、规则明确',
-    hoverClass: 'hover:border-red-500/50',
-    textClass: 'text-red-400',
-  },
-  {
-    id: 'high',
-    name: '高风险',
-    icon: '🔶',
-    description: '大部分可被 AI 替代',
-    hoverClass: 'hover:border-orange-500/50',
-    textClass: 'text-orange-400',
-  },
-  {
-    id: 'medium',
-    name: '中等风险',
-    icon: '💛',
-    description: '部分可被 AI 辅助',
-    hoverClass: 'hover:border-yellow-500/50',
-    textClass: 'text-yellow-400',
-  },
-  {
-    id: 'low',
-    name: '低风险',
-    icon: '✅',
-    description: '需创造力和复杂决策',
-    hoverClass: 'hover:border-green-500/50',
-    textClass: 'text-green-400',
-  },
+  { id: 'extreme', level: 'extreme', name: '极 高', dot: '#B5202A' },
+  { id: 'high',    level: 'high',    name: '高',   dot: '#A87326' },
+  { id: 'medium',  level: 'medium',  name: '中',   dot: '#1F3147' },
+  { id: 'low',     level: 'low',     name: '低',   dot: '#3F5D3A' },
 ]
 
-const professions = ref([
-  {
-    id: 1,
-    name: '文案策划',
-    slug: 'copywriter',
-    riskLevel: 'extreme',
-    automationRate: 85,
-    safeSkills: ['创意构思', '品牌策略', '用户洞察']
-  },
-  {
-    id: 2,
-    name: '平面设计',
-    slug: 'graphic-designer',
-    riskLevel: 'high',
-    automationRate: 75,
-    safeSkills: ['创意思维', '品牌设计', '用户体验']
-  },
-  {
-    id: 3,
-    name: '数据录入员',
-    slug: 'data-entry',
-    riskLevel: 'extreme',
-    automationRate: 95,
-    safeSkills: ['数据校验', '异常处理']
-  },
-  {
-    id: 4,
-    name: '客服代表',
-    slug: 'customer-service',
-    riskLevel: 'high',
-    automationRate: 70,
-    safeSkills: ['情感沟通', '复杂问题处理']
-  },
-  {
-    id: 5,
-    name: '初级程序员',
-    slug: 'junior-developer',
-    riskLevel: 'medium',
-    automationRate: 60,
-    safeSkills: ['系统设计', '架构思维', '业务理解']
-  },
-  {
-    id: 6,
-    name: '产品经理',
-    slug: 'product-manager',
-    riskLevel: 'low',
-    automationRate: 35,
-    safeSkills: ['战略规划', '用户研究', '商业洞察']
-  },
-])
+const methodSteps = [
+  { title: '拆 任 务',  body: '把每个职业拆成三十到六十个可执行子任务，标注每个任务的自动化潜力。' },
+  { title: '看 市 场',  body: '结合招聘数据、薪资曲线与岗位增长趋势，估算市场对该职业的需求弹性。' },
+  { title: '问 从 业 者', body: '对四百一十二位从业者做访谈，校准「模型实际能用上」与「看上去能用上」的差距。' },
+  { title: '给 一 个 数 字', body: '把以上三个维度合成零到一百的指数。它是一张「该把学习预算花在哪里」的地图。' },
+]
 
-const filteredProfessions = computed(() => {
-  if (!searchQuery.value) return professions.value
-  const query = searchQuery.value.toLowerCase()
-  return professions.value.filter(p =>
-    p.name.toLowerCase().includes(query) ||
-    p.safeSkills.some(s => s.toLowerCase().includes(query))
-  )
+const professions = ref<any[]>([])
+
+const fetchProfessions = async () => {
+  loading.value = true
+  try {
+    const params: any = { page: currentPage.value, page_size: pageSize.value }
+    if (activeRiskLevel.value !== 'all') params.risk_level = activeRiskLevel.value
+    if (searchKeyword.value) params.keyword = searchKeyword.value
+    const res: any = await $fetch('/api/professions', { query: params })
+    const data = res?.data || res
+    professions.value = data?.professions || []
+    totalCount.value = data?.total || 0
+    totalPages.value = data?.total_pages || 0
+  } catch (err) {
+    console.error('Failed to fetch professions:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+const { data: initial } = await useAsyncData('professions-initial', () => $fetch('/api/professions', {
+  query: { page: 1, page_size: 12 },
+}), {
+  transform: (res: any) => {
+    const data = res?.data || res
+    return {
+      list: data?.professions || [],
+      total: data?.total || 0,
+      totalPages: data?.total_pages || 0,
+    }
+  },
+})
+professions.value = initial.value?.list || []
+totalCount.value = initial.value?.total || 0
+totalPages.value = initial.value?.totalPages || 0
+
+const handleSearch = async () => {
+  currentPage.value = 1
+  await fetchProfessions()
+}
+const clearSearch = async () => {
+  searchKeyword.value = ''
+  currentPage.value = 1
+  await fetchProfessions()
+}
+const handleRiskLevelChange = async (level: string) => {
+  activeRiskLevel.value = level
+  currentPage.value = 1
+  await fetchProfessions()
+}
+const goToPage = async (page: number) => {
+  if (page < 1 || page > totalPages.value || page === currentPage.value) return
+  currentPage.value = page
+  await fetchProfessions()
+  if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+const displayPages = computed(() => {
+  const pages: (number | string)[] = []
+  const total = totalPages.value
+  const current = currentPage.value
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i)
+  } else if (current <= 4) {
+    for (let i = 1; i <= 5; i++) pages.push(i)
+    pages.push('...')
+    pages.push(total)
+  } else if (current >= total - 3) {
+    pages.push(1)
+    pages.push('...')
+    for (let i = total - 4; i <= total; i++) pages.push(i)
+  } else {
+    pages.push(1)
+    pages.push('...')
+    for (let i = current - 1; i <= current + 1; i++) pages.push(i)
+    pages.push('...')
+    pages.push(total)
+  }
+  return pages
 })
 
-const getRiskTagClass = (riskLevel: string) => {
-  const map: Record<string, string> = {
-    extreme: 'tag-risk-extreme',
-    high: 'tag-risk-high',
-    medium: 'tag-risk-medium',
-    low: 'tag-risk-low',
-  }
-  return map[riskLevel] || 'tag-cyber'
+const getRiskLevelName = (level: string) => {
+  const map: Record<string, string> = { extreme: '极 高 风 险', high: '高 风 险', medium: '中 等 风 险', low: '低 风 险' }
+  return map[level] || level
 }
 
-const getRiskName = (riskLevel: string) => {
-  const names: Record<string, string> = {
-    extreme: '极高风险',
-    high: '高风险',
-    medium: '中等风险',
-    low: '低风险'
-  }
-  return names[riskLevel] || '未知'
+const getRiskColor = (score: number) => {
+  if (score >= 80) return '#B5202A'
+  if (score >= 60) return '#A87326'
+  if (score >= 40) return '#1F3147'
+  return '#3F5D3A'
 }
 
-const getRiskTextClass = (riskLevel: string) => {
-  const map: Record<string, string> = {
-    extreme: 'text-red-400',
-    high: 'text-orange-400',
-    medium: 'text-yellow-400',
-    low: 'text-green-400',
-  }
-  return map[riskLevel] || 'text-gray-400'
+const getBarHeight = (score: number) => {
+  // score 0-100 → 1.2rem to 8rem
+  const ratio = Math.max(0, Math.min(100, score)) / 100
+  return (1.2 + ratio * 6.8).toFixed(2) + 'rem'
 }
 
-const getRiskProgressClass = (riskLevel: string) => {
-  const map: Record<string, string> = {
-    extreme: 'bg-gradient-to-r from-red-500 to-red-400',
-    high: 'bg-gradient-to-r from-orange-500 to-orange-400',
-    medium: 'bg-gradient-to-r from-yellow-500 to-yellow-400',
-    low: 'bg-gradient-to-r from-green-500 to-green-400',
-  }
-  return map[riskLevel] || 'bg-gray-500'
+const getRiskTrend = (level: string) => {
+  const map: Record<string, string> = { extreme: '替代加速', high: '显著上升', medium: '缓慢变化', low: '相对稳定' }
+  return map[level] || '波动'
 }
 </script>
+
+<style scoped>
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>

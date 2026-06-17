@@ -1,250 +1,191 @@
 <template>
-  <div>
-    <!-- 页面标题 -->
-    <div class="mb-8">
-      <div class="flex items-center gap-3 mb-2">
-        <div class="w-1 h-8 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></div>
-        <h1 class="font-tech text-3xl font-bold tracking-wider">最新资讯</h1>
+  <div class="broadsheet">
+
+    <!-- ============================================================
+         卷一首部 — 标题 / 搜索 / 分类
+         ============================================================ -->
+    <section class="pt-10 md:pt-16 pb-10">
+      <div class="flex items-center gap-4 mb-6 anim-rise">
+        <span class="seal-square seal-square--tilt-l anim-seal">卷一</span>
+        <span class="kicker kicker--indigo">资讯 · LATEST INTEL</span>
       </div>
-      <p class="text-gray-500 font-mono text-sm ml-4">
-        <span class="text-cyan-400">//</span> 追踪 AI 领域最新动态，洞察职业发展趋势 <span class="text-cyan-400">//</span>
+
+      <h1 class="headline headline--xl anim-rise anim-rise-1 text-balance">
+        本期<br />
+        收录 <em class="not-italic text-vermillion">{{ totalCount || '—' }}</em> 条
+      </h1>
+
+      <p class="deck mt-7 max-w-[40rem] text-pretty anim-rise anim-rise-2">
+        本卷辑录每周值得读的 AI 资讯。追的是对岗位结构有真实影响的事，
+        不是又一条<span class="zhupi">「颠覆性发布」</span>的标题党。
       </p>
-    </div>
+    </section>
 
-    <!-- 搜索框 -->
-    <div class="mb-6">
-      <div class="relative max-w-2xl">
-        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <input
-          v-model="searchKeyword"
-          type="text"
-          placeholder="搜索文章标题或内容..."
-          class="input-cyber pl-12 pr-12"
-          @keyup.enter="handleSearch"
-        />
-        <button
-          v-if="searchKeyword"
-          @click="clearSearch"
-          class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-cyan-400 transition-colors"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-    </div>
+    <hr class="rule" />
 
-    <!-- 分类筛选 -->
-    <div class="flex flex-wrap gap-2 mb-8">
-      <button
-        :class="[
-          'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300',
-          activeCategory === 'all'
-            ? 'bg-cyan-500 text-gray-900 border border-cyan-400'
-            : 'bg-cyan-500/5 border border-cyan-500/20 text-gray-400 hover:text-cyan-400 hover:border-cyan-400/50'
-        ]"
-        @click="handleCategoryChange('all')"
-      >
-        全部
-      </button>
-      <button
-        v-for="category in categories"
-        :key="category.id"
-        :class="[
-          'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300',
-          activeCategory === category.code
-            ? 'bg-cyan-500 text-gray-900 border border-cyan-400'
-            : 'bg-cyan-500/5 border border-cyan-500/20 text-gray-400 hover:text-cyan-400 hover:border-cyan-400/50'
-        ]"
-        @click="handleCategoryChange(category.code)"
-      >
-        {{ category.name }}
-      </button>
-    </div>
-
-    <!-- 加载状态 -->
-    <div v-if="loading" class="space-y-6">
-      <div v-for="i in 3" :key="i" class="glass-card p-6">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="skeleton h-6 w-20"></div>
-          <div class="skeleton h-4 w-32"></div>
+    <!-- ============================================================
+         搜索 + 分类筛选
+         ============================================================ -->
+    <section class="py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        <div class="lg:col-span-7">
+          <label for="article-search" class="label">检 索 · Search</label>
+          <div class="flex items-end gap-3">
+            <input
+              id="article-search"
+              v-model="searchKeyword"
+              type="text"
+              class="field flex-1"
+              placeholder="如：GPT-5 / 设计师 / 多模态"
+              @keyup.enter="handleSearch"
+            />
+            <button
+              v-if="searchKeyword"
+              type="button"
+              @click="clearSearch"
+              class="btn btn--ghost btn--sm"
+              aria-label="清空"
+            >
+              清 空
+            </button>
+            <button type="button" @click="handleSearch" class="btn btn--cinnabar btn--sm whitespace-nowrap">
+              检 索
+              <span class="arrow">→</span>
+            </button>
+          </div>
         </div>
-        <div class="skeleton h-6 w-3/4 mb-2"></div>
-        <div class="skeleton h-6 w-1/2 mb-4"></div>
-        <div class="skeleton h-4 w-full mb-2"></div>
-        <div class="skeleton h-4 w-2/3"></div>
-      </div>
-    </div>
 
-    <!-- 文章列表 -->
-    <div v-else-if="articles && articles.length > 0" class="space-y-6">
-      <article
-        v-for="article in articles"
-        :key="article.id"
-        class="glass-card card-decoration p-6 group hover:border-cyan-400/50 transition-all duration-300"
-      >
-        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
-          <div class="flex items-center gap-3 flex-wrap">
-            <span :class="['tag-cyber', getCategoryClass(article.category_code || article.category_name)]">
+        <div class="lg:col-span-5">
+          <span class="label">分 类 · Category</span>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              :class="['px-3 py-1.5 text-[12.5px] font-serif border tracking-[0.06em] transition-colors',
+                       activeCategory === 'all'
+                         ? 'bg-ink text-paper-soft border-ink'
+                         : 'border-ink text-ink hover:bg-ink hover:text-paper-soft']"
+              @click="handleCategoryChange('all')"
+            >
+              全 部
+            </button>
+            <button
+              v-for="category in categories || []"
+              :key="category.id"
+              type="button"
+              :class="['px-3 py-1.5 text-[12.5px] font-serif border tracking-[0.06em] transition-colors',
+                       activeCategory === category.code
+                         ? 'bg-ink text-paper-soft border-ink'
+                         : 'border-ink text-ink hover:bg-ink hover:text-paper-soft']"
+              @click="handleCategoryChange(category.code)"
+            >
+              {{ category.name }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="rule-soft" />
+
+    <!-- ============================================================
+         文章列表（卷一·印张式）
+         ============================================================ -->
+    <section class="py-10">
+      <div v-if="loading" class="space-y-0">
+        <div v-for="i in 3" :key="i" class="article-card">
+          <div class="h-3 w-24 bg-paper-deep mb-4"></div>
+          <div class="h-6 w-full bg-paper-deep mb-3"></div>
+          <div class="h-6 w-4/5 bg-paper-deep mb-5"></div>
+          <div class="h-3 w-full bg-paper-deep mb-2"></div>
+          <div class="h-3 w-3/4 bg-paper-deep"></div>
+        </div>
+      </div>
+
+      <div v-else-if="articles && articles.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+        <article
+          v-for="(article, index) in articles"
+          :key="article.id"
+          class="article-card anim-rise"
+          :class="`anim-rise-${(index % 5) + 1}`"
+        >
+          <div class="article-mast">
+            <span class="article-mast__num">№ {{ String(index + 1).padStart(2, '0') }}</span>
+            <span :class="['seal-square', sealTilt(index)]">
               {{ article.category_name }}
             </span>
-            <span class="flex items-center gap-1.5 text-xs text-gray-500 font-mono">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              {{ formatDate(article.published_at) }}
-            </span>
-            <span v-if="article.author" class="flex items-center gap-1.5 text-xs text-gray-500 font-mono">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              {{ article.author }}
-            </span>
+            <span class="byline ml-auto">{{ formatDate(article.published_at) }}</span>
           </div>
-        </div>
 
-        <h2 class="text-xl font-semibold mb-3 group-hover:text-cyan-400 transition-colors">
-          <NuxtLink :to="`/articles/${article.id}`">
-            {{ article.title }}
-          </NuxtLink>
-        </h2>
-
-        <p class="text-gray-500 mb-4 line-clamp-2 text-sm">
-          {{ article.summary }}
-        </p>
-
-        <!-- 统计信息 -->
-        <div class="flex items-center gap-6 text-xs text-gray-600 mb-4">
-          <span class="flex items-center gap-1">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-            {{ formatNumber(article.view_count || 0) }}
-          </span>
-          <span class="flex items-center gap-1">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            {{ formatNumber(article.comment_count || 0) }}
-          </span>
-          <span class="flex items-center gap-1">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-            {{ formatNumber(article.like_count || 0) }}
-          </span>
-        </div>
-
-        <div class="flex items-center justify-between pt-4 border-t border-cyan-500/10">
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-600">来源:</span>
-            <span class="text-xs text-cyan-400 font-medium">{{ article.source_name }}</span>
-          </div>
-          <div class="flex items-center gap-4">
-            <button
-              @click="toggleFavorite(article)"
-              class="flex items-center gap-1 text-xs transition-colors"
-              :class="article.is_favorited ? 'text-red-400' : 'text-gray-500 hover:text-red-400'"
-            >
-              <svg class="w-4 h-4" :fill="article.is_favorited ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-              </svg>
-              {{ article.is_favorited ? '已收藏' : '收藏' }}
-            </button>
-            <a
-              v-if="article.original_url"
-              :href="article.original_url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex items-center gap-1 text-xs text-gray-500 hover:text-green-400 transition-colors"
-              @click.stop
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              查看原文
-            </a>
-            <NuxtLink
-              :to="`/articles/${article.id}`"
-              class="flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 transition-colors"
-            >
-              阅读全文
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
+          <h2 class="headline headline--md mt-5 text-balance">
+            <NuxtLink :to="`/articles/${article.id}`" class="hover:text-vermillion transition-colors">
+              {{ article.title }}
             </NuxtLink>
+          </h2>
+
+          <p class="font-serif text-[15.5px] text-ink-soft leading-[1.95] mt-4 text-pretty line-clamp-3">
+            {{ article.summary }}
+          </p>
+
+          <div class="mt-5 pt-4 border-t border-rule-faint flex items-center justify-between text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute">
+            <span>来 源 · {{ article.source_name }}</span>
+            <span class="flex items-center gap-4">
+              <span v-if="article.view_count">{{ formatNumber(article.view_count) }} 阅</span>
+              <NuxtLink :to="`/articles/${article.id}`" class="text-ink underline-draw">阅全文 →</NuxtLink>
+            </span>
           </div>
-        </div>
-      </article>
-    </div>
-
-    <!-- 空状态 -->
-    <div v-else class="glass-card p-12 text-center">
-      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center">
-        <svg class="w-8 h-8 text-cyan-500/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
+        </article>
       </div>
-      <p class="text-gray-400 text-lg mb-2">暂无文章数据</p>
-      <p v-if="searchKeyword" class="text-gray-600 text-sm">尝试更换搜索关键词或清除筛选条件</p>
-    </div>
 
-    <!-- 分页 -->
-    <div v-if="totalPages > 1" class="mt-12 flex flex-col sm:flex-row justify-center items-center gap-4">
-      <nav class="flex items-center gap-2">
-        <button
-          @click="goToPage(currentPage - 1)"
-          :disabled="currentPage === 1"
-          class="btn-cyber-ghost flex items-center gap-1 disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-          上一页
-        </button>
+      <div v-else class="py-20 text-center">
+        <span class="seal-square seal-square--tilt-l">空</span>
+        <p class="mt-5 font-serif italic text-ink-mute">本期本类尚无资讯。</p>
+      </div>
 
-        <template v-for="page in displayPages" :key="page">
-          <span v-if="page === '...'" class="px-2 text-gray-600 font-mono">...</span>
+      <!-- 分页 -->
+      <div v-if="totalPages > 1" class="mt-12 pt-8 border-t border-rule-soft flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <p class="text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute">
+          第 <span class="text-ink">{{ currentPage }}</span> / {{ totalPages }} 页 · 共 <span class="text-ink">{{ totalCount }}</span> 条
+        </p>
+        <nav class="flex items-center gap-2 flex-wrap">
           <button
-            v-else
-            @click="goToPage(page as number)"
-            :class="[
-              'w-10 h-10 rounded-lg text-sm font-mono transition-all duration-300',
-              currentPage === page
-                ? 'bg-cyan-500 text-gray-900 border border-cyan-400'
-                : 'btn-cyber-ghost'
-            ]"
+            type="button"
+            @click="goToPage(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="btn btn--ghost btn--sm disabled:opacity-30"
           >
-            {{ page }}
+            ← 上一页
           </button>
-        </template>
-
-        <button
-          @click="goToPage(currentPage + 1)"
-          :disabled="currentPage === totalPages"
-          class="btn-cyber-ghost flex items-center gap-1 disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          下一页
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </nav>
-
-      <div class="text-xs text-gray-500 font-mono">
-        第 <span class="text-cyan-400">{{ currentPage }}</span> / <span>{{ totalPages }}</span> 页，共 <span class="text-cyan-400">{{ totalCount }}</span> 条
+          <template v-for="page in displayPages" :key="page">
+            <span v-if="page === '...'" class="px-2 text-ink-faint font-mono">…</span>
+            <button
+              v-else
+              type="button"
+              @click="goToPage(page as number)"
+              :class="['min-w-[2.5rem] h-9 px-2 text-[13px] font-mono border tracking-wider transition-colors',
+                       currentPage === page
+                         ? 'bg-ink text-paper-soft border-ink'
+                         : 'border-ink text-ink hover:bg-ink hover:text-paper-soft']"
+            >
+              {{ page }}
+            </button>
+          </template>
+          <button
+            type="button"
+            @click="goToPage(currentPage + 1)"
+            :disabled="currentPage === totalPages"
+            class="btn btn--ghost btn--sm disabled:opacity-30"
+          >
+            下一页 →
+          </button>
+        </nav>
       </div>
-    </div>
+    </section>
+
   </div>
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  layout: 'default'
-})
+definePageMeta({ layout: 'default' })
 
 const activeCategory = ref('all')
 const searchKeyword = ref('')
@@ -255,55 +196,51 @@ const totalPages = ref(0)
 const loading = ref(false)
 
 const { data: categories } = await useFetch('/api/articles/categories', {
-  transform: (data) => {
-    const responseData = data?.data || data
-    return responseData || []
-  }
+  transform: (data: any) => data?.data || data || [],
 })
 
 const buildQuery = () => {
   const params: any = {
     page: currentPage.value,
-    page_size: pageSize.value
+    page_size: pageSize.value,
   }
-  if (activeCategory.value !== 'all') {
-    params.category = activeCategory.value
-  }
-  if (searchKeyword.value) {
-    params.keyword = searchKeyword.value
-  }
+  if (activeCategory.value !== 'all') params.category = activeCategory.value
+  if (searchKeyword.value) params.keyword = searchKeyword.value
   return params
 }
+
+const articles = ref<any[]>([])
 
 const fetchArticles = async () => {
   loading.value = true
   try {
-    const { data } = await useFetch('/api/articles', {
-      query: buildQuery(),
-      transform: (res) => {
-        const responseData = res?.data || res
-        totalCount.value = responseData?.total || 0
-        totalPages.value = responseData?.total_pages || 0
-        return responseData?.articles || []
-      }
-    })
-    articles.value = data.value || []
-  } catch (error) {
-    console.error('获取文章列表失败:', error)
+    const res: any = await $fetch('/api/articles', { query: buildQuery() })
+    const data = res?.data || res
+    articles.value = data?.articles || []
+    totalCount.value = data?.total || 0
+    totalPages.value = data?.total_pages || 0
+  } catch (err) {
+    console.error('获取文章列表失败:', err)
   } finally {
     loading.value = false
   }
 }
 
-const { data: articles } = await useFetch('/api/articles', {
-  query: buildQuery(),
-  transform: (res) => {
-    const responseData = res?.data || res
-    totalCount.value = responseData?.total || 0
-    totalPages.value = responseData?.total_pages || 0
-    return responseData?.articles || []
-  }
+const { data: initial } = await useAsyncData('articles-initial', () => $fetch('/api/articles', {
+  query: { page: 1, page_size: pageSize.value },
+}), {
+  transform: (res: any) => {
+    const data = res?.data || res
+    return {
+      articles: data?.articles || [],
+      total: data?.total || 0,
+      totalPages: data?.total_pages || 0,
+    }
+  },
 })
+articles.value = initial.value?.articles || []
+totalCount.value = initial.value?.total || 0
+totalPages.value = initial.value?.totalPages || 0
 
 const handleCategoryChange = async (category: string) => {
   activeCategory.value = category
@@ -323,85 +260,55 @@ const clearSearch = async () => {
 }
 
 const goToPage = async (page: number) => {
-  if (page < 1 || page > totalPages.value || page === currentPage.value) {
-    return
-  }
+  if (page < 1 || page > totalPages.value || page === currentPage.value) return
   currentPage.value = page
   await fetchArticles()
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 const displayPages = computed(() => {
   const pages: (number | string)[] = []
   const total = totalPages.value
   const current = currentPage.value
-
   if (total <= 7) {
-    for (let i = 1; i <= total; i++) {
-      pages.push(i)
-    }
+    for (let i = 1; i <= total; i++) pages.push(i)
+  } else if (current <= 4) {
+    for (let i = 1; i <= 5; i++) pages.push(i)
+    pages.push('...')
+    pages.push(total)
+  } else if (current >= total - 3) {
+    pages.push(1)
+    pages.push('...')
+    for (let i = total - 4; i <= total; i++) pages.push(i)
   } else {
-    if (current <= 4) {
-      for (let i = 1; i <= 5; i++) {
-        pages.push(i)
-      }
-      pages.push('...')
-      pages.push(total)
-    } else if (current >= total - 3) {
-      pages.push(1)
-      pages.push('...')
-      for (let i = total - 4; i <= total; i++) {
-        pages.push(i)
-      }
-    } else {
-      pages.push(1)
-      pages.push('...')
-      for (let i = current - 1; i <= current + 1; i++) {
-        pages.push(i)
-      }
-      pages.push('...')
-      pages.push(total)
-    }
+    pages.push(1)
+    pages.push('...')
+    for (let i = current - 1; i <= current + 1; i++) pages.push(i)
+    pages.push('...')
+    pages.push(total)
   }
-
   return pages
 })
 
-const toggleFavorite = async (article: any) => {
-  article.is_favorited = !article.is_favorited
-}
+const sealTilt = (i: number) => (i % 2 === 0 ? 'seal-square--tilt-l' : 'seal-square--tilt-r')
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return ''
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  })
+  const d = new Date(dateStr)
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 }
 
-const formatNumber = (num: number) => {
-  if (num >= 10000) return (num / 10000).toFixed(1) + 'w'
-  if (num >= 1000) return (num / 1000).toFixed(1) + 'k'
-  return num.toString()
-}
-
-const getCategoryClass = (code: string) => {
-  const map: Record<string, string> = {
-    news: 'category-news',
-    impact: 'category-impact',
-    learn: 'category-learn',
-    tool: 'category-tool',
-  }
-  return map[code] || 'category-news'
+const formatNumber = (n: number) => {
+  if (n >= 10000) return (n / 10000).toFixed(1) + ' 万'
+  if (n >= 1000) return (n / 1000).toFixed(1) + ' 千'
+  return String(n)
 }
 </script>
 
 <style scoped>
-.line-clamp-2 {
+.line-clamp-3 {
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

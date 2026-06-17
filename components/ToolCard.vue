@@ -1,31 +1,29 @@
 <template>
-  <div class="h-full">
-    <div class="flex items-start justify-between mb-4">
+  <div class="h-full flex flex-col">
+    <div class="flex items-start justify-between mb-5">
       <div class="flex items-center gap-3">
-        <span class="text-3xl">{{ tool.icon }}</span>
+        <span class="font-serif font-black text-vermillion text-[2.4rem] leading-none w-12 h-12 flex items-center justify-center border border-ink">
+          {{ (tool.name?.charAt(0) || '·') }}
+        </span>
         <div>
-          <h3 class="text-lg font-semibold text-white group-hover:text-cyan-400 transition-colors">{{ tool.name }}</h3>
-          <p class="text-xs text-gray-500 font-mono">{{ getCategoryName(tool.category_id) }}</p>
+          <h3 class="font-serif font-bold text-[18px] text-ink group-hover:text-vermillion transition-colors tracking-[0.04em] leading-tight">{{ tool.name }}</h3>
+          <p class="text-[11px] text-ink-mute font-mono tracking-[0.16em] uppercase mt-1">{{ getCategoryName(tool.category_id) }}</p>
         </div>
       </div>
-      <span
-        :class="['tag-cyber', getDifficultyClass(tool.difficulty)]"
-      >
+      <span :class="['seal-square', difficultyTilt]">
         {{ getDifficultyName(tool.difficulty) }}
       </span>
     </div>
 
-    <p class="text-gray-400 text-sm mb-4 line-clamp-2">{{ tool.description }}</p>
+    <p class="font-serif text-[14px] text-ink-soft leading-[1.85] mb-5 line-clamp-2 text-pretty">{{ tool.description }}</p>
 
-    <div class="flex items-center justify-between mt-auto pt-4 border-t border-cyan-500/10">
-      <div class="flex items-center gap-1">
-        <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-        <span class="text-sm font-mono text-gray-300">{{ tool.rating.toFixed(1) }}</span>
-        <span class="text-xs text-gray-600">({{ tool.review_count }})</span>
-      </div>
-      <span class="text-xs text-gray-500 font-mono">{{ formatNumber(tool.view_count) }} 阅读</span>
+    <div class="mt-auto pt-4 border-t border-rule-faint flex items-center justify-between text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute">
+      <span class="flex items-center gap-1.5">
+        <span class="text-ochre">★</span>
+        <span class="text-ink font-bold">{{ tool.rating?.toFixed(1) || '—' }}</span>
+        <span class="text-ink-faint">({{ tool.review_count || 0 }})</span>
+      </span>
+      <span>{{ formatNumber(tool.view_count) }} 阅</span>
     </div>
   </div>
 </template>
@@ -33,9 +31,18 @@
 <script setup lang="ts">
 import type { Tool } from '~/types/tool'
 
-defineProps<{
+const props = defineProps<{
   tool: Tool
 }>()
+
+const difficultyTilt = computed(() => {
+  const map: Record<string, string> = {
+    beginner: 'seal-square--tilt-l',
+    intermediate: '',
+    advanced: 'seal-square--tilt-r',
+  }
+  return map[props.tool.difficulty] || 'seal-square--tilt-l'
+})
 
 const getDifficultyClass = (difficulty: string) => {
   const map: Record<string, string> = {
@@ -48,25 +55,26 @@ const getDifficultyClass = (difficulty: string) => {
 
 const getDifficultyName = (difficulty: string) => {
   const names: Record<string, string> = {
-    beginner: '入门',
-    intermediate: '进阶',
-    advanced: '高级'
+    beginner: '入 门',
+    intermediate: '进 阶',
+    advanced: '高 级'
   }
-  return names[difficulty] || '未知'
+  return names[difficulty] || '未 知'
 }
 
 const getCategoryName = (categoryId: number) => {
-  return '工具分类'
+  return '工 具 分 类'
 }
 
 const formatNumber = (num: number) => {
+  if (!num) return '0'
   if (num >= 10000) {
-    return (num / 10000).toFixed(1) + 'w'
+    return (num / 10000).toFixed(1) + ' 万'
   }
   if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'k'
+    return (num / 1000).toFixed(1) + ' 千'
   }
-  return num.toString()
+  return String(num)
 }
 </script>
 

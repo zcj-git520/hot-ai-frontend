@@ -9,7 +9,7 @@
         :aria-pressed="props.fontSize === size.value"
         @click="emit('update:fontSize', size.value)"
       >
-        <span :style="{ fontSize: size.sample }">A</span>
+        <span :style="{ fontSize: size.sample }">字</span>
       </button>
     </div>
 
@@ -42,14 +42,14 @@ import { onMounted, onBeforeUnmount, ref } from 'vue'
 import type { FontSize, Theme } from '~/app/composables/useReaderPrefs'
 
 const SIZES = [
-  { value: 'sm' as FontSize, label: '小', sample: '12px' },
-  { value: 'md' as FontSize, label: '中', sample: '14px' },
-  { value: 'lg' as FontSize, label: '大', sample: '16px' },
+  { value: 'sm' as FontSize, label: '小', sample: '11px' },
+  { value: 'md' as FontSize, label: '中', sample: '13px' },
+  { value: 'lg' as FontSize, label: '大', sample: '15px' },
 ]
 const THEMES = [
-  { value: 'dark'  as Theme, label: '深色', dot: '#0d1117' },
-  { value: 'light' as Theme, label: '浅色', dot: '#ffffff' },
-  { value: 'sepia' as Theme, label: '护眼', dot: '#f5ecd9' },
+  { value: 'paper'  as Theme, label: '宣纸', dot: '#F2EBD9' },
+  { value: 'indigo' as Theme, label: '青墨', dot: '#1F3147' },
+  { value: 'ochre'  as Theme, label: '赭石', dot: '#A87326' },
 ]
 
 const props = defineProps<{
@@ -78,54 +78,56 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
   flex-direction: column;
   gap: 8px;
   z-index: 50;
+  font-family: 'Noto Serif SC', serif;
 }
 .group {
   display: flex;
   gap: 2px;
-  background: rgba(22, 27, 34, 0.85);
-  border: 1px solid #30363d;
-  border-radius: 999px;
+  background: rgba(242, 235, 217, 0.92);
+  border: 1px solid #1A1714;
   padding: 4px;
   backdrop-filter: blur(8px);
 }
 button {
   border: 0;
   background: transparent;
-  color: #8b949e;
+  color: #6B6155;
   width: 36px;
   height: 36px;
-  border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 150ms;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
 }
-button:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
-button.active { color: #fff; background: linear-gradient(135deg, #22d3ee, #a78bfa); }
+button:hover { color: #1A1714; background: rgba(26, 23, 20, 0.06); }
+button.active { color: #F2EBD9; background: #B5202A; }
 .theme-btn .dot {
   display: block;
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid #1A1714;
 }
 
 .back-to-top {
   width: 44px;
   height: 44px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #22d3ee, #a78bfa);
-  color: #0d1117;
+  background: #1A1714;
+  color: #F2EBD9;
   font-weight: 700;
   font-size: 18px;
   opacity: 0;
   transform: translateY(8px);
   transition: all 200ms;
   pointer-events: none;
-  box-shadow: 0 4px 20px rgba(167, 139, 250, 0.4);
+  border: 1px solid #1A1714;
+  font-family: 'Noto Serif SC', serif;
 }
 .back-to-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.back-to-top:hover { background: #B5202A; border-color: #B5202A; }
 
 @media (max-width: 768px) {
   .reader-toolbar { right: 12px; bottom: 12px; }

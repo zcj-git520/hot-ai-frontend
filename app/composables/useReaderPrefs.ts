@@ -1,14 +1,14 @@
 import { ref, watch } from 'vue'
 
 export type FontSize = 'sm' | 'md' | 'lg'
-export type Theme = 'dark' | 'light' | 'sepia'
+export type Theme = 'paper' | 'indigo' | 'ochre'
 
 const STORAGE_KEY = 'reader-prefs'
 const FONT_SIZES: FontSize[] = ['sm', 'md', 'lg']
-const THEMES: Theme[] = ['dark', 'light', 'sepia']
+const THEMES: Theme[] = ['paper', 'indigo', 'ochre']
 
 const fontSize = ref<FontSize>('md')
-const theme = ref<Theme>('dark')
+const theme = ref<Theme>('paper')
 let initialized = false
 
 function loadFromStorage() {

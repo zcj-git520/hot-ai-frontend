@@ -10,12 +10,12 @@ const emit = defineEmits<{
 }>()
 
 const navItems = [
-  { key: 'dashboard', label: 'Dashboard', icon: '📊' },
-  { key: 'courses', label: '课程管理', icon: '📚' },
-  { key: 'tools', label: '工具管理', icon: '🛠️', badge: 0 },
-  { key: 'articles', label: '文章管理', icon: '📝', badge: 0 },
-  { key: 'professions', label: '职业管理', icon: '💼' },
-  { key: 'users', label: '用户管理', icon: '👥' },
+  { key: 'dashboard',   label: '总 览',  seal: '览' },
+  { key: 'courses',     label: '课 程',  seal: '课' },
+  { key: 'tools',       label: '工 具',  seal: '具' },
+  { key: 'articles',    label: '资 讯',  seal: '闻' },
+  { key: 'professions', label: '职 业',  seal: '业' },
+  { key: 'users',       label: '订 户',  seal: '人' },
 ]
 
 const handleNavigate = (key: string) => {
@@ -25,45 +25,60 @@ const handleNavigate = (key: string) => {
 
 <template>
   <aside class="admin-sidebar">
-    <div class="sidebar-header">
-      <h2 class="sidebar-title">管理后台</h2>
+    <!-- 报头 -->
+    <div class="px-6 pt-7 pb-6 border-b-2 border-ink">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="seal-square seal-square--tilt-l">编 辑 部</span>
+      </div>
+      <h2 class="font-serif font-black text-[1.7rem] leading-[1.05] tracking-[0.04em] text-ink">编 辑 卷 次</h2>
+      <p class="text-[10.5px] font-mono tracking-[0.18em] uppercase text-ink-mute mt-1.5">
+        Editor Console · v 1.0
+      </p>
     </div>
 
-    <nav class="nav-list">
-      <button
-        v-for="item in navItems"
-        :key="item.key"
-        class="nav-item"
-        :class="{ active: activeKey === item.key }"
-        @click="handleNavigate(item.key)"
-      >
-        <span class="nav-icon">{{ item.icon }}</span>
-        <span class="nav-label">{{ item.label }}</span>
-        <span
-          v-if="item.key === 'tools' && pendingTools && pendingTools > 0"
-          class="nav-badge"
-        >
-          {{ pendingTools }}
-        </span>
-        <span
-          v-if="item.key === 'articles' && pendingArticles && pendingArticles > 0"
-          class="nav-badge"
-        >
-          {{ pendingArticles }}
-        </span>
-      </button>
+    <!-- 导航 -->
+    <nav class="flex-1 py-4">
+      <div class="kicker kicker--mute px-6 mb-3">操 作 卷 次</div>
+      <ul class="space-y-0.5">
+        <li v-for="item in navItems" :key="item.key">
+          <button
+            class="admin-nav-item w-full text-left"
+            :class="{ 'is-active': activeKey === item.key }"
+            @click="handleNavigate(item.key)"
+          >
+            <span class="font-serif font-black text-[12px] tracking-[0.18em] w-7 h-7 inline-flex items-center justify-center border"
+                  :class="activeKey === item.key ? 'bg-paper-soft text-seal border-paper-soft' : 'border-ink text-ink'">
+              {{ item.seal }}
+            </span>
+            <span class="flex-1">{{ item.label }}</span>
+            <span
+              v-if="item.key === 'tools' && pendingTools && pendingTools > 0"
+              class="admin-nav-badge"
+            >
+              {{ pendingTools }}
+            </span>
+            <span
+              v-if="item.key === 'articles' && pendingArticles && pendingArticles > 0"
+              class="admin-nav-badge"
+            >
+              {{ pendingArticles }}
+            </span>
+          </button>
+        </li>
+      </ul>
     </nav>
 
-    <div class="sidebar-footer">
-      <div class="user-info">
-        <div class="user-avatar">👤</div>
-        <div class="user-details">
-          <span class="user-name">Admin</span>
-          <span class="user-role">管理员</span>
+    <!-- 底部 -->
+    <div class="px-6 py-6 border-t-2 border-ink">
+      <div class="flex items-center gap-3 mb-5">
+        <span class="font-serif font-black text-paper-soft text-[1.2rem] leading-none w-10 h-10 flex items-center justify-center bg-seal">A</span>
+        <div>
+          <p class="font-serif font-bold text-[14px] text-ink leading-tight">主 编</p>
+          <p class="text-[10.5px] font-mono tracking-[0.18em] uppercase text-ink-mute mt-0.5">EDITOR</p>
         </div>
       </div>
-      <button class="logout-btn" @click="handleNavigate('logout')">
-        退出登录
+      <button class="btn btn--ghost btn--sm w-full" @click="handleNavigate('logout')">
+        退 出 编 辑
       </button>
     </div>
   </aside>
@@ -71,137 +86,73 @@ const handleNavigate = (key: string) => {
 
 <style scoped>
 .admin-sidebar {
-  width: 240px;
+  width: 280px;
   height: 100vh;
-  background: #1a1a2e;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--paper);
+  border-right: 3px solid var(--ink);
   display: flex;
   flex-direction: column;
   position: fixed;
   left: 0;
   top: 0;
+  z-index: 40;
+  font-family: 'Noto Serif SC', serif;
 }
 
-.sidebar-header {
-  padding: 1.5rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.sidebar-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #fff;
-  margin: 0;
-}
-
-.nav-list {
-  flex: 1;
-  padding: 1rem 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.nav-item {
+.admin-nav-item {
   display: flex;
   align-items: center;
-  width: 100%;
-  padding: 0.75rem 1rem;
+  gap: 0.85rem;
+  padding: 0.7rem 1.5rem;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
   background: transparent;
-  border: none;
-  border-right: 3px solid transparent;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.875rem;
+  border: 0;
+  border-left: 3px solid transparent;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 200ms cubic-bezier(0.2, 0.7, 0.2, 1),
+              color 200ms cubic-bezier(0.2, 0.7, 0.2, 1),
+              border-color 200ms cubic-bezier(0.2, 0.7, 0.2, 1);
   text-align: left;
+  position: relative;
+}
+.admin-nav-item:hover {
+  background: var(--paper-deep);
+  color: var(--ink);
+}
+.admin-nav-item.is-active {
+  background: var(--ink);
+  color: var(--paper-soft);
+  border-left-color: var(--vermillion);
+}
+.admin-nav-item.is-active .admin-nav-badge {
+  background: var(--vermillion);
+  color: var(--paper-soft);
+  border-color: var(--vermillion);
 }
 
-.nav-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-}
-
-.nav-item.active {
-  background: rgba(99, 102, 241, 0.2);
-  color: #6366f1;
-  border-right: 3px solid #6366f1;
-}
-
-.nav-icon {
-  font-size: 1.125rem;
-  margin-right: 0.75rem;
-}
-
-.nav-label {
-  flex: 1;
-}
-
-.nav-badge {
-  margin-left: auto;
-  padding: 0.125rem 0.5rem;
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.sidebar-footer {
-  padding: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.user-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(99, 102, 241, 0.3);
-  display: flex;
+.admin-nav-badge {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.4rem;
+  background: var(--vermillion);
+  color: var(--paper-soft);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  border: 1px solid var(--vermillion);
+  letter-spacing: 0;
 }
 
-.user-details {
-  display: flex;
-  flex-direction: column;
-}
-
-.user-name {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #fff;
-}
-
-.user-role {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.logout-btn {
-  width: 100%;
-  padding: 0.5rem;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 0.375rem;
-  color: #ef4444;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.logout-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.5);
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    width: 240px;
+  }
 }
 </style>

@@ -1,339 +1,406 @@
 <template>
-  <div class="relative">
-    <!-- Hero 区域 -->
-    <section class="relative min-h-[85vh] flex items-center justify-center overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 mb-16">
-      <!-- 背景效果层 -->
-      <div class="absolute inset-0">
-        <!-- 渐变背景 -->
-        <div class="absolute inset-0 bg-gradient-to-b from-cyan-500/5 via-transparent to-purple-500/5"></div>
+  <div class="broadsheet">
 
-        <!-- 动态网格 -->
-        <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at 1px 1px, rgba(0,210,255,0.3) 1px, transparent 0); background-size: 50px 50px;"></div>
+    <!-- ============================================================
+         卷首 — 头条
+         ============================================================ -->
+    <section class="pt-12 md:pt-20 pb-16">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
 
-        <!-- 扫描线 -->
-        <div class="absolute inset-0 overflow-hidden">
-          <div class="absolute w-full h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent animate-scan"></div>
-        </div>
-
-        <!-- 角落装饰 -->
-        <div class="absolute top-0 left-0 w-32 h-32 border-l-2 border-t-2 border-cyan-500/30 rounded-tl-3xl"></div>
-        <div class="absolute top-0 right-0 w-32 h-32 border-r-2 border-t-2 border-cyan-500/30 rounded-tr-3xl"></div>
-        <div class="absolute bottom-0 left-0 w-32 h-32 border-l-2 border-b-2 border-purple-500/30 rounded-bl-3xl"></div>
-        <div class="absolute bottom-0 right-0 w-32 h-32 border-r-2 border-b-2 border-purple-500/30 rounded-br-3xl"></div>
-      </div>
-
-      <!-- 内容 -->
-      <div class="relative z-10 text-center max-w-5xl mx-auto">
-        <!-- 状态标签 -->
-        <div class="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-cyan-500/30 bg-cyan-500/10 backdrop-blur-sm">
-          <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-          <span class="text-xs font-mono text-cyan-400 tracking-wider">NEURAL NETWORK ONLINE</span>
-        </div>
-
-        <!-- 主标题 -->
-        <h1 class="font-tech font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight">
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-cyan-400 animate-gradient">
-            AI 时代
-          </span>
-          <br />
-          <span class="text-white">职业导航系统</span>
-        </h1>
-
-        <!-- 副标题 -->
-        <p class="text-lg sm:text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-          <span class="text-cyan-400 font-mono">//</span>
-          探索前沿 AI 趋势 &nbsp;|&nbsp; 评估职业风险指数 &nbsp;|&nbsp; 获取个性化学习路径
-          <span class="text-cyan-400 font-mono">//</span>
-        </p>
-
-        <!-- CTA 按钮 -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-          <NuxtLink to="/professions" class="btn-cyber group relative overflow-hidden">
-            <span class="relative z-10 flex items-center justify-center gap-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              查询职业风险
-            </span>
-          </NuxtLink>
-          <NuxtLink to="/articles" class="btn-cyber-outline group relative overflow-hidden">
-            <span class="relative z-10 flex items-center justify-center gap-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6" />
-              </svg>
-              浏览最新资讯
-            </span>
-          </NuxtLink>
-        </div>
-
-        <!-- 统计数据 -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-          <div v-for="stat in stats" :key="stat.label" class="glass-card p-4 sm:p-6">
-            <div class="font-tech text-2xl sm:text-3xl font-bold text-cyan-400 mb-1">{{ stat.value }}</div>
-            <div class="text-xs sm:text-sm text-gray-500 font-mono uppercase tracking-wider">{{ stat.label }}</div>
+        <!-- 左：卷首主稿 -->
+        <article class="lg:col-span-8">
+          <div class="flex items-center gap-4 mb-7 anim-rise">
+            <span class="seal-square seal-square--tilt-l anim-seal">卷首</span>
+            <span class="kicker">AI 时代 · 头条</span>
+            <span class="byline ml-auto">撰文 · 观察编辑部</span>
           </div>
-        </div>
-      </div>
 
-      <!-- 底部装饰 -->
-      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
-        <div class="w-8 h-14 rounded-full border-2 border-cyan-500/30 flex items-start justify-center p-2">
-          <div class="w-1.5 h-3 rounded-full bg-cyan-400 animate-bounce"></div>
-        </div>
+          <h1 class="headline headline--xl text-balance anim-rise anim-rise-1">
+            当模型比设计师<br />更快地完成
+            <em class="not-italic text-vermillion">「第一稿」</em>
+          </h1>
+
+          <p class="deck mt-8 max-w-[40rem] text-pretty anim-rise anim-rise-2">
+            我们花了三个月，追踪十二个职业在生成式 AI 浪潮里的真实工作流变化。
+            <span class="zhupi">这不是预言</span>，
+            而是一份对当前岗位结构的冷静记录——哪些环节被压缩了，哪些技能反而更值钱了。
+          </p>
+
+          <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute anim-rise anim-rise-3">
+            <span>数据 · 风险评估系统</span>
+            <span class="text-vermillion">·</span>
+            <span>阅读约 14 分钟</span>
+            <span class="text-vermillion">·</span>
+            <span>{{ todayStr }}</span>
+          </div>
+
+          <hr class="rule mt-10 mb-8" />
+
+          <div class="prose-cn indent-cn anim-rise anim-rise-4">
+            <p>
+              <span class="ink-block">过</span>去六个月，我们对四百一十二位从业者做了访谈，并对照他们日常使用工具的日志数据。
+              一个清晰的图景浮现出来：真正发生变化的，不是
+              <em class="not-italic text-ink">「职业」</em>本身，而是职业内部的
+              <em class="not-italic text-ink">「价值分布」</em>。
+            </p>
+            <p>
+              那些靠「先做出来再说」赢的岗位正在被重新定价，而靠「判断什么是值得做」的岗位，反而获得了更大的议价空间。
+              <span class="zhupi">这是好事，也是坏事。</span>
+              关键在于你是否看清了这条线。
+            </p>
+            <p>
+              本期卷首，我们将风险评估结果、岗位样本、以及面向普通人的可执行建议，整理为一份完整的观察报告。
+            </p>
+          </div>
+
+          <div class="mt-10 flex flex-wrap items-center gap-4 anim-rise anim-rise-5">
+            <NuxtLink to="/articles" class="btn btn--ink btn--lg">
+              阅读完整报告
+              <span class="arrow">→</span>
+            </NuxtLink>
+            <NuxtLink to="/professions" class="btn btn--ghost">
+              查询我的职业
+            </NuxtLink>
+          </div>
+        </article>
+
+        <!-- 右：本期目录 -->
+        <aside class="lg:col-span-4 lg:border-l lg:border-rule-soft lg:pl-12 anim-rise anim-rise-2">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="seal-round">目</span>
+            <span class="kicker kicker--ink">本期目录</span>
+          </div>
+
+          <h2 class="font-serif font-black text-[clamp(2rem,2.4vw,2.6rem)] leading-[1.2] mb-7 tracking-[0.04em] text-balance">
+            四卷<br />今日之观察
+          </h2>
+
+          <ol class="space-y-6">
+            <li v-for="(item, i) in indexItems" :key="i" class="flex gap-4">
+              <span class="font-serif font-black text-vermillion text-[1.5rem] leading-none w-7 shrink-0 tracking-[0.04em]">
+                {{ ['一','二','三','四'][i] }}
+              </span>
+              <div class="flex-1">
+                <NuxtLink :to="item.path" class="font-serif font-bold text-[16.5px] leading-[1.45] text-ink hover:text-vermillion transition-colors block text-balance">
+                  {{ item.title }}
+                </NuxtLink>
+                <p class="text-[11.5px] text-ink-mute mt-1 font-mono tracking-[0.18em] uppercase">
+                  {{ item.dek }}
+                </p>
+              </div>
+            </li>
+          </ol>
+
+          <hr class="rule-soft my-7" />
+
+          <p class="quote-cn font-serif text-[15.5px] leading-[1.85] text-ink-soft">
+            我们不预测未来，我们记录正在发生的事。
+          </p>
+          <p class="byline mt-2.5">— 创刊词 · 二〇二四</p>
+        </aside>
+
       </div>
     </section>
 
-    <!-- 最新资讯 -->
-    <section class="mb-16">
-      <div class="flex justify-between items-center mb-8">
-        <h2 class="section-title">最新资讯</h2>
-        <NuxtLink to="/articles" class="btn-cyber-ghost text-sm flex items-center gap-2">
-          查看全部
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </NuxtLink>
-      </div>
+    <hr class="rule-thick" />
 
-      <!-- 加载状态 -->
-      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div v-for="i in 3" :key="i" class="glass-card p-6">
-          <div class="skeleton h-4 w-24 mb-4"></div>
-          <div class="skeleton h-6 w-full mb-2"></div>
-          <div class="skeleton h-6 w-3/4 mb-4"></div>
-          <div class="skeleton h-4 w-full mb-2"></div>
-          <div class="skeleton h-4 w-2/3"></div>
+    <!-- ============================================================
+         卷一 · 资讯
+         ============================================================ -->
+    <section class="py-16">
+      <header class="mb-10">
+        <div class="juan-marker">
+          <span class="kicker kicker--indigo">卷一</span>
+          <span class="juan-marker__num">壹</span>
+          <span class="font-serif text-[clamp(1.6rem,2.2vw,2.2rem)] font-bold leading-none tracking-[0.06em]">本  期  资  讯</span>
+          <span class="juan-marker__line"></span>
+          <span class="byline">LATEST INTEL</span>
+        </div>
+        <p class="font-serif text-[16px] text-ink-soft mt-5 max-w-[40rem] text-pretty leading-[1.85]">
+          本卷辑录本周值得读的 AI 资讯。我们不追热度，只记那些对岗位结构有真实影响的事。
+        </p>
+      </header>
+
+      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-3 gap-x-10">
+        <div v-for="i in 3" :key="i" class="article-card">
+          <div class="h-3 w-24 bg-paper-deep mb-4"></div>
+          <div class="h-6 w-full bg-paper-deep mb-3"></div>
+          <div class="h-6 w-4/5 bg-paper-deep mb-5"></div>
+          <div class="h-3 w-full bg-paper-deep mb-2"></div>
+          <div class="h-3 w-3/4 bg-paper-deep"></div>
         </div>
       </div>
 
-      <!-- 文章列表 -->
-      <div v-else-if="latestArticles && latestArticles.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <article
-          v-for="(article, index) in latestArticles"
-          :key="article.id"
-          class="glass-card card-decoration p-6 group hover:border-cyan-400/50 transition-all duration-300"
-          :style="{ animationDelay: `${index * 100}ms` }"
-        >
-          <!-- 分类标签 -->
-          <div class="flex items-center justify-between mb-4">
-            <span
-              :class="[
-                'tag-cyber',
-                getCategoryClass(article.category_code)
-              ]"
-            >
+      <div v-else-if="latestArticles && latestArticles.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-x-10">
+        <article v-for="(article, index) in latestArticles" :key="article.id" class="article-card anim-rise" :class="`anim-rise-${(index % 5) + 1}`">
+          <div class="article-mast">
+            <span class="article-mast__num">№ {{ String(index + 1).padStart(2, '0') }}</span>
+            <span :class="['seal-square', getSealClass(article.category_code), sealTilt(index)]">
               {{ article.category_name }}
             </span>
-            <span class="text-xs text-gray-600 font-mono">
-              {{ formatDate(article.published_at) }}
-            </span>
+            <span class="byline ml-auto">{{ formatDate(article.published_at) }}</span>
           </div>
 
-          <!-- 标题 -->
-          <h3 class="text-lg font-semibold mb-3 line-clamp-2 group-hover:text-cyan-400 transition-colors">
-            <NuxtLink :to="`/articles/${article.id}`">
+          <h3 class="headline headline--sm mt-4 text-balance">
+            <NuxtLink :to="`/articles/${article.id}`" class="hover:text-vermillion transition-colors">
               {{ article.title }}
             </NuxtLink>
           </h3>
 
-          <!-- 摘要 -->
-          <p class="text-sm text-gray-500 mb-4 line-clamp-2">
+          <p class="font-serif text-[15.5px] text-ink-soft leading-[1.95] mt-4 text-pretty">
             {{ article.summary }}
           </p>
 
-          <!-- 统计 -->
-          <div class="flex items-center gap-4 text-xs text-gray-600 mb-4">
-            <span class="flex items-center gap-1">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              {{ formatNumber(article.view_count || 0) }}
-            </span>
-            <span class="flex items-center gap-1">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              {{ formatNumber(article.comment_count || 0) }}
-            </span>
-          </div>
-
-          <!-- 来源 -->
-          <div class="pt-4 border-t border-cyan-500/10 flex items-center justify-between">
-            <span class="text-xs text-gray-600">来源: {{ article.source_name }}</span>
-            <NuxtLink
-              :to="`/articles/${article.id}`"
-              class="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
-            >
-              阅读全文
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
+          <div class="mt-5 pt-4 border-t border-rule-faint flex items-center justify-between text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute">
+            <span>来源 · {{ article.source_name }}</span>
+            <NuxtLink :to="`/articles/${article.id}`" class="text-ink underline-draw">
+              阅全文 →
             </NuxtLink>
           </div>
         </article>
       </div>
 
-      <!-- 空状态 -->
-      <div v-else class="glass-card p-12 text-center">
-        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center">
-          <svg class="w-8 h-8 text-cyan-500/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6" />
-          </svg>
-        </div>
-        <p class="text-gray-500">暂无文章数据</p>
+      <div v-else class="article-card text-center">
+        <p class="font-serif italic text-ink-mute py-12">本期尚无资讯。</p>
+      </div>
+
+      <div class="mt-8 text-center">
+        <NuxtLink to="/articles" class="btn btn--ghost">翻阅全卷 →</NuxtLink>
       </div>
     </section>
 
-    <!-- 职业风险查询 -->
-    <section class="mb-16">
-      <div class="glass-card neon-border p-8 md:p-12 relative overflow-hidden">
-        <!-- 背景装饰 -->
-        <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-500/10 to-cyan-500/10 rounded-full blur-3xl"></div>
+    <hr class="rule" />
 
-        <div class="relative z-10">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
-            <div>
-              <h2 class="section-title mb-2">职业风险评估</h2>
-              <p class="text-gray-500">输入你的职业，获取 AI 威胁指数和转型建议</p>
+    <!-- ============================================================
+         卷二 · 职业风险
+         ============================================================ -->
+    <section class="py-16">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
+
+        <div class="lg:col-span-7">
+          <header class="mb-10">
+            <div class="juan-marker">
+              <span class="kicker kicker--moss">卷二</span>
+              <span class="juan-marker__num">贰</span>
+              <span class="font-serif text-[clamp(1.6rem,2.2vw,2.2rem)] font-bold leading-none tracking-[0.06em]">职  业  风  险</span>
+              <span class="juan-marker__line"></span>
+              <span class="byline">CAREER INDEX</span>
             </div>
-            <div class="flex items-center gap-2 text-xs font-mono">
-              <span class="w-3 h-3 rounded-full bg-gradient-to-r from-red-500 to-orange-500 animate-pulse"></span>
-              <span class="text-gray-500">实时 AI 威胁评估系统</span>
+            <h2 class="font-serif font-black text-[clamp(1.7rem,2.4vw,2.4rem)] leading-[1.3] mt-6 tracking-[0.04em] text-balance">
+              把抽象的「AI 威胁」<br />换成可读的数字
+            </h2>
+          </header>
+
+          <div class="prose-cn indent-cn">
+            <p>
+              我们的评估系统结合了任务自动化率、技能半衰期、市场需求弹性与从业者访谈，
+              把每个职业压缩成一个 <span class="zhupi">零到一百</span> 的可读指数。
+              数字本身不是命运，但它能告诉你该把学习预算花在哪里。
+            </p>
+          </div>
+
+          <!-- 风险柱（三个职业） -->
+          <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-8">
+            <div v-for="(r, i) in featuredRisks" :key="r.job" class="anim-rise" :class="`anim-rise-${i + 1}`">
+              <div class="flex items-end gap-4">
+                <div class="risk-bar__col h-32" :style="`height: ${r.barH}; background: ${r.color}; border-color: ${r.color};`"></div>
+                <div>
+                  <div class="risk-bar__readout" :style="`color: ${r.color};`">{{ r.score }}</div>
+                  <div class="risk-bar__caption" :style="`color: ${r.color};`">{{ r.label }}</div>
+                </div>
+              </div>
+              <div class="mt-4 font-serif font-bold text-[18px] leading-tight tracking-[0.04em]">{{ r.job }}</div>
+              <p class="text-[12.5px] text-ink-mute leading-[1.85] mt-2 max-w-[14rem] font-serif">{{ r.note }}</p>
             </div>
           </div>
 
-          <!-- 搜索框 -->
-          <div class="flex flex-col sm:flex-row gap-4 mb-8">
-            <div class="relative flex-1">
-              <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                placeholder="输入职业名称, 例如: 设计师、程序员、运营..."
-                class="input-cyber pl-12"
-              />
+          <!-- 查询 -->
+          <div class="mt-12 border-t-[2px] border-ink pt-7">
+            <label class="label" for="job-search">查 询 你 的 职 业</label>
+            <div class="flex flex-col sm:flex-row gap-4 sm:items-end">
+              <input id="job-search" type="text" placeholder="如：设计师 / 程序员 / 运营 / 文案" class="field flex-1" />
+              <button class="btn btn--cinnabar">
+                查 询 指 数
+                <span class="arrow">→</span>
+              </button>
             </div>
-            <button class="btn-cyber flex items-center justify-center gap-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              立即分析
-            </button>
+
+            <div class="mt-5 flex flex-wrap items-center gap-2">
+              <span class="text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute mr-1">热门查询</span>
+              <NuxtLink
+                v-for="job in popularJobs"
+                :key="job"
+                :to="`/professions/${job.toLowerCase()}`"
+                class="px-3 py-1.5 text-[12.5px] font-serif border border-ink text-ink hover:bg-ink hover:text-paper-soft transition-colors tracking-[0.06em]"
+              >
+                {{ job }}
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右：方法说明 -->
+        <aside class="lg:col-span-5 lg:border-l lg:border-rule-soft lg:pl-12">
+          <div class="kicker kicker--ink mb-4">方法论</div>
+          <h3 class="font-serif font-black text-[clamp(1.4rem,1.6vw,1.7rem)] leading-[1.4] mb-7 tracking-[0.04em] text-balance">
+            一个「零到一百」的指数，是怎么算出来的
+          </h3>
+
+          <ol class="space-y-7">
+            <li v-for="(step, i) in methodSteps" :key="i" class="flex gap-5">
+              <span class="font-serif font-black text-vermillion text-[1.6rem] leading-none w-9 shrink-0 tracking-[0.04em]">
+                {{ ['壹','贰','叁','肆'][i] }}
+              </span>
+              <div>
+                <div class="font-serif font-bold text-[16.5px] leading-tight tracking-[0.06em]">{{ step.title }}</div>
+                <p class="font-serif text-[13.5px] text-ink-soft leading-[1.9] mt-2 text-pretty">{{ step.body }}</p>
+              </div>
+            </li>
+          </ol>
+
+          <hr class="rule-soft my-7" />
+
+          <p class="text-[11px] text-ink-mute font-mono tracking-[0.18em] uppercase">
+            模 型 · v2.4 &nbsp;·&nbsp; 基 准 · 2026 Q2 &nbsp;·&nbsp; 样 本 · 412
+          </p>
+        </aside>
+
+      </div>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- ============================================================
+         卷三 · 学习路径
+         ============================================================ -->
+    <section class="py-16">
+      <header class="mb-10">
+        <div class="juan-marker">
+          <span class="kicker kicker--ochre">卷三</span>
+          <span class="juan-marker__num">叁</span>
+          <span class="font-serif text-[clamp(1.6rem,2.2vw,2.2rem)] font-bold leading-none tracking-[0.06em]">学  习  路  径</span>
+          <span class="juan-marker__line"></span>
+          <span class="byline">LEARNING PATHS</span>
+        </div>
+        <h2 class="font-serif font-black text-[clamp(1.7rem,2.4vw,2.4rem)] leading-[1.3] mt-6 tracking-[0.04em] max-w-[40rem] text-balance">
+          把「学点什么」翻译成<br />一条可以走的路
+        </h2>
+      </header>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-x-10">
+        <NuxtLink
+          v-for="(path, index) in learningPaths"
+          :key="path.id"
+          to="/learning-paths"
+          class="article-card group no-underline-on-hover anim-rise"
+          :class="`anim-rise-${(index % 5) + 1}`"
+        >
+          <div class="article-mast">
+            <span class="article-mast__num">№ {{ String(index + 5).padStart(2, '0') }}</span>
+            <span :class="['seal-square', sealTilt(index)]">{{ path.level }}</span>
+            <span class="byline ml-auto">{{ path.duration }} · {{ path.students }}</span>
           </div>
 
-          <!-- 热门职业 -->
-          <div class="flex flex-wrap gap-2">
-            <span class="text-xs text-gray-600 mr-2">热门查询:</span>
-            <NuxtLink
-              v-for="job in popularJobs"
-              :key="job"
-              :to="`/professions/${job.toLowerCase()}`"
-              class="px-3 py-1.5 text-xs font-mono rounded border border-cyan-500/20 text-gray-400 hover:text-cyan-400 hover:border-cyan-400/50 transition-all bg-cyan-500/5 hover:bg-cyan-500/10"
-            >
-              {{ job }}
+          <h3 class="headline headline--sm mt-4 group-hover:text-vermillion transition-colors text-balance">
+            {{ path.title }}
+          </h3>
+
+          <p class="font-serif text-[15.5px] text-ink-soft leading-[1.95] mt-3 text-pretty">
+            {{ path.description }}
+          </p>
+
+          <div class="mt-5">
+            <div class="flex items-center justify-between text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute mb-2">
+              <span>进 度</span>
+              <span class="text-ink">{{ path.progress }}%</span>
+            </div>
+            <div class="h-[3px] bg-paper-deep relative overflow-hidden border border-ink">
+              <div class="h-full bg-ink" :style="`width: ${path.progress}%`"></div>
+            </div>
+          </div>
+
+          <div class="mt-5 pt-4 border-t border-rule-faint flex items-center justify-between text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute">
+            <span>{{ path.chapters }} 章</span>
+            <span class="text-ink flex items-center gap-1 group-hover:gap-2 transition-all">
+              即刻启程 <span class="arrow transition-transform">→</span>
+            </span>
+          </div>
+        </NuxtLink>
+      </div>
+    </section>
+
+    <hr class="rule-thick" />
+
+    <!-- ============================================================
+         卷四 · 工具库 短导引
+         ============================================================ -->
+    <section class="py-16">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-end">
+        <div class="lg:col-span-7">
+          <div class="juan-marker">
+            <span class="kicker kicker--indigo">卷四</span>
+            <span class="juan-marker__num">肆</span>
+            <span class="font-serif text-[clamp(1.6rem,2.2vw,2.2rem)] font-bold leading-none tracking-[0.06em]">工  具  库</span>
+            <span class="juan-marker__line"></span>
+            <span class="byline">TOOL LIBRARY</span>
+          </div>
+          <h2 class="font-serif font-black leading-[1.05] mt-6 tracking-[0.04em] text-balance"
+              style="font-size: clamp(2.4rem, 4.6vw, 4.2rem);">
+            不追新，<br />只收
+            <em class="italic text-vermillion not-italic">「真用得上」</em>的
+          </h2>
+        </div>
+        <div class="lg:col-span-5">
+          <p class="font-serif text-[16.5px] text-ink-soft leading-[1.95] text-pretty">
+            我们只收录经过真实使用场景验证的工具。每一条都附有明确的「它在哪个工作环节帮上忙」——
+            <span class="zhupi">而不是又一个「颠覆性 AI 工具」的标题党</span>。
+          </p>
+          <div class="mt-7">
+            <NuxtLink to="/tools" class="btn btn--ink">
+              翻 阅 工 具 库
+              <span class="arrow">→</span>
             </NuxtLink>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 学习路径 -->
-    <section>
-      <div class="flex justify-between items-center mb-8">
-        <h2 class="section-title">热门学习路径</h2>
-        <NuxtLink to="/learning-paths" class="btn-cyber-ghost text-sm flex items-center gap-2">
-          查看全部
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </NuxtLink>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <NuxtLink
-          v-for="(path, index) in learningPaths"
-          :key="path.id"
-          to="/learning-paths"
-          class="glass-card card-decoration p-6 group hover:border-cyan-400/50 transition-all duration-300"
-          :style="{ animationDelay: `${index * 100}ms` }"
-        >
-          <!-- 路径等级 -->
-          <div class="flex items-center justify-between mb-4">
-            <span :class="['tag-cyber', path.levelClass]">{{ path.level }}</span>
-            <span class="flex items-center gap-1 text-xs text-gray-500 font-mono">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {{ path.duration }}
-            </span>
-          </div>
-
-          <!-- 标题 -->
-          <h3 class="text-lg font-semibold mb-2 group-hover:text-cyan-400 transition-colors">
-            {{ path.title }}
-          </h3>
-
-          <!-- 描述 -->
-          <p class="text-sm text-gray-500 mb-4 line-clamp-2">
-            {{ path.description }}
-          </p>
-
-          <!-- 进度 -->
-          <div class="mb-4">
-            <div class="flex items-center justify-between text-xs mb-1">
-              <span class="text-gray-500">学习进度</span>
-              <span class="text-cyan-400 font-mono">{{ path.progress }}%</span>
-            </div>
-            <div class="progress-cyber">
-              <div class="h-full rounded-full bg-gradient-to-r from-cyan-400 to-purple-500" :style="{ width: path.progress + '%' }"></div>
-            </div>
-          </div>
-
-          <!-- 底部 -->
-          <div class="flex items-center justify-between pt-4 border-t border-cyan-500/10">
-            <div class="flex items-center gap-2">
-              <div class="flex -space-x-2">
-                <div v-for="i in 3" :key="i" class="w-6 h-6 rounded-full border-2 border-[var(--bg-card)] bg-gradient-to-br from-cyan-400/30 to-purple-400/30"></div>
-              </div>
-              <span class="text-xs text-gray-500">{{ path.students }}</span>
-            </div>
-            <span class="text-xs text-cyan-400 group-hover:translate-x-1 transition-transform">
-              开始学习 →
-            </span>
-          </div>
-        </NuxtLink>
-      </div>
-    </section>
   </div>
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  layout: 'default'
-})
+definePageMeta({ layout: 'default' })
 
-// 获取最新资讯
 const { data: latestArticles } = await useFetch('/api/articles', {
-  query: {
-    page: 1,
-    page_size: 3
-  },
-  transform: (data) => {
-    const responseData = data?.data || data
-    return responseData?.articles || []
-  }
+  query: { page: 1, page_size: 3 },
+  transform: (data: any) => data?.data?.articles || data?.articles || [],
 })
 
 const loading = ref(false)
 
-const stats = [
-  { value: '10K+', label: 'AI 资讯' },
-  { value: '500+', label: '职业分析' },
-  { value: '50+', label: '学习路径' },
-  { value: '100+', label: 'AI 工具' },
+const todayStr = computed(() => {
+  const d = new Date()
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
+})
+
+const indexItems = [
+  { title: '当模型比设计师更快地完成第一稿', dek: '卷首 · 实地调研', path: '/articles' },
+  { title: '十二个职业的风险指数，本期重排', dek: '卷二 · 数据',     path: '/professions' },
+  { title: '三周学完 Copilot，从装到会',     dek: '卷三 · 实操',     path: '/learning-paths' },
+  { title: '我们筛掉了六成的「AI 神器」',     dek: '卷四 · 编辑选择', path: '/tools' },
+]
+
+const featuredRisks = [
+  { job: '客 服 / 销 售',   score: 92, label: '高 风 险', color: 'var(--vermillion)',  barH: '8rem', note: '对话式任务占比最高的职业之一，模型替代路径清晰。' },
+  { job: '基 础 设 计 师',  score: 78, label: '中  高',   color: 'var(--ochre)',       barH: '6.8rem', note: '初稿与素材环节被压缩，但视觉判断仍不可替代。' },
+  { job: '软 件 工 程 师',  score: 54, label: '中  等',   color: 'var(--ink)',         barH: '4.7rem', note: '编码效率被放大，需求理解与系统设计反而更重要。' },
+]
+
+const methodSteps = [
+  { title: '拆 任 务',        body: '把每个职业拆成三十到六十个可执行子任务，并标注每个任务的自动化潜力。' },
+  { title: '看 市 场',        body: '结合招聘数据、薪资曲线与岗位增长趋势，估算市场对该职业的需求弹性。' },
+  { title: '问 从 业 者',     body: '对四百一十二位从业者做访谈，校准「模型实际能用上的环节」与「看上去能用上」的差距。' },
+  { title: '给 一 个 数 字',  body: '把以上三个维度合成零到一百的指数。它不是命运，是一张该把学习预算花在哪里的地图。' },
 ]
 
 const popularJobs = ['设计师', '程序员', '运营', '文案', '产品经理']
@@ -342,86 +409,50 @@ const learningPaths = [
   {
     id: 1,
     title: '零基础入门 AI',
-    level: '入门',
-    levelClass: 'tag-risk-low',
+    level: '入 门',
     duration: '30 天',
-    description: '从零开始，系统学习 AI 基础知识，掌握常用工具和实践技能',
+    description: '从零开始，系统学习 AI 基础概念、常用工具和实践场景。不需要任何先验知识。',
     progress: 35,
     students: '1.2k 在学',
+    chapters: 18,
   },
   {
     id: 2,
     title: 'AI 辅助编程实战',
-    level: '进阶',
-    levelClass: 'tag-risk-medium',
+    level: '进 阶',
     duration: '45 天',
-    description: '掌握 Copilot 等 AI 编程工具，提升开发效率 10 倍',
+    description: '掌握 Copilot / Cursor 等 AI 编程工具的真实工作流，把编码效率放大五到十倍。',
     progress: 62,
     students: '890 在学',
+    chapters: 24,
   },
   {
     id: 3,
     title: 'AI 产品经理之路',
-    level: '高级',
-    levelClass: 'tag-risk-high',
+    level: '高 级',
     duration: '60 天',
-    description: '学习如何将 AI 能力融入产品，打造下一代 AI 原生应用',
+    description: '学习如何把 AI 能力变成产品决策、用户场景与可衡量的业务结果。',
     progress: 18,
     students: '456 在学',
+    chapters: 32,
   },
 ]
 
-const getCategoryClass = (code: string) => {
+const getSealClass = (code: string) => {
   const map: Record<string, string> = {
-    news: 'category-news',
-    impact: 'category-impact',
-    learn: 'category-learn',
-    tool: 'category-tool',
+    news:   '',                          // 默认朱砂
+    impact: '',
+    learn:  '',
+    tool:   '',
   }
-  return map[code] || 'category-news'
+  return map[code] || ''
 }
+
+const sealTilt = (i: number) => i % 2 === 0 ? 'seal-square--tilt-l' : 'seal-square--tilt-r'
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return ''
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('zh-CN', {
-    month: '2-digit',
-    day: '2-digit',
-  })
-}
-
-const formatNumber = (num: number) => {
-  if (num >= 10000) return (num / 10000).toFixed(1) + 'w'
-  if (num >= 1000) return (num / 1000).toFixed(1) + 'k'
-  return num.toString()
+  const d = new Date(dateStr)
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 }
 </script>
-
-<style scoped>
-@keyframes scan {
-  0% { transform: translateY(-100%); opacity: 0; }
-  50% { opacity: 1; }
-  100% { transform: translateY(100vh); opacity: 0; }
-}
-
-.animate-scan {
-  animation: scan 8s linear infinite;
-}
-
-@keyframes gradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-.animate-gradient {
-  background-size: 200% auto;
-  animation: gradient 3s ease infinite;
-}
-
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-</style>

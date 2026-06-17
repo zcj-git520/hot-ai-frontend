@@ -1,322 +1,260 @@
 <template>
-  <div class="min-h-screen bg-[#0d1117]">
-    <!-- 顶部导航栏 -->
-    <header class="border-b border-[#30363d] bg-[#161b22]/80 backdrop-blur-sm sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-4 sm:gap-8">
-            <NuxtLink to="/" class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-              <span class="text-2xl sm:text-3xl">🤖</span>
-              <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">AI 热点追踪</span>
-            </NuxtLink>
-            <nav class="hidden lg:flex items-center gap-6">
-              <NuxtLink to="/" class="text-[#8b949e] hover:text-white transition-colors font-medium">首页</NuxtLink>
-              <NuxtLink to="/articles" class="text-[#8b949e] hover:text-white transition-colors font-medium">资讯</NuxtLink>
-              <NuxtLink to="/professions" class="text-[#8b949e] hover:text-white transition-colors font-medium">职业风险</NuxtLink>
-              <NuxtLink to="/learning-paths" class="text-white font-medium">学习路径</NuxtLink>
-              <NuxtLink to="/tools" class="text-[#8b949e] hover:text-white transition-colors font-medium">工具库</NuxtLink>
-            </nav>
-          </div>
-          <div class="flex items-center gap-2 sm:gap-4">
-            <!-- 登录状态 -->
-            <div v-if="user" class="flex items-center gap-2 sm:gap-4">
-              <NuxtLink to="/profile" class="flex items-center gap-2">
-                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white font-medium text-xs sm:text-sm">
-                  {{ user.nickname?.charAt(0).toUpperCase() || 'U' }}
-                </div>
-                <span class="text-white font-medium text-sm hidden md:block">{{ user.nickname || user.email }}</span>
-              </NuxtLink>
-              <button
-                @click="handleLogout"
-                class="text-[#8b949e] hover:text-white transition-colors font-medium text-xs sm:text-sm"
-              >
-                退出
-              </button>
-            </div>
+  <div class="broadsheet">
 
-            <!-- 未登录状态 -->
-            <div v-else class="flex items-center gap-2 sm:gap-4">
-              <NuxtLink to="/login" class="text-[#8b949e] hover:text-white transition-colors font-medium text-sm">登录</NuxtLink>
-              <NuxtLink to="/register" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md font-medium text-xs sm:text-sm transition-all shadow-lg hover:shadow-xl">
-                注册
-              </NuxtLink>
-            </div>
-          </div>
-        </div>
+    <!-- ============================================================
+         卷三首部
+         ============================================================ -->
+    <section class="pt-10 md:pt-16 pb-10">
+      <div class="flex items-center gap-4 mb-6 anim-rise">
+        <span class="seal-square seal-square--tilt-l anim-seal">卷三</span>
+        <span class="kicker kicker--indigo">学习路径 · LEARNING PATHS</span>
       </div>
-    </header>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
-      <div class="text-center mb-8 sm:mb-12">
-        <h1 class="text-2xl sm:text-4xl font-bold text-white mb-3 sm:mb-4">学习路径</h1>
-        <p class="text-[#8b949e] text-base sm:text-lg mb-6 sm:mb-8">系统学习 AI 技能，提升职业竞争力</p>
+      <h1 class="headline headline--xl anim-rise anim-rise-1 text-balance">
+        别在「收藏夹」<br />里<em class="not-italic text-vermillion">自我感动</em>，
+        <br />先把这一条走完
+      </h1>
 
-        <!-- 搜索栏 -->
-        <div class="mb-6">
-          <div class="relative max-w-xl mx-auto">
+      <p class="deck mt-7 max-w-[40rem] text-pretty anim-rise anim-rise-2">
+        每一卷都是编辑部亲自走过的。
+        多少天、几章、卡在哪一节——写得清楚明白。
+        <span class="zhupi">不会学的，先从一份能读完的学起</span>。
+      </p>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- ============================================================
+         检索 + 难度筛选
+         ============================================================ -->
+    <section class="py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        <div class="lg:col-span-7">
+          <label for="path-search" class="label">检 索 · Search</label>
+          <div class="flex items-end gap-3">
             <input
+              id="path-search"
               v-model="searchKeyword"
-              @keyup.enter="handleSearch"
               type="text"
-              placeholder="搜索学习路径标题或描述..."
-              class="w-full bg-[#161b22] border border-[#30363d] rounded-full py-2.5 sm:py-3 px-4 sm:px-5 pr-12 text-white placeholder-[#8b949e] focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all text-sm"
+              class="field flex-1"
+              placeholder="如：Prompt 工程师 / 向量数据库 / Midjourney"
+              @keyup.enter="handleSearch"
             />
             <button
-              @click="handleSearch"
-              class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#58a6ff] hover:bg-[#388bfd] text-white w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-colors"
+              v-if="searchKeyword"
+              type="button"
+              @click="searchKeyword = ''; handleSearch()"
+              class="btn btn--ghost btn--sm"
             >
-              <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              清 空
+            </button>
+            <button type="button" @click="handleSearch" class="btn btn--cinnabar btn--sm whitespace-nowrap">
+              检 索
+              <span class="arrow">→</span>
             </button>
           </div>
         </div>
 
-        <!-- 难度筛选 -->
-        <div class="flex flex-wrap justify-center gap-2 sm:gap-4">
-          <button
-            v-for="level in levels"
-            :key="level.id"
-            @click="handleFilter(level.id)"
-            :class="[
-              'px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all',
-              selectedDifficulty === level.id
-                ? `${level.color}/20 ${level.color} border ${level.color}`
-                : 'bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:border-[#58a6ff]'
-            ]"
-          >
-            {{ level.icon }} {{ level.name }}
-          </button>
+        <div class="lg:col-span-5">
+          <span class="label">难 度 等 级 · Difficulty</span>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="level in levels"
+              :key="level.id"
+              type="button"
+              :class="['px-3 py-1.5 text-[12.5px] font-serif border tracking-[0.06em] transition-colors flex items-center gap-1.5',
+                       selectedDifficulty === level.id
+                         ? 'bg-ink text-paper-soft border-ink'
+                         : 'border-ink text-ink hover:bg-ink hover:text-paper-soft']"
+              @click="handleFilter(level.id)"
+            >
+              <span class="w-2 h-2 inline-block" :style="{ background: level.dot }"></span>
+              {{ level.name }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="rule-soft" />
+
+    <!-- ============================================================
+         路径列表（印张式）
+         ============================================================ -->
+    <section class="py-10">
+      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12">
+        <div v-for="i in 6" :key="i" class="border-t-2 border-ink pt-7">
+          <div class="h-3 w-20 bg-paper-deep mb-5"></div>
+          <div class="h-6 w-3/4 bg-paper-deep mb-3"></div>
+          <div class="h-3 w-full bg-paper-deep mb-2"></div>
+          <div class="h-3 w-2/3 bg-paper-deep"></div>
         </div>
       </div>
 
-      <!-- 加载状态 -->
-      <div v-if="loading" class="text-center py-12">
-        <div class="inline-block w-8 h-8 border-4 border-[#58a6ff] border-t-transparent rounded-full animate-spin"></div>
-        <p class="text-[#8b949e] mt-4">加载中...</p>
+      <div v-else-if="error" class="py-16 text-center">
+        <span class="seal-square seal-square--tilt-r">错</span>
+        <p class="mt-5 font-serif italic text-ink-mute">{{ error }}</p>
+        <button @click="loadPaths" class="btn btn--ghost mt-6">重 试</button>
       </div>
 
-      <!-- 错误状态 -->
-      <div v-else-if="error" class="text-center py-12">
-        <p class="text-red-400">{{ error }}</p>
-        <button @click="loadPaths" class="mt-4 text-[#58a6ff] hover:underline">重试</button>
-      </div>
-
-      <!-- 路径列表 -->
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div
-          v-for="path in paths"
+      <div v-else-if="paths && paths.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12">
+        <NuxtLink
+          v-for="(path, i) in paths"
           :key="path.id"
-          @click="goToPathDetail(path.id)"
-          class="bg-[#161b22] border border-[#30363d] rounded-lg p-4 sm:p-6 hover:border-[#58a6ff] transition-all cursor-pointer group"
+          :to="`/learning-paths/${path.id}`"
+          class="group no-underline-on-hover border-t-2 border-ink pt-7 block anim-rise"
+          :class="`anim-rise-${(i % 5) + 1}`"
         >
-          <div class="flex items-center justify-between mb-3 sm:mb-4">
-            <span class="text-2xl sm:text-3xl">{{ path.icon || '📚' }}</span>
-            <span :class="getLevelStyle(path.difficulty)" class="text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full font-bold">
-              {{ path.level_label }}
+          <div class="flex items-start justify-between mb-5">
+            <div class="flex items-center gap-3">
+              <span class="font-serif font-black text-vermillion text-[2.4rem] leading-none w-12 h-12 flex items-center justify-center border border-ink">
+                {{ path.title?.charAt(0) || '学' }}
+              </span>
+              <div>
+                <span class="kicker kicker--indigo">№ {{ String(i + 1).padStart(2, '0') }}</span>
+                <p class="text-[11px] text-ink-mute font-mono tracking-[0.16em] uppercase mt-1">
+                  {{ getLevelName(path.difficulty) }}
+                </p>
+              </div>
+            </div>
+            <span :class="difficultyTilt(path.difficulty)" class="seal-square">
+              {{ getLevelName(path.difficulty) }}
             </span>
           </div>
-          <h3 class="text-base sm:text-xl font-bold text-white group-hover:text-[#58a6ff] transition-colors mb-2 leading-snug">
+
+          <h3 class="headline headline--md group-hover:text-vermillion transition-colors text-balance">
             {{ path.title }}
           </h3>
-          <p class="text-[#8b949e] text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
-            {{ path.description }}
+
+          <p class="font-serif text-[14.5px] text-ink-soft leading-[1.9] mt-3 text-pretty line-clamp-2">
+            {{ path.description || '本卷系统讲解这一主题的工作流——从基础到实战，逐章推进。' }}
           </p>
-          <div class="flex items-center justify-between mb-3 sm:mb-4">
-            <div class="flex items-center gap-3 sm:gap-4 text-xs text-[#8b949e]">
-              <span>⏱️ {{ path.estimated_days }}天</span>
-              <span>📚 {{ path.chapter_count }} 章</span>
-            </div>
+
+          <div class="mt-5 pt-4 border-t border-rule-faint flex items-center justify-between text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute">
+            <span class="flex items-center gap-3">
+              <span>≈ {{ path.estimated_days || '—' }} 日</span>
+              <span class="text-vermillion">·</span>
+              <span>{{ path.chapter_count || 0 }} 章</span>
+            </span>
+            <span class="text-ink flex items-center gap-1 group-hover:gap-2 transition-all">
+              阅 详 情 <span class="arrow">→</span>
+            </span>
           </div>
-          <div class="flex items-center justify-between pt-3 sm:pt-4 border-t border-[#30363d]">
-            <div class="flex -space-x-2">
-              <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 border-2 border-[#161b22]"></div>
-              <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-green-400 to-blue-400 border-2 border-[#161b22]"></div>
-              <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-yellow-400 to-orange-400 border-2 border-[#161b22]"></div>
-            </div>
-            <span class="text-xs sm:text-sm text-[#8b949e]">{{ formatStudentCount(path.student_count) }} 人在学</span>
-          </div>
-        </div>
+        </NuxtLink>
+      </div>
+
+      <div v-else class="py-20 text-center">
+        <span class="seal-square seal-square--tilt-l">无</span>
+        <p class="mt-5 font-serif italic text-ink-mute">本条件下暂无学习路径。</p>
       </div>
 
       <!-- 分页 -->
-      <div v-if="totalPages > 1" class="flex justify-center gap-2 mt-8 sm:mt-12">
-        <button
-          @click="handlePageChange(currentPage - 1)"
-          :disabled="currentPage <= 1"
-          class="px-4 py-2 bg-[#161b22] border border-[#30363d] rounded-md text-white disabled:opacity-50 disabled:cursor-not-allowed hover:border-[#58a6ff]"
-        >
-          上一页
-        </button>
-        <button
-          v-for="page in totalPages"
-          :key="page"
-          @click="handlePageChange(page)"
-          :class="[
-            'px-4 py-2 rounded-md text-sm font-medium',
-            currentPage === page
-              ? 'bg-[#58a6ff] text-white'
-              : 'bg-[#161b22] border border-[#30363d] text-white hover:border-[#58a6ff]'
-          ]"
-        >
-          {{ page }}
-        </button>
-        <button
-          @click="handlePageChange(currentPage + 1)"
-          :disabled="currentPage >= totalPages"
-          class="px-4 py-2 bg-[#161b22] border border-[#30363d] rounded-md text-white disabled:opacity-50 disabled:cursor-not-allowed hover:border-[#58a6ff]"
-        >
-          下一页
-        </button>
+      <div v-if="totalPages > 1 && !loading" class="mt-12 pt-8 border-t border-rule-soft flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <p class="text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute">
+          第 <span class="text-ink">{{ currentPage }}</span> / {{ totalPages }} 页 · 共 <span class="text-ink">{{ total }}</span> 条
+        </p>
+        <nav class="flex items-center gap-2">
+          <button
+            type="button"
+            @click="goToPage(currentPage - 1)"
+            :disabled="currentPage <= 1"
+            class="btn btn--ghost btn--sm disabled:opacity-30"
+          >
+            ← 上一页
+          </button>
+          <button
+            type="button"
+            @click="goToPage(currentPage + 1)"
+            :disabled="currentPage >= totalPages"
+            class="btn btn--ghost btn--sm disabled:opacity-30"
+          >
+            下一页 →
+          </button>
+        </nav>
       </div>
-    </div>
+    </section>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
-import { useAuth } from '~/composables/useAuth'
-import { useToast } from '~/composables/useToast'
+definePageMeta({ layout: 'default' })
 
-// 获取认证信息
-const { user, clearAuth, restoreAuth } = useAuth()
-const { toastSuccess, toastError } = useToast()
-
-// 状态
-const paths = ref<any[]>([])
-const levels = ref<any[]>([])
-const loading = ref(false)
-const error = ref<string | null>(null)
-const currentPage = ref(1)
-const selectedDifficulty = ref<string>('all')
-const total = ref(0)
 const searchKeyword = ref('')
+const selectedDifficulty = ref('all')
+const currentPage = ref(1)
+const total = ref(0)
+const paths = ref<any[]>([])
+const loading = ref(false)
+const error = ref('')
 
-// 搜索处理
-const handleSearch = () => {
-  currentPage.value = 1
-  loadPaths()
+const levels = [
+  { id: 'all',         name: '全 部',  dot: '#9A8E7E' },
+  { id: 'beginner',    name: '入 门',  dot: '#3F5D3A' },
+  { id: 'intermediate', name: '进 阶',  dot: '#1F3147' },
+  { id: 'advanced',    name: '高 级',  dot: '#B5202A' },
+]
+
+const totalPages = computed(() => Math.ceil(total.value / 12))
+
+const getLevelName = (d: string) => {
+  const map: Record<string, string> = { beginner: '入 门', intermediate: '进 阶', advanced: '高 级' }
+  return map[d] || '未 知'
 }
 
-// 计算属性
-const totalPages = computed(() => {
-  return Math.ceil(total.value / 12)
-})
+const difficultyTilt = (d: string) => {
+  const map: Record<string, string> = {
+    beginner: 'seal-square--tilt-l',
+    intermediate: '',
+    advanced: 'seal-square--tilt-r',
+  }
+  return map[d] || 'seal-square--tilt-l'
+}
 
-// 恢复用户认证信息
-onMounted(() => {
-  restoreAuth()
-  loadPaths()
-  loadLevels()
-})
-
-// 监听筛选和分页变化
-watch([currentPage, selectedDifficulty], () => {
-  loadPaths()
-})
-
-// 加载学习路径列表
 const loadPaths = async () => {
   loading.value = true
-  error.value = null
+  error.value = ''
   try {
     const params: Record<string, any> = {
       page: currentPage.value,
-      page_size: 12
+      page_size: 12,
     }
-    if (selectedDifficulty.value !== 'all') {
-      params.difficulty = selectedDifficulty.value
-    }
-    if (searchKeyword.value) {
-      params.search = searchKeyword.value
-    }
+    if (selectedDifficulty.value !== 'all') params.difficulty = selectedDifficulty.value
+    if (searchKeyword.value) params.search = searchKeyword.value
 
     const query = new URLSearchParams(params as any)
-    const res = await $fetch(`/api/learning-paths?${query.toString()}`)
-
+    const res: any = await $fetch(`/api/learning-paths?${query.toString()}`)
     const data = res?.data || res
     paths.value = data.professions || data.list || data.paths || []
     total.value = data.total || paths.value.length
-
-    console.log('学习路径列表:', res)
   } catch (err: any) {
     console.error('加载学习路径失败:', err)
     error.value = err.message || '加载失败，请重试'
-    toastError('加载学习路径失败')
   } finally {
     loading.value = false
   }
 }
 
-// 加载难度等级信息
-const loadLevels = async () => {
-  try {
-    const res = await $fetch('/api/learning-paths/levels')
-    levels.value = [
-      { id: 'all', level: 'all', name: '全部', icon: '📚', description: '', color: '#8b949e', min_hours: 0, max_hours: 0 },
-      ...(res?.data || res || [])
-    ]
-  } catch (err) {
-    console.error('加载难度等级失败:', err)
-    // 使用默认值
-    levels.value = [
-      { id: 'all', level: 'all', name: '全部', icon: '📚', description: '', color: '#8b949e', min_hours: 0, max_hours: 0 },
-      { id: 'beginner', level: 'beginner', name: '入门', icon: '🌱', description: '', color: '#4ade80', min_hours: 0, max_hours: 0 },
-      { id: 'intermediate', level: 'intermediate', name: '进阶', icon: '✍️', description: '', color: '#60a5fa', min_hours: 0, max_hours: 0 },
-      { id: 'advanced', level: 'advanced', name: '高级', icon: '🚀', description: '', color: '#a855f7', min_hours: 0, max_hours: 0 }
-    ]
-  }
-}
+onMounted(() => {
+  loadPaths()
+})
 
-// 处理筛选
-const handleFilter = (levelId: string) => {
-  selectedDifficulty.value = levelId
+const handleSearch = () => {
   currentPage.value = 1
+  loadPaths()
 }
 
-// 处理分页
-const handlePageChange = (page: number) => {
+const handleFilter = (id: string) => {
+  selectedDifficulty.value = id
+  currentPage.value = 1
+  loadPaths()
+}
+
+const goToPage = (page: number) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-}
-
-// 退出登录
-const handleLogout = async () => {
-  try {
-    const { authApi } = await import('~/app/lib/api')
-    await authApi.logout()
-    toastSuccess('已退出登录')
-  } catch (error) {
-    console.error('Logout failed', error)
-    toastError('退出登录失败')
-  } finally {
-    clearAuth()
-    navigateTo('/')
-  }
-}
-
-// 跳转到路径详情
-const goToPathDetail = (id: number) => {
-  navigateTo(`/learning-paths/${id}`)
-}
-
-// 获取难度样式
-const getLevelStyle = (difficulty: string) => {
-  const styles: Record<string, string> = {
-    'beginner': 'bg-green-500/10 text-green-400',
-    'intermediate': 'bg-blue-500/10 text-blue-400',
-    'advanced': 'bg-purple-500/10 text-purple-400'
-  }
-  return styles[difficulty] || 'bg-gray-500/10 text-gray-400'
-}
-
-// 格式化学生数量
-const formatStudentCount = (count: number): string => {
-  if (count >= 1000) {
-    return (count / 1000).toFixed(1) + 'k'
-  }
-  return count.toString()
 }
 </script>
 

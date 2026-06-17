@@ -1,182 +1,189 @@
 <template>
-  <div class="min-h-screen">
-    <!-- 页面标题 -->
-    <div class="mb-8">
-      <div class="flex items-center gap-3 mb-2">
-        <div class="w-1 h-8 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full"></div>
-        <h1 class="font-tech text-3xl font-bold tracking-wider">个人中心</h1>
+  <div class="broadsheet">
+
+    <!-- ============================================================
+         顶部：报头
+         ============================================================ -->
+    <section class="pt-10 md:pt-14 pb-6">
+      <div class="flex items-center gap-3 mb-3 anim-rise">
+        <span class="seal-square seal-square--tilt-l">自 录</span>
+        <span class="kicker kicker--ink">个 人 中 心 · PROFILE</span>
       </div>
-      <p class="text-gray-500 font-mono text-sm ml-4">
-        <span class="text-cyan-400">//</span> 管理你的个人信息和账户设置 <span class="text-cyan-400">//</span>
+      <h1 class="headline headline--lg anim-rise anim-rise-1 text-balance">
+        你的来处，<br />
+        <em class="not-italic text-vermillion">一处</em>档案
+      </h1>
+      <p class="deck mt-5 max-w-[36rem] text-pretty anim-rise anim-rise-2">
+        此处只做两件事：记录你读到了哪一卷，更新你的<em class="not-italic">身份</em>。
       </p>
+    </section>
+
+    <hr class="rule" />
+
+    <div v-if="loadError" class="my-8 border-l-[2px] border-vermillion bg-paper-deep pl-5 py-4 pr-5">
+      <p class="font-serif text-[14px] text-ink">{{ loadError }}</p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- 侧边栏 -->
-      <div class="lg:col-span-1">
-        <div class="glass-card neon-border p-6 sticky top-24">
-          <!-- 用户头像 -->
-          <div class="text-center mb-6">
-            <div class="relative inline-block">
-              <div class="w-24 h-24 rounded-full bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center text-3xl font-tech font-bold text-white mx-auto mb-4">
-                {{ user?.nickname?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U' }}
-              </div>
-              <div class="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-[var(--bg-card)]"></div>
+    <div v-if="loading && !profileLoaded" class="py-20 text-center">
+      <span class="seal-square seal-square--tilt-l">载</span>
+      <p class="mt-5 font-serif italic text-ink-mute">正在调阅档案…</p>
+    </div>
+
+    <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-10 py-10">
+
+      <!-- ============================================================
+           左侧：身份信息
+           ============================================================ -->
+      <aside class="lg:col-span-4 space-y-6">
+        <section class="border-t-2 border-ink pt-6">
+          <span class="kicker kicker--ink mb-5">身 份 印 章</span>
+
+          <div class="mt-6 flex flex-col items-start gap-5">
+            <span class="font-serif font-black text-paper-soft text-[3.6rem] leading-none w-24 h-24 flex items-center justify-center bg-seal relative anim-seal">
+              {{ user?.nickname?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U' }}
+            </span>
+            <div>
+              <h2 class="headline headline--sm text-balance">{{ user?.nickname || '未 取 名' }}</h2>
+              <p class="text-[12.5px] text-ink-mute font-mono tracking-[0.16em] uppercase mt-1.5 break-all">
+                {{ user?.email }}
+              </p>
             </div>
-            <h2 class="text-xl font-semibold text-white">{{ user?.nickname || '用户' }}</h2>
-            <p class="text-sm text-gray-500">{{ user?.email }}</p>
           </div>
 
-          <!-- 状态 -->
-          <div class="flex items-center justify-center gap-2 py-3 border-t border-b border-cyan-500/10 mb-6">
-            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            <span class="text-xs text-gray-500 font-mono">ONLINE</span>
+          <hr class="rule-soft my-7" />
+
+          <dl class="space-y-3 text-[13px] font-serif">
+            <div class="flex justify-between gap-3">
+              <dt class="text-ink-mute">账 号 编 号</dt>
+              <dd class="text-ink font-bold font-mono">№ {{ String(user?.id || '—').padStart(4, '0') }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-ink-mute">入 录 日</dt>
+              <dd class="text-ink font-bold">{{ user?.created_at ? formatDate(user.created_at) : '—' }}</dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-ink-mute">状 态</dt>
+              <dd class="text-ink font-bold flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-vermillion"></span>
+                在 线
+              </dd>
+            </div>
+          </dl>
+
+          <hr class="rule-soft my-7" />
+
+          <button
+            type="button"
+            @click="handleLogout"
+            class="w-full btn btn--ghost btn--sm"
+          >
+            登 出 账 号
+          </button>
+        </section>
+      </aside>
+
+      <!-- ============================================================
+           右侧：表单
+           ============================================================ -->
+      <main class="lg:col-span-8 space-y-10">
+
+        <!-- 基本信息 -->
+        <section id="profile" class="border-t-2 border-ink pt-6">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-serif font-black text-seal text-[1.4rem] leading-none tracking-[0.04em]">壹</span>
+            <h3 class="font-serif font-bold text-[18px] tracking-[0.06em]">基 本 资 料</h3>
           </div>
 
-          <!-- 菜单 -->
-          <nav class="space-y-1">
-            <a href="#profile" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              个人资料
-            </a>
-            <a href="#password" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-500 hover:text-cyan-400 hover:bg-cyan-500/5 transition-all">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-              </svg>
-              修改密码
-            </a>
-          </nav>
+          <form @submit.prevent="updateProfile" class="space-y-7">
+            <div>
+              <label for="nickname" class="label">昵 称 · NICKNAME</label>
+              <input
+                id="nickname"
+                v-model="profileForm.nickname"
+                type="text"
+                class="field"
+                placeholder="给自己起个别号"
+              />
+            </div>
 
-          <!-- 返回首页 -->
-          <div class="mt-6 pt-6 border-t border-cyan-500/10">
-            <NuxtLink to="/" class="flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-cyan-400 transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              返回首页
-            </NuxtLink>
-          </div>
-        </div>
-      </div>
+            <div>
+              <label for="bio" class="label">个 人 简 介 · BIO</label>
+              <textarea
+                id="bio"
+                v-model="profileForm.bio"
+                rows="3"
+                class="field resize-none"
+                placeholder="三两行即可——介绍自己、所学所好、读到了哪一卷"
+                style="border: 0; border-bottom: 1.5px solid var(--ink); padding: 0.85rem 0;"
+              ></textarea>
+            </div>
 
-      <!-- 主内容 -->
-      <div class="lg:col-span-2 space-y-6">
-        <!-- 错误提示 -->
-        <div v-if="loadError" class="glass-card p-4 border border-red-500/30">
-          <div class="flex items-center gap-3">
-            <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p class="text-red-400 text-sm flex-1">{{ loadError }}</p>
-            <button @click="loadError = ''" class="text-gray-500 hover:text-red-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- 加载状态 -->
-        <div v-if="loading && !profileLoaded" class="glass-card p-12 text-center">
-          <div class="inline-block animate-spin rounded-full h-12 w-12 border-2 border-cyan-500/30 border-t-cyan-500 mb-4"></div>
-          <p class="text-gray-500">加载中...</p>
-        </div>
-
-        <template v-else>
-          <!-- 基本信息卡片 -->
-          <div id="profile" class="glass-card neon-border p-6">
-            <h3 class="font-tech text-lg font-semibold text-white mb-6 flex items-center gap-2">
-              <span class="text-cyan-400">01</span>
-              基本信息
-            </h3>
-
-            <form @submit.prevent="updateProfile" class="space-y-5">
-              <div>
-                <label class="block text-sm font-mono text-gray-400 mb-2">
-                  <span class="text-cyan-400">//</span> 昵称
-                </label>
-                <input
-                  v-model="profileForm.nickname"
-                  type="text"
-                  class="input-cyber"
-                  placeholder="your_nickname"
-                />
-              </div>
-
-              <div>
-                <label class="block text-sm font-mono text-gray-400 mb-2">
-                  <span class="text-cyan-400">//</span> 个人简介
-                </label>
-                <textarea
-                  v-model="profileForm.bio"
-                  rows="3"
-                  class="input-cyber resize-none"
-                  placeholder="介绍一下自己..."
-                ></textarea>
-              </div>
-
+            <div class="pt-2">
               <button
                 type="submit"
                 :disabled="submitting"
-                class="btn-cyber disabled:opacity-50 disabled:cursor-not-allowed"
+                class="btn btn--cinnabar disabled:opacity-40"
               >
-                {{ submitting ? '保存中...' : '保存修改' }}
+                {{ submitting ? '保 存 中 …' : '保 存 修 改' }}
+                <span class="arrow">→</span>
               </button>
-            </form>
+            </div>
+          </form>
+        </section>
+
+        <hr class="rule" />
+
+        <!-- 修改密码 -->
+        <section id="password" class="pt-2">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="font-serif font-black text-seal text-[1.4rem] leading-none tracking-[0.04em]">贰</span>
+            <h3 class="font-serif font-bold text-[18px] tracking-[0.06em]">更 改 密 码</h3>
           </div>
 
-          <!-- 修改密码卡片 -->
-          <div id="password" class="glass-card neon-border p-6">
-            <h3 class="font-tech text-lg font-semibold text-white mb-6 flex items-center gap-2">
-              <span class="text-cyan-400">02</span>
-              修改密码
-            </h3>
+          <form @submit.prevent="changePassword" class="space-y-7">
+            <div>
+              <label for="old-password" class="label">当 前 密 码</label>
+              <input
+                id="old-password"
+                v-model="passwordForm.old_password"
+                type="password"
+                required
+                class="field"
+                placeholder="••••••••"
+              />
+            </div>
 
-            <form @submit.prevent="changePassword" class="space-y-5">
-              <div>
-                <label class="block text-sm font-mono text-gray-400 mb-2">
-                  <span class="text-cyan-400">//</span> 当前密码
-                </label>
-                <input
-                  v-model="passwordForm.old_password"
-                  type="password"
-                  required
-                  class="input-cyber"
-                  placeholder="••••••••"
-                />
-              </div>
+            <div>
+              <label for="new-password" class="label">新 密 码 · 至少 8 位</label>
+              <input
+                id="new-password"
+                v-model="passwordForm.new_password"
+                type="password"
+                required
+                minlength="8"
+                class="field"
+                placeholder="新设的密令"
+              />
+            </div>
 
-              <div>
-                <label class="block text-sm font-mono text-gray-400 mb-2">
-                  <span class="text-cyan-400">//</span> 新密码
-                </label>
-                <input
-                  v-model="passwordForm.new_password"
-                  type="password"
-                  required
-                  minlength="8"
-                  class="input-cyber"
-                  placeholder="至少 8 位"
-                />
-              </div>
+            <div v-if="passwordError" class="border-l-[2px] border-vermillion bg-paper-deep pl-5 py-3 pr-5">
+              <p class="font-serif text-[13.5px] text-vermillion">{{ passwordError }}</p>
+            </div>
 
-              <div v-if="passwordError" class="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
-                <p class="text-xs text-red-400 font-mono">{{ passwordError }}</p>
-              </div>
-
+            <div class="pt-2">
               <button
                 type="submit"
                 :disabled="submitting"
-                class="btn-cyber disabled:opacity-50 disabled:cursor-not-allowed"
+                class="btn btn--ink disabled:opacity-40"
               >
-                {{ submitting ? '修改中...' : '修改密码' }}
+                {{ submitting ? '修 改 中 …' : '修 改 密 码' }}
+                <span class="arrow">→</span>
               </button>
-            </form>
-          </div>
-        </template>
-      </div>
+            </div>
+          </form>
+        </section>
+
+      </main>
     </div>
   </div>
 </template>
@@ -184,13 +191,15 @@
 <script setup lang="ts">
 import { userApi } from '~/app/lib/api'
 import { useAuth } from '~/composables/useAuth'
+import { useToast } from '~/composables/useToast'
 
 definePageMeta({
   layout: 'default',
   middleware: 'auth'
 })
 
-const { user, logout } = useAuth()
+const { user, logout, restoreAuth } = useAuth()
+const { toastSuccess, toastError } = useToast()
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -200,17 +209,24 @@ const profileLoaded = ref(false)
 
 const profileForm = ref({
   nickname: '',
-  bio: ''
+  bio: '',
 })
 
 const passwordForm = ref({
   old_password: '',
-  new_password: ''
+  new_password: '',
 })
+
+const formatDate = (d: string) => {
+  if (!d) return '—'
+  const date = new Date(d)
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`
+}
 
 onMounted(async () => {
   loading.value = true
   loadError.value = ''
+  restoreAuth()
 
   try {
     if (user.value) {
@@ -247,9 +263,9 @@ const updateProfile = async () => {
       user.value.nickname = profileForm.value.nickname
       user.value.bio = profileForm.value.bio
     }
-    alert('个人资料已更新')
+    toastSuccess('个人资料已更新')
   } catch (err: any) {
-    alert(err.data?.message || '更新失败')
+    toastError(err.data?.message || '更新失败')
   } finally {
     submitting.value = false
   }
@@ -266,7 +282,7 @@ const changePassword = async () => {
 
   try {
     await userApi.changePassword(passwordForm.value)
-    alert('密码已修改')
+    toastSuccess('密码已修改')
     passwordForm.value = { old_password: '', new_password: '' }
   } catch (err: any) {
     passwordError.value = err.data?.message || '修改失败'
@@ -276,7 +292,7 @@ const changePassword = async () => {
 }
 
 const handleLogout = async () => {
-  if (confirm('确定要退出登录吗？')) {
+  if (confirm('确定要登出吗？')) {
     await logout()
   }
 }

@@ -13,15 +13,36 @@ function handleNavigate(key: string) {
 </script>
 
 <template>
-  <div class="flex min-h-screen" style="background: #1a1a2e;">
+  <div class="admin-shell">
     <AdminSidebar
       :active-key="activeMenu"
       :pending-tools="pendingToolsCount"
       :pending-articles="pendingArticlesCount"
       @navigate="handleNavigate"
     />
-    <main class="flex-1 p-8 overflow-auto" style="background: #1a1a2e; margin-left: 240px;">
-      <slot />
+    <main class="admin-main">
+      <div class="broadsheet">
+        <slot />
+      </div>
     </main>
   </div>
 </template>
+
+<style scoped>
+.admin-shell {
+  min-height: 100vh;
+  background: var(--paper);
+  font-family: 'Noto Serif SC', 'Noto Sans SC', serif;
+}
+.admin-main {
+  margin-left: 280px;
+  flex: 1;
+  min-height: 100vh;
+  padding-block: clamp(2rem, 4vw, 4rem);
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 1024px) {
+  .admin-main { margin-left: 240px; }
+}
+</style>

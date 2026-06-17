@@ -1,276 +1,213 @@
 <template>
-  <div class="min-h-screen bg-[#0d1117]">
-    <!-- 顶部导航栏 -->
-    <header class="border-b border-[#30363d] bg-[#161b22]/80 backdrop-blur-sm sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-4 sm:gap-8">
-            <NuxtLink to="/" class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-              <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">AI 热点追踪</span>
-            </NuxtLink>
-            <nav class="hidden lg:flex items-center gap-6">
-              <NuxtLink to="/" class="text-[#8b949e] hover:text-white transition-colors font-medium">首页</NuxtLink>
-              <NuxtLink to="/articles" class="text-[#8b949e] hover:text-white transition-colors font-medium">资讯</NuxtLink>
-              <NuxtLink to="/professions" class="text-[#8b949e] hover:text-white transition-colors font-medium">职业风险</NuxtLink>
-              <NuxtLink to="/learning-paths" class="text-white hover:text-[#58a6ff] transition-colors font-medium">学习路径</NuxtLink>
-              <NuxtLink to="/tools" class="text-[#8b949e] hover:text-white transition-colors font-medium">工具库</NuxtLink>
-            </nav>
-          </div>
-          <div class="flex items-center gap-2 sm:gap-4">
-            <template v-if="user">
-              <NuxtLink to="/profile" class="flex items-center gap-2">
-                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white font-medium text-xs sm:text-sm">
-                  {{ user.nickname?.charAt(0).toUpperCase() || 'U' }}
-                </div>
-                <span class="text-white font-medium text-sm hidden md:block">{{ user.nickname || user.email }}</span>
-              </NuxtLink>
-              <button @click="handleLogout" class="text-[#8b949e] hover:text-white transition-colors font-medium text-xs sm:text-sm">退出</button>
-            </template>
-            <template v-else>
-              <NuxtLink to="/login" class="text-[#8b949e] hover:text-white transition-colors font-medium text-sm">登录</NuxtLink>
-              <NuxtLink to="/register" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md font-medium text-xs sm:text-sm transition-all shadow-lg hover:shadow-xl">注册</NuxtLink>
-            </template>
-          </div>
-        </div>
-      </div>
-    </header>
+  <div class="broadsheet">
 
-    <!-- 面包屑导航 -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-      <nav class="flex items-center gap-2 text-sm text-[#8b949e]">
-        <NuxtLink to="/" class="hover:text-white transition-colors">首页</NuxtLink>
-        <span>/</span>
-        <NuxtLink to="/learning-paths" class="hover:text-white transition-colors">学习路径</NuxtLink>
-        <span>/</span>
-        <span class="text-white truncate">{{ learningPath?.title || '路径详情' }}</span>
-      </nav>
-    </div>
+    <!-- 面包屑 -->
+    <nav class="pt-8 pb-3 text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute flex items-center gap-2 flex-wrap">
+      <NuxtLink to="/" class="underline-draw">头版</NuxtLink>
+      <span class="text-vermillion">·</span>
+      <NuxtLink to="/learning-paths" class="underline-draw">卷三 · 学习</NuxtLink>
+      <span class="text-vermillion">·</span>
+      <span class="text-ink truncate max-w-[28rem]">{{ learningPath?.title || '路径详情' }}</span>
+    </nav>
+
+    <hr class="rule-soft" />
 
     <!-- 加载状态 -->
-    <div v-if="loading" class="max-w-7xl mx-auto px-4 sm:px-6 py-12 text-center">
-      <div class="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-[#58a6ff]"></div>
-      <p class="text-[#8b949e] mt-3">加载中...</p>
+    <div v-if="loading" class="py-24 text-center">
+      <span class="seal-square seal-square--tilt-l">载</span>
+      <p class="mt-5 font-serif italic text-ink-mute">正在调阅卷宗…</p>
     </div>
 
-    <!-- 学习路径详情 -->
-    <div v-else-if="learningPath" class="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
-      <!-- 头部信息卡片 -->
-      <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-6 sm:p-8 mb-6">
-        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-          <div class="flex items-start gap-4">
-            <span class="text-5xl sm:text-6xl">{{ learningPath.icon }}</span>
-            <div>
-              <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">{{ learningPath.title }}</h1>
-              <div class="flex items-center gap-3 flex-wrap">
-                <span :class="getLevelStyle(learningPath.difficulty)" class="px-3 py-1 rounded-full text-sm font-bold">
-                  {{ learningPath.level_label }}
-                </span>
+    <div v-else-if="learningPath" class="pt-10 pb-16">
+
+      <!-- ============================================================
+           头部
+           ============================================================ -->
+      <header class="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-10 anim-rise">
+        <div class="lg:col-span-8">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="seal-square seal-square--tilt-l">路径</span>
+            <span class="kicker kicker--indigo">LEARNING DOSSIER</span>
+            <span class="ml-auto byline">{{ getLevelName(learningPath.difficulty) }}</span>
+          </div>
+          <h1 class="headline headline--xl text-balance">{{ learningPath.title }}</h1>
+          <p class="deck mt-6 max-w-[40rem] text-pretty">{{ learningPath.description }}</p>
+
+          <div class="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute">
+            <span>难 度 · {{ getLevelName(learningPath.difficulty) }}</span>
+            <span class="text-vermillion">·</span>
+            <span>约 {{ learningPath.estimated_days || '—' }} 日</span>
+            <span class="text-vermillion">·</span>
+            <span>共 {{ chapters.length }} 章</span>
+          </div>
+        </div>
+
+        <aside class="lg:col-span-4 lg:border-l lg:border-rule-soft lg:pl-10 space-y-7">
+          <div>
+            <div class="kicker kicker--ink">档 案 信 息</div>
+            <dl class="mt-4 space-y-4 text-[12.5px] font-serif">
+              <div class="flex items-baseline justify-between gap-3">
+                <dt class="text-ink-mute font-mono tracking-[0.16em] uppercase text-[11px]">预 估 时 长</dt>
+                <dd class="font-bold text-ink">{{ learningPath.estimated_hours || '—' }} 小 时</dd>
               </div>
-            </div>
+              <div class="flex items-baseline justify-between gap-3">
+                <dt class="text-ink-mute font-mono tracking-[0.16em] uppercase text-[11px]">章 节 数</dt>
+                <dd class="font-bold text-ink">{{ chapters.length }} 章</dd>
+              </div>
+              <div class="flex items-baseline justify-between gap-3">
+                <dt class="text-ink-mute font-mono tracking-[0.16em] uppercase text-[11px]">在 学 人 数</dt>
+                <dd class="font-bold text-ink">{{ formatStudentCount(learningPath.student_count) }}</dd>
+              </div>
+            </dl>
           </div>
-        </div>
+        </aside>
+      </header>
 
-        <p class="text-[#c9d1d9] text-base leading-relaxed">{{ learningPath.description }}</p>
-
-        <!-- 统计数据 -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-[#30363d]">
-          <div class="text-center">
-            <div class="text-[#8b949e] text-sm mb-1">预计天数</div>
-            <div class="text-white font-bold text-xl">{{ learningPath.estimated_days }} 天</div>
-          </div>
-          <div class="text-center">
-            <div class="text-[#8b949e] text-sm mb-1">预计时长</div>
-            <div class="text-white font-bold text-xl">{{ learningPath.estimated_hours }} 小时</div>
-          </div>
-          <div class="text-center">
-            <div class="text-[#8b949e] text-sm mb-1">章节数</div>
-            <div class="text-white font-bold text-xl">{{ learningPath.chapter_count }} 章</div>
-          </div>
-          <div class="text-center">
-            <div class="text-[#8b949e] text-sm mb-1">在学人数</div>
-            <div class="text-white font-bold text-xl">{{ formatStudentCount(learningPath.student_count) }}</div>
-          </div>
-        </div>
-      </div>
+      <hr class="rule" />
 
       <!-- 学习目标 -->
-      <div v-if="parsedLearningGoals.length > 0" class="bg-[#161b22] border border-[#30363d] rounded-lg p-6 sm:p-8 mb-6">
-        <h2 class="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
-          <span>🎯</span> 学习目标
-        </h2>
-        <ul class="space-y-3">
-          <li v-for="(goal, index) in parsedLearningGoals" :key="index" class="flex items-start gap-3 text-[#c9d1d9]">
-            <span class="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-xs font-bold mt-0.5">
-              {{ index + 1 }}
+      <section v-if="parsedLearningGoals.length" class="py-10">
+        <div class="kicker kicker--ochre mb-5">学 习 目 标</div>
+        <ol class="space-y-3">
+          <li v-for="(goal, index) in parsedLearningGoals" :key="index" class="flex gap-4 font-serif text-[15.5px] text-ink-soft leading-[1.85]">
+            <span class="font-serif font-black text-vermillion text-[1.4rem] leading-none w-9 shrink-0 tracking-[0.04em]">
+              {{ ['壹','贰','叁','肆','伍','陆'][index] || (index + 1) }}
             </span>
-            <span>{{ goal }}</span>
+            <span class="text-pretty">{{ goal }}</span>
           </li>
-        </ul>
-      </div>
+        </ol>
+      </section>
+
+      <hr v-if="parsedLearningGoals.length" class="rule-soft" />
 
       <!-- 适合人群 -->
-      <div v-if="parsedTargetAudience.length > 0" class="bg-[#161b22] border border-[#30363d] rounded-lg p-6 sm:p-8 mb-6">
-        <h2 class="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
-          <span>👥</span> 适合人群
-        </h2>
+      <section v-if="parsedTargetAudience.length" class="py-10">
+        <div class="kicker kicker--moss mb-5">适 合 人 群</div>
         <div class="flex flex-wrap gap-2">
           <span v-for="(audience, index) in parsedTargetAudience" :key="index"
-                class="bg-blue-500/10 border border-blue-500/20 text-blue-400 px-4 py-2 rounded-full text-sm">
+                class="px-4 py-2 text-[13.5px] font-serif border border-ink text-ink tracking-[0.04em]">
             {{ audience }}
           </span>
         </div>
-      </div>
+      </section>
+
+      <hr v-if="parsedTargetAudience.length" class="rule-soft" />
 
       <!-- 章节列表 -->
-      <div v-if="chapters.length > 0" class="bg-[#161b22] border border-[#30363d] rounded-lg p-6 sm:p-8">
-        <h2 class="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
-          <span>📚</span> 课程章节
-        </h2>
-        <div class="space-y-3">
-          <NuxtLink v-for="chapter in chapters" :key="chapter.id"
-               :to="`/learning-paths/${id}/chapters/${chapter.id}`"
-               class="flex items-center justify-between bg-[#21262d] hover:bg-[#30363d] rounded-lg px-5 py-4 transition-colors group block">
-            <div class="flex items-center gap-4 flex-1 min-w-0">
-              <span class="flex-shrink-0 w-8 h-8 rounded-full bg-[#58a6ff]/20 text-[#58a6ff] flex items-center justify-center text-sm font-bold">
-                {{ chapter.order_index }}
+      <section v-if="chapters.length" class="py-10">
+        <div class="kicker kicker--indigo mb-5">课 程 章 节</div>
+        <div class="border-t-2 border-ink">
+          <NuxtLink
+            v-for="(chapter, i) in chapters"
+            :key="chapter.id"
+            :to="`/learning-paths/${id}/chapters/${chapter.id}`"
+            class="group no-underline-on-hover border-b border-rule-soft grid grid-cols-12 gap-4 items-center py-5 hover:bg-paper-deep transition-colors"
+          >
+            <div class="col-span-1">
+              <span class="font-serif font-black text-vermillion text-[1.6rem] leading-none tracking-[0.04em]">
+                {{ ['壹','贰','叁','肆','伍','陆','柒','捌','玖','拾'][i] || (i + 1) }}
               </span>
-              <div class="min-w-0 flex-1">
-                <h3 class="text-white font-medium group-hover:text-[#58a6ff] transition-colors truncate">
-                  {{ chapter.title }}
-                </h3>
-                <p class="text-[#8b949e] text-sm truncate">{{ chapter.description }}</p>
-              </div>
             </div>
-            <div class="flex items-center gap-3 ml-4 flex-shrink-0">
-              <span class="text-[#8b949e] text-sm">{{ chapter.estimated_hours }} 小时</span>
-              <span :class="getContentTypeStyle(chapter.content_type)" class="px-2 py-1 rounded text-xs">
+            <div class="col-span-7 md:col-span-8">
+              <h3 class="font-serif font-bold text-[16px] text-ink group-hover:text-vermillion transition-colors tracking-[0.04em] leading-tight">
+                {{ chapter.title }}
+              </h3>
+              <p class="font-serif text-[13px] text-ink-mute leading-[1.7] mt-1 line-clamp-1">
+                {{ chapter.description }}
+              </p>
+            </div>
+            <div class="col-span-4 md:col-span-3 flex items-center justify-end gap-3 text-[11px] font-mono tracking-[0.16em] uppercase text-ink-mute">
+              <span class="hidden sm:inline">{{ chapter.estimated_hours || '—' }} 时</span>
+              <span class="px-2 py-1 border border-rule-soft text-ink-soft text-[10.5px]">
                 {{ getContentTypeName(chapter.content_type) }}
               </span>
-              <svg class="w-5 h-5 text-[#8b949e] group-hover:text-[#58a6ff] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
+              <span class="text-ink">→</span>
             </div>
           </NuxtLink>
         </div>
-      </div>
+      </section>
 
-      <!-- 返回按钮 -->
-      <div class="mt-8 text-center">
-        <NuxtLink to="/learning-paths"
-                  class="inline-flex items-center gap-2 bg-[#21262d] hover:bg-[#30363d] text-white px-6 py-3 rounded-lg transition-colors font-medium">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-          返回列表
+      <hr class="rule" />
+
+      <div class="pt-12 text-center">
+        <NuxtLink to="/learning-paths" class="btn btn--ink">
+          返 回 路 径 总 览
+          <span class="arrow">→</span>
         </NuxtLink>
       </div>
     </div>
 
-    <!-- 404 状态 -->
-    <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 py-20 text-center">
-      <div class="text-6xl mb-4">😕</div>
-      <h2 class="text-2xl font-bold text-white mb-3">学习路径不存在</h2>
-      <p class="text-[#8b949e] mb-6">抱歉，您访问的学习路径不存在或已被删除</p>
-      <NuxtLink to="/learning-paths"
-                class="inline-flex items-center gap-2 bg-[#58a6ff] hover:bg-[#1f6feb] text-white px-6 py-3 rounded-lg transition-colors font-medium">
-        查看学习路径列表
-      </NuxtLink>
+    <!-- 404 -->
+    <div v-else class="py-24 text-center">
+      <span class="seal-square seal-square--tilt-r">无</span>
+      <h2 class="font-serif font-black text-[clamp(1.6rem,2.2vw,2.2rem)] leading-[1.25] mt-7 tracking-[0.06em] text-balance">
+        该路径已不在卷中
+      </h2>
+      <p class="font-serif text-[15px] text-ink-mute mt-4 max-w-[28rem] mx-auto text-pretty">
+        这条学习路径可能已被合并、调整，或链接已失效。
+      </p>
+      <div class="mt-9">
+        <NuxtLink to="/learning-paths" class="btn btn--ink">
+          查 看 路 径 总 览
+          <span class="arrow">→</span>
+        </NuxtLink>
+      </div>
     </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { useAuth } from '~/composables/useAuth'
-import { useToast } from '~/composables/useToast'
-
-const { user, clearAuth, restoreAuth } = useAuth()
-const { toastSuccess, toastError } = useToast()
-
-onMounted(() => { restoreAuth() })
-
-const handleLogout = async () => {
-  try {
-    const { authApi } = await import('~/app/lib/api')
-    await authApi.logout()
-    toastSuccess('已退出登录')
-  } catch (error) {
-    toastError('退出登录失败')
-  } finally {
-    clearAuth()
-    navigateTo('/')
-  }
-}
+definePageMeta({ layout: 'default' })
 
 const route = useRoute()
 const id = route.params.id as string
 
-// 获取学习路径详情
-const { data: learningPath, error, pending: loading } = await useFetch(`/api/learning-paths/${id}`, {
+const { data: learningPath, pending: loading } = await useFetch(`/api/learning-paths/${id}`, {
   transform: (res: any) => {
     if (!res) return null
-    // 后端返回 {code, data, message},提取 data 字段
     const responseData = res?.data || res
     if (!responseData) return null
-    // 后端直接返回对象
     if (responseData.title) return responseData
     return null
-  }
+  },
 })
 
-// 获取章节列表
-const { data: chapters } = await useFetch(`/api/learning-paths/${id}/chapters`, {
+const { data: chaptersData } = await useFetch(`/api/learning-paths/${id}/chapters`, {
   transform: (res: any) => {
     if (!res) return []
-    // 后端返回 {code, data, message},提取 data 字段
     const responseData = res?.data || res
     if (!responseData) return []
     if (Array.isArray(responseData)) return responseData
     if (responseData.chapters && Array.isArray(responseData.chapters)) return responseData.chapters
     return []
-  }
+  },
 })
 
-if (error.value) {
-  console.error('Failed to fetch learning path:', error.value)
-}
+const chapters = computed(() => chaptersData.value || [])
 
-// 工具函数
 const formatStudentCount = (count: number) => {
   if (!count) return '0'
-  if (count >= 1000) return (count / 1000).toFixed(1) + 'k'
-  return count.toString()
+  if (count >= 10000) return (count / 10000).toFixed(1) + ' 万'
+  if (count >= 1000) return (count / 1000).toFixed(1) + ' 千'
+  return String(count)
 }
 
-const getLevelStyle = (difficulty: string) => {
-  const map: Record<string, string> = {
-    'beginner': 'bg-green-500/10 text-green-400',
-    'intermediate': 'bg-blue-500/10 text-blue-400',
-    'advanced': 'bg-purple-500/10 text-purple-400'
-  }
-  return map[difficulty] || 'bg-gray-500/10 text-gray-400'
+const getLevelName = (d: string) => {
+  const map: Record<string, string> = { beginner: '入 门', intermediate: '进 阶', advanced: '高 级' }
+  return map[d] || '未 知'
 }
 
 const getContentTypeName = (type: string) => {
   const map: Record<string, string> = {
-    'article': '文章',
-    'video': '视频',
-    'practice': '实践',
-    'external': '外部链接'
+    article: '文 章',
+    video: '视 频',
+    practice: '实 践',
+    external: '外 部 链 接',
   }
   return map[type] || type
 }
 
-const getContentTypeStyle = (type: string) => {
-  const map: Record<string, string> = {
-    'article': 'bg-yellow-500/10 text-yellow-400',
-    'video': 'bg-red-500/10 text-red-400',
-    'practice': 'bg-green-500/10 text-green-400',
-    'external': 'bg-purple-500/10 text-purple-400'
-  }
-  return map[type] || 'bg-gray-500/10 text-gray-400'
-}
-
-// 解析学习目标
 const parsedLearningGoals = computed(() => {
   const goals = learningPath.value?.learning_goals
   if (!goals) return []
@@ -283,7 +220,6 @@ const parsedLearningGoals = computed(() => {
   }
 })
 
-// 解析适合人群
 const parsedTargetAudience = computed(() => {
   const audience = learningPath.value?.target_audience
   if (!audience) return []
@@ -296,3 +232,12 @@ const parsedTargetAudience = computed(() => {
   }
 })
 </script>
+
+<style scoped>
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>
