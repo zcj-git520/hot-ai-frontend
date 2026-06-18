@@ -27,6 +27,18 @@
     </div>
 
     <button
+      v-if="props.translatable"
+      class="translate-btn"
+      :class="{ active: props.translated, busy: props.translating }"
+      :aria-label="props.translated ? `还原为${props.restoreLabel}` : `翻译为${props.targetLabel}`"
+      :aria-pressed="props.translated"
+      :disabled="props.translating"
+      @click="emit('toggle-translate')"
+    >
+      {{ props.translated ? `原 · ${props.restoreLabel}` : `译 · ${props.targetLabel}` }}
+    </button>
+
+    <button
       class="back-to-top"
       :class="{ visible: showTop }"
       aria-label="返回顶部"
@@ -52,13 +64,25 @@ const THEMES = [
   { value: 'ochre'  as Theme, label: '赭石', dot: '#A87326' },
 ]
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   fontSize: FontSize
   theme: Theme
-}>()
+  translatable?: boolean
+  translating?: boolean
+  translated?: boolean
+  targetLabel?: string
+  restoreLabel?: string
+}>(), {
+  translatable: false,
+  translating: false,
+  translated: false,
+  targetLabel: '英文',
+  restoreLabel: '中文',
+})
 const emit = defineEmits<{
   (e: 'update:fontSize', value: FontSize): void
   (e: 'update:theme', value: Theme): void
+  (e: 'toggle-translate'): void
 }>()
 
 const showTop = ref(false)
@@ -112,6 +136,31 @@ button.active { color: #F2EBD9; background: #B5202A; }
   border: 1px solid #1A1714;
 }
 
+.translate-btn {
+  height: 36px;
+  align-self: flex-start;
+  width: auto;
+  padding: 0 16px;
+  background: rgba(242, 235, 217, 0.92);
+  color: #1A1714;
+  border: 1px solid #1A1714;
+  border-radius: 999px;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(8px);
+  transition: all 200ms;
+  white-space: nowrap;
+}
+.translate-btn:hover { background: #1A1714; color: #F2EBD9; }
+.translate-btn.active { background: #B5202A; color: #F2EBD9; border-color: #B5202A; }
+.translate-btn.busy { cursor: wait; opacity: 0.6; animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
 .back-to-top {
   width: 44px;
   height: 44px;
@@ -133,5 +182,6 @@ button.active { color: #F2EBD9; background: #B5202A; }
   .reader-toolbar { right: 12px; bottom: 12px; }
   .group button { width: 32px; height: 32px; }
   .back-to-top { width: 40px; height: 40px; }
+  .translate-btn { height: 32px; padding: 0 12px; font-size: 11px; }
 }
 </style>
