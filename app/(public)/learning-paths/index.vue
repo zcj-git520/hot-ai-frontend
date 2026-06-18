@@ -172,6 +172,22 @@
           </button>
         </nav>
       </div>
+
+      <!-- 返回 -->
+      <div class="mt-12 pt-8 border-t border-rule-soft flex flex-col sm:flex-row items-center justify-center gap-4">
+        <NuxtLink to="/" class="btn btn--ink">
+          返 回 头 版
+          <span class="arrow">→</span>
+        </NuxtLink>
+        <button
+          type="button"
+          @click="scrollToTop"
+          class="btn btn--ghost"
+        >
+          返 回 顶 部
+          <span class="arrow">↑</span>
+        </button>
+      </div>
     </section>
 
   </div>
@@ -255,6 +271,10 @@ const goToPage = (page: number) => {
     currentPage.value = page
     if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
   }
+}
+
+const scrollToTop = () => {
+  if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 </script>
 
