@@ -94,10 +94,9 @@ export const useAuth = () => {
     }
   }
 
-  // 检查是否已登录
-  const isAuthenticated = () => {
-    return !!token.value
-  }
+  // 检查是否已登录 — 改用 computed, 让模板里 v-if="isAuthenticated" 真正生效
+  // (函数引用在 v-if 里恒为 truthy, 之前永远走 v-else 分支)
+  const isAuthenticated = computed(() => !!token.value)
 
   return {
     user,

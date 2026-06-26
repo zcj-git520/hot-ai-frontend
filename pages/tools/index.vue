@@ -162,6 +162,7 @@
 <script setup lang="ts">
 import type { Tool, ToolCategory } from '~/types/tool'
 import ToolCard from '~/components/ToolCard.vue'
+import { toolApi } from '~/app/lib/api'
 
 definePageMeta({ layout: 'default' })
 
@@ -179,9 +180,11 @@ const error = ref('')
 
 const fetchCategories = async () => {
   try {
-    const response: any = await $fetch('/api/tools/categories')
+    const response: any = await toolApi.getCategories()
     if (response.code === 0 && response.data) {
       categories.value = response.data
+    } else if (Array.isArray(response)) {
+      categories.value = response
     }
   } catch (err) {
     /* 静默 */
@@ -201,14 +204,21 @@ const fetchTools = async () => {
     if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
     if (selectedCategory.value) params.category_id = selectedCategory.value
 
-    const response: any = await $fetch('/api/tools', { query: params })
-    if ((response.code === 0 || response.code === 200) && response.data) {
-      tools.value = Array.isArray(response.data.list) ? response.data.list : []
-      totalCount.value = response.data.total || 0
-      totalPages.value = Math.ceil((response.data.total || 0) / pageSize.value)
+    const response: any = await toolApi.getList({
+      page: params.page,
+      pageSize: params.page_size,
+      search: params.search,
+      category: params.category_id,
+    })
+    // axios 拦截器已解包 {code, data, message} → response 已是 data 部分
+    if (response && (response.list || response.data)) {
+      const list = response.list || response.data.list || []
+      tools.value = Array.isArray(list) ? list : []
+      totalCount.value = response.total || response.data?.total || 0
+      totalPages.value = Math.ceil((response.total || response.data?.total || 0) / pageSize.value)
     } else {
       tools.value = []
-      error.value = response.message || '获取工具列表失败'
+      error.value = '获取工具列表失败'
     }
   } catch (err: any) {
     tools.value = []

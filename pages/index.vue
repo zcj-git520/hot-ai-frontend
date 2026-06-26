@@ -2,6 +2,44 @@
   <div class="broadsheet">
 
     <!-- ============================================================
+         用户欢迎卡 — 仅登录用户显示
+         ============================================================ -->
+    <section v-if="isAuthenticated" class="pt-10 md:pt-14 anim-rise">
+      <div class="border-t-2 border-ink pt-7 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <div class="md:col-span-8 flex items-center gap-5">
+          <span class="w-16 h-16 flex items-center justify-center border-2 border-vermillion text-vermillion font-serif font-black text-[2rem] tracking-[0.04em]">
+            {{ userInitial }}
+          </span>
+          <div>
+            <p class="text-[11px] font-mono tracking-[0.18em] uppercase text-ink-mute">
+              {{ todayStr }} · 本期读者
+            </p>
+            <h2 class="font-serif font-black text-[clamp(1.4rem,2vw,1.8rem)] leading-[1.3] mt-1 tracking-[0.04em]">
+              {{ greeting }}，<span class="text-vermillion">{{ user?.nickname || '读者' }}</span>
+            </h2>
+            <p class="font-serif text-[14px] text-ink-soft mt-1">
+              <span
+                class="inline-block px-2 py-0.5 text-[11px] font-mono tracking-[0.18em] uppercase mr-2"
+                :class="userLevel === 2 ? 'text-vermillion border border-vermillion' : userLevel === 1 ? 'text-indigo border border-indigo' : 'text-ink-mute border border-ink-mute'"
+              >
+                {{ userLevelLabel }}
+              </span>
+              <span v-if="userLevel === 0">登入后可解锁免费章节，会员可解锁全部内容。</span>
+              <span v-else-if="userLevel === 1">可阅读免费内容；部分章节需会员权限。</span>
+              <span v-else>已解锁全部内容 · 感谢你的订阅。</span>
+            </p>
+          </div>
+        </div>
+        <div class="md:col-span-4 flex flex-wrap md:justify-end gap-2">
+          <NuxtLink to="/profile" class="btn btn--ghost btn--sm">个 人 中 心</NuxtLink>
+          <NuxtLink to="/learning-paths" class="btn btn--cinnabar btn--sm">继 续 学 习 <span class="arrow">→</span></NuxtLink>
+        </div>
+      </div>
+    </section>
+
+    <hr v-if="isAuthenticated" class="rule mt-10" />
+
+    <!-- ============================================================
          卷首 — 头条
          ============================================================ -->
     <section class="pt-12 md:pt-20 pb-16">
@@ -369,11 +407,52 @@
 </template>
 
 <script setup lang="ts">
+import { articleApi } from '~/app/lib/api'
+
 definePageMeta({ layout: 'default' })
 
-const { data: latestArticles } = await useFetch('/api/articles', {
-  query: { page: 1, page_size: 3 },
-  transform: (data: any) => data?.data?.articles || data?.articles || [],
+const { user, token, isAuthenticated, restoreAuth } = useAuth()
+
+onMounted(() => {
+  restoreAuth()
+})
+
+const userInitial = computed(() => {
+  const name = user.value?.nickname || user.value?.email || '?'
+  return name.charAt(0).toUpperCase()
+})
+
+const userLevel = computed(() => {
+  if (!token.value) return 0
+  try {
+    const parts = token.value.split('.')
+    if (parts.length !== 3) return 0
+    const payload = JSON.parse(atob(parts[1]))
+    return payload.level ?? 0
+  } catch {
+    return 0
+  }
+})
+
+const userLevelLabel = computed(() => {
+  if (userLevel.value >= 2) return '会 员'
+  if (userLevel.value >= 1) return '普 通 用 户'
+  return '游 客'
+})
+
+const greeting = computed(() => {
+  const h = new Date().getHours()
+  if (h < 6) return '夜深了'
+  if (h < 12) return '早安'
+  if (h < 18) return '午后好'
+  return '晚上好'
+})
+
+const { data: latestArticles } = await useAsyncData('home-articles', () => articleApi.getList({
+  page: 1,
+  pageSize: 3,
+}), {
+  transform: (data: any) => data?.articles || data?.data?.articles || [],
 })
 
 const loading = ref(false)

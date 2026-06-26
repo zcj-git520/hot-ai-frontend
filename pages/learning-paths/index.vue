@@ -117,9 +117,19 @@
                 </p>
               </div>
             </div>
-            <span :class="difficultyTilt(path.difficulty)" class="seal-square">
-              {{ getLevelName(path.difficulty) }}
-            </span>
+            <div class="flex items-center gap-2">
+              <span
+                v-if="path.is_locked"
+                class="seal-square seal-square--tilt-r text-[10px]"
+                :class="path.required_level >= 2 ? 'seal-square--cinnabar' : 'seal-square--ink'"
+                :title="path.required_level >= 2 ? '会员专享' : '登录后阅读'"
+              >
+                {{ path.required_level >= 2 ? '会' : '锁' }}
+              </span>
+              <span :class="difficultyTilt(path.difficulty)" class="seal-square">
+                {{ getLevelName(path.difficulty) }}
+              </span>
+            </div>
           </div>
 
           <h3 class="headline headline--md group-hover:text-vermillion transition-colors text-balance">
@@ -194,6 +204,8 @@
 </template>
 
 <script setup lang="ts">
+import { learningPathApi } from '~/app/lib/api'
+
 definePageMeta({ layout: 'default' })
 
 const searchKeyword = ref('')
@@ -239,7 +251,7 @@ const loadPaths = async () => {
     if (searchKeyword.value) params.search = searchKeyword.value
 
     const query = new URLSearchParams(params as any)
-    const res: any = await $fetch(`/api/learning-paths?${query.toString()}`)
+    const res: any = await learningPathApi.getList(params as any)
     const data = res?.data || res
     paths.value = data.professions || data.list || data.paths || []
     total.value = data.total || paths.value.length

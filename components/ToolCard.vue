@@ -10,9 +10,19 @@
           <p class="text-[11px] text-ink-mute font-mono tracking-[0.16em] uppercase mt-1">{{ getCategoryName(tool.category_id) }}</p>
         </div>
       </div>
-      <span :class="['seal-square', difficultyTilt]">
-        {{ getDifficultyName(tool.difficulty) }}
-      </span>
+      <div class="flex flex-col items-end gap-1.5">
+        <span :class="['seal-square', difficultyTilt]">
+          {{ getDifficultyName(tool.difficulty) }}
+        </span>
+        <span
+          v-if="tool.is_locked"
+          class="seal-square seal-square--tilt-r text-[10px]"
+          :class="tool.required_level >= 2 ? 'seal-square--cinnabar' : 'seal-square--ink'"
+          :title="tool.required_level >= 2 ? '会员专享' : '登录后阅读'"
+        >
+          {{ tool.required_level >= 2 ? '会' : '锁' }}
+        </span>
+      </div>
     </div>
 
     <p class="font-serif text-[14px] text-ink-soft leading-[1.85] mb-5 line-clamp-2 text-pretty">{{ tool.description }}</p>

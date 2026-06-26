@@ -30,16 +30,23 @@
 
     <div v-if="article.content" ref="bodyEl" class="reader-body" v-html="html" />
 
-    <div v-else class="empty-body">
+    <LockNotice
+      v-if="article.is_locked"
+      :required-level="article.required_level || 2"
+      :title="article.locked?.title"
+      :message="article.locked?.message"
+    />
+
+    <div v-else-if="!article.content" class="empty-body">
       <p class="empty-text">暂无正文内容</p>
-      <a v-if="article.original_url" :href="article.original_url" target="_blank" rel="noopener noreferrer" class="empty-link">
+      <a v-if="article.original_url && !article.is_locked" :href="article.original_url" target="_blank" rel="noopener noreferrer" class="empty-link">
         查看原文 →
       </a>
     </div>
 
     <footer class="reader-footer ignore">
       <NuxtLink to="/articles" class="back-link">← 返 回 资 讯 列 表</NuxtLink>
-      <a v-if="article.original_url" :href="article.original_url" target="_blank" rel="noopener noreferrer" class="original-link">
+      <a v-if="article.original_url && !article.is_locked" :href="article.original_url" target="_blank" rel="noopener noreferrer" class="original-link">
         查 看 原 文 →
       </a>
     </footer>
@@ -68,6 +75,7 @@ import { useReaderPrefs } from '~/app/composables/useReaderPrefs'
 import { useTranslator } from '~/app/composables/useTranslator'
 import ReadingProgress from './ReadingProgress.vue'
 import ReaderToolbar from './ReaderToolbar.vue'
+import LockNotice from './LockNotice.vue'
 import { enhanceCodeBlocks } from './CodeBlockEnhancer.client'
 import { enhanceImages } from './enhanceImages.client'
 
@@ -91,7 +99,7 @@ const { html } = useArticleRender(() => props.article.content)
 const bodyEl = ref<HTMLElement>()
 const rootEl = ref<HTMLElement>()
 
-const canShowTranslate = computed(() => Boolean(props.article.content))
+const canShowTranslate = computed(() => Boolean(props.article.content) && !props.article.is_locked)
 
 // 嗅探文章主语言：CJK 字符比例 > 30% 视为中文，否则视为英文
 const sourceLang = computed<'zh' | 'en'>(() => {

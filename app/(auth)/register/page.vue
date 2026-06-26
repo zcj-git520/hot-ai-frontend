@@ -39,7 +39,7 @@
       </div>
 
       <div class="relative z-10 font-mono text-[10.5px] tracking-[0.24em] uppercase text-paper-soft/50 flex items-center gap-4">
-        <span>印于北京</span>
+        <span>印于上海</span>
         <span class="text-vermillion-soft">●</span>
         <span>独立 AI 职业刊物</span>
       </div>

@@ -120,6 +120,14 @@
             <span :class="difficultyTilt(path.difficulty)" class="seal-square">
               {{ getLevelName(path.difficulty) }}
             </span>
+            <span
+              v-if="path.is_locked"
+              class="seal-square seal-square--tilt-r text-[10px] mt-1.5"
+              :class="path.required_level >= 2 ? 'seal-square--cinnabar' : 'seal-square--ink'"
+              :title="path.required_level >= 2 ? '会员专享' : '登录后阅读'"
+            >
+              {{ path.required_level >= 2 ? '会' : '锁' }}
+            </span>
           </div>
 
           <h3 class="headline headline--md group-hover:text-vermillion transition-colors text-balance">

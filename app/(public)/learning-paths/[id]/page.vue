@@ -28,6 +28,14 @@
           <div class="flex items-center gap-3 mb-5">
             <span class="seal-square seal-square--tilt-l">路径</span>
             <span class="kicker kicker--indigo">LEARNING DOSSIER</span>
+            <span
+              v-if="learningPath.is_locked"
+              class="seal-square seal-square--tilt-r text-[10px]"
+              :class="learningPath.required_level >= 2 ? 'seal-square--cinnabar' : 'seal-square--ink'"
+              :title="learningPath.required_level >= 2 ? '会员专享' : '登录后阅读'"
+            >
+              {{ learningPath.required_level >= 2 ? '会' : '锁' }}
+            </span>
             <span class="ml-auto byline">{{ getLevelName(learningPath.difficulty) }}</span>
           </div>
           <h1 class="headline headline--xl text-balance">{{ learningPath.title }}</h1>
@@ -120,6 +128,14 @@
               <span class="hidden sm:inline">{{ chapter.estimated_hours || '—' }} 时</span>
               <span class="px-2 py-1 border border-rule-soft text-ink-soft text-[10.5px]">
                 {{ getContentTypeName(chapter.content_type) }}
+              </span>
+              <span
+                v-if="chapter.is_locked"
+                class="seal-square text-[9px] w-7 h-7"
+                :class="chapter.required_level >= 2 ? 'seal-square--cinnabar' : 'seal-square--ink'"
+                :title="chapter.required_level >= 2 ? '会员专享' : '登录后阅读'"
+              >
+                {{ chapter.required_level >= 2 ? '会' : '锁' }}
               </span>
               <span class="text-ink">→</span>
             </div>

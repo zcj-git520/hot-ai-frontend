@@ -113,7 +113,17 @@
                 <div class="risk-bar__caption">{{ getRiskLevelName(p.risk_level) }}</div>
               </div>
             </div>
-            <span class="byline">№ {{ String(i + 1).padStart(2, '0') }}</span>
+            <div class="flex items-center gap-2">
+              <span
+                v-if="p.is_locked"
+                class="seal-square seal-square--tilt-r text-[10px]"
+                :class="p.required_level >= 2 ? 'seal-square--cinnabar' : 'seal-square--ink'"
+                :title="p.required_level >= 2 ? '会员专享' : '登录后阅读'"
+              >
+                {{ p.required_level >= 2 ? '会' : '锁' }}
+              </span>
+              <span class="byline">№ {{ String(i + 1).padStart(2, '0') }}</span>
+            </div>
           </div>
 
           <h3 class="headline headline--md group-hover:text-vermillion transition-colors text-balance">
@@ -225,6 +235,8 @@
 </template>
 
 <script setup lang="ts">
+import { professionApi } from '~/app/lib/api'
+
 definePageMeta({ layout: 'default' })
 
 const searchKeyword = ref('')
@@ -257,7 +269,11 @@ const fetchProfessions = async () => {
     const params: any = { page: currentPage.value, page_size: pageSize.value }
     if (activeRiskLevel.value !== 'all') params.risk_level = activeRiskLevel.value
     if (searchKeyword.value) params.keyword = searchKeyword.value
-    const res: any = await $fetch('/api/professions', { query: params })
+    const res: any = await professionApi.getList({
+      page: params.page,
+      pageSize: params.page_size,
+      riskLevel: params.risk_level
+    })
     const data = res?.data || res
     professions.value = data?.professions || []
     totalCount.value = data?.total || 0
@@ -269,8 +285,9 @@ const fetchProfessions = async () => {
   }
 }
 
-const { data: initial } = await useAsyncData('professions-initial', () => $fetch('/api/professions', {
-  query: { page: 1, page_size: 12 },
+const { data: initial } = await useAsyncData('professions-initial', () => professionApi.getList({
+  page: 1,
+  pageSize: 12,
 }), {
   transform: (res: any) => {
     const data = res?.data || res

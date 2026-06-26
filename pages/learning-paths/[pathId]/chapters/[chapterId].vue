@@ -51,6 +51,14 @@
           <span class="seal-square seal-square--tilt-l">第 {{ chapter.order_index }} 章</span>
           <span class="kicker kicker--indigo">{{ getContentTypeName(chapter.content_type) }}</span>
           <span v-if="chapter.is_free" class="px-2 py-0.5 text-[10.5px] font-mono tracking-[0.18em] uppercase border border-ochre text-ochre">免 费</span>
+          <span
+            v-if="chapter.is_locked"
+            class="seal-square seal-square--tilt-r text-[10px]"
+            :class="chapter.required_level >= 2 ? 'seal-square--cinnabar' : 'seal-square--ink'"
+            :title="chapter.required_level >= 2 ? '会员专享' : '登录后阅读'"
+          >
+            {{ chapter.required_level >= 2 ? '会' : '锁' }}
+          </span>
           <span class="ml-auto byline">≈ {{ chapter.estimated_hours || '—' }} 小 时</span>
         </div>
 
@@ -64,7 +72,14 @@
            章节正文
            ============================================================ -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 py-12">
-        <article class="lg:col-span-8 prose-cn indent-cn article-content">
+        <article v-if="chapter.is_locked" class="lg:col-span-8">
+          <LockNotice
+            :required-level="chapter.required_level || 2"
+            content-type="chapter"
+          />
+        </article>
+
+        <article v-else class="lg:col-span-8 prose-cn indent-cn article-content">
           <div v-html="renderedContent" />
         </article>
 
@@ -93,7 +108,7 @@
 
           <hr class="rule-soft" />
 
-          <div v-if="externalLinks.length > 0">
+          <div v-if="!chapter.is_locked && externalLinks.length > 0">
             <div class="kicker kicker--moss mb-3">相 关 资 源</div>
             <ul class="space-y-2.5">
               <li v-for="(link, index) in externalLinks" :key="index">
@@ -171,6 +186,8 @@
 
 <script setup lang="ts">
 import { marked } from 'marked'
+import LockNotice from '~/app/components/article/LockNotice.vue'
+import { learningPathApi } from '~/app/lib/api'
 
 definePageMeta({ layout: 'default' })
 
@@ -178,28 +195,25 @@ const route = useRoute()
 const id = route.params.pathId as string
 const chapterId = route.params.chapterId as string
 
-const { data: learningPath, pending: lpLoading } = await useFetch(`/api/learning-paths/${id}`, {
-  transform: (res: any) => {
-    if (!res) return null
-    const responseData = res?.data || res
-    if (!responseData) return null
-    if (responseData.title) return responseData
-    return null
-  },
-})
+const learningPath = ref<any>(null)
+const allChaptersRaw = ref<any[]>([])
+const loading = ref(false)
 
-const { data: allChaptersRaw, pending: chaptersLoading } = await useFetch(`/api/learning-paths/${id}/chapters`, {
-  transform: (res: any) => {
-    if (!res) return []
-    const responseData = res?.data || res
-    if (!responseData) return []
-    if (Array.isArray(responseData)) return responseData
-    if (responseData.chapters && Array.isArray(responseData.chapters)) return responseData.chapters
-    return []
-  },
-})
-
-const loading = computed(() => lpLoading.value || chaptersLoading.value)
+const fetchData = async () => {
+  if (!id) return
+  loading.value = true
+  try {
+    const pathData: any = await learningPathApi.getById(id)
+    learningPath.value = pathData?.data || pathData
+    const chaptersData: any = await learningPathApi.getChapters(id)
+    const list = Array.isArray(chaptersData) ? chaptersData : (chaptersData?.list || chaptersData?.chapters || [])
+    allChaptersRaw.value = list
+  } catch (err) {
+    console.error('获取章节详情失败:', err)
+  } finally {
+    loading.value = false
+  }
+}
 
 const chapter = computed(() => {
   if (!allChaptersRaw.value || !chapterId) return null
@@ -252,6 +266,10 @@ const getContentTypeName = (type: string) => {
   }
   return map[type] || type
 }
+
+onMounted(() => {
+  fetchData()
+})
 </script>
 
 <style scoped>

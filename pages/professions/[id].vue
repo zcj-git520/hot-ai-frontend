@@ -29,6 +29,14 @@
           <div class="flex items-center gap-3 mb-5">
             <span class="seal-square seal-square--tilt-l">档案</span>
             <span class="kicker kicker--moss">CAREER DOSSIER</span>
+            <span
+              v-if="profession.is_locked"
+              class="seal-square seal-square--tilt-r text-[10px]"
+              :class="profession.required_level >= 2 ? 'seal-square--cinnabar' : 'seal-square--ink'"
+              :title="profession.required_level >= 2 ? '会员专享' : '登录后阅读'"
+            >
+              {{ profession.required_level >= 2 ? '会' : '锁' }}
+            </span>
           </div>
           <h1 class="headline headline--xl text-balance">{{ profession.name }}</h1>
           <p class="deck mt-6 max-w-[40rem] text-pretty">{{ profession.description }}</p>
@@ -67,7 +75,14 @@
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 py-12">
 
         <!-- 左：主文 -->
-        <article class="lg:col-span-8 prose-cn indent-cn">
+        <article v-if="profession.is_locked" class="lg:col-span-8">
+          <LockNotice
+            :required-level="profession.required_level || 2"
+            content-type="profession"
+          />
+        </article>
+
+        <article v-else class="lg:col-span-8 prose-cn indent-cn">
           <h2 class="font-serif font-black text-[clamp(1.5rem,2vw,2rem)] leading-[1.3] mb-5 tracking-[0.04em] text-balance">一份档案，记录这个职业正在发生什么</h2>
 
           <p>
@@ -271,19 +286,29 @@
 </template>
 
 <script setup lang="ts">
+import LockNotice from '~/app/components/article/LockNotice.vue'
+import { professionApi } from '~/app/lib/api'
+
 definePageMeta({ layout: 'default' })
 
 const route = useRoute()
 const id = route.params.id as string
 
-const { data: profession } = await useFetch(`/api/professions/${id}`, {
-  transform: (res: any) => {
-    if (res && res.name) return res
-    return res?.data || null
-  },
-})
-
+const profession = ref<any>(null)
 const loading = ref(false)
+
+const fetchProfession = async () => {
+  if (!id) return
+  loading.value = true
+  try {
+    const data: any = await professionApi.getById(id)
+    profession.value = data?.data || data
+  } catch (err) {
+    console.error('获取职业详情失败:', err)
+  } finally {
+    loading.value = false
+  }
+}
 
 const riskLevelName = computed(() => {
   const map: Record<string, string> = { extreme: '极 高 风 险', high: '高 风 险', medium: '中 等 风 险', low: '低 风 险' }
@@ -325,6 +350,10 @@ const getSalaryImpactName = (s: string) => {
   const map: Record<string, string> = { positive: '正 向 影 响', neutral: '中 性 影 响', negative: '负 向 影 响' }
   return map[s] || s || '—'
 }
+
+onMounted(() => {
+  fetchProfession()
+})
 </script>
 
 <style scoped>

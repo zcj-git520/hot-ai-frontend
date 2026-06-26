@@ -28,6 +28,14 @@
           <div class="flex items-center gap-3 mb-5">
             <span class="seal-square seal-square--tilt-l">路径</span>
             <span class="kicker kicker--indigo">LEARNING DOSSIER</span>
+            <span
+              v-if="learningPath.is_locked"
+              class="seal-square seal-square--tilt-r text-[10px]"
+              :class="learningPath.required_level >= 2 ? 'seal-square--cinnabar' : 'seal-square--ink'"
+              :title="learningPath.required_level >= 2 ? '会员专享' : '登录后阅读'"
+            >
+              {{ learningPath.required_level >= 2 ? '会' : '锁' }}
+            </span>
             <span class="ml-auto byline">{{ getLevelName(learningPath.difficulty) }}</span>
           </div>
           <h1 class="headline headline--xl text-balance">{{ learningPath.title }}</h1>
@@ -121,6 +129,14 @@
               <span class="px-2 py-1 border border-rule-soft text-ink-soft text-[10.5px]">
                 {{ getContentTypeName(chapter.content_type) }}
               </span>
+              <span
+                v-if="chapter.is_locked"
+                class="seal-square text-[9px] w-7 h-7"
+                :class="chapter.required_level >= 2 ? 'seal-square--cinnabar' : 'seal-square--ink'"
+                :title="chapter.required_level >= 2 ? '会员专享' : '登录后阅读'"
+              >
+                {{ chapter.required_level >= 2 ? '会' : '锁' }}
+              </span>
               <span class="text-ink">→</span>
             </div>
           </NuxtLink>
@@ -158,33 +174,32 @@
 </template>
 
 <script setup lang="ts">
+import { learningPathApi } from '~/app/lib/api'
+
 definePageMeta({ layout: 'default' })
 
 const route = useRoute()
 const id = route.params.id as string
 
-const { data: learningPath, pending: loading } = await useFetch(`/api/learning-paths/${id}`, {
-  transform: (res: any) => {
-    if (!res) return null
-    const responseData = res?.data || res
-    if (!responseData) return null
-    if (responseData.title) return responseData
-    return null
-  },
-})
+const learningPath = ref<any>(null)
+const chapters = ref<any[]>([])
+const loading = ref(false)
 
-const { data: chaptersData } = await useFetch(`/api/learning-paths/${id}/chapters`, {
-  transform: (res: any) => {
-    if (!res) return []
-    const responseData = res?.data || res
-    if (!responseData) return []
-    if (Array.isArray(responseData)) return responseData
-    if (responseData.chapters && Array.isArray(responseData.chapters)) return responseData.chapters
-    return []
-  },
-})
-
-const chapters = computed(() => chaptersData.value || [])
+const fetchPath = async () => {
+  if (!id) return
+  loading.value = true
+  try {
+    const pathData: any = await learningPathApi.getById(id)
+    learningPath.value = pathData?.data || pathData
+    const chaptersData: any = await learningPathApi.getChapters(id)
+    const list = Array.isArray(chaptersData) ? chaptersData : (chaptersData?.list || chaptersData?.chapters || [])
+    chapters.value = list
+  } catch (err) {
+    console.error('获取路径详情失败:', err)
+  } finally {
+    loading.value = false
+  }
+}
 
 const formatStudentCount = (count: number) => {
   if (!count) return '0'
@@ -230,6 +245,10 @@ const parsedTargetAudience = computed(() => {
   } catch {
     return []
   }
+})
+
+onMounted(() => {
+  fetchPath()
 })
 </script>
 

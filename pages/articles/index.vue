@@ -113,6 +113,14 @@
             <span :class="['seal-square', sealTilt(index)]">
               {{ article.category_name }}
             </span>
+            <span
+              v-if="article.is_locked"
+              class="ml-2 seal-square seal-square--tilt-r"
+              :class="article.required_level >= 2 ? 'seal-square--cinnabar' : 'seal-square--ink'"
+              :title="article.required_level >= 2 ? '会员专享' : '登录后阅读'"
+            >
+              {{ article.required_level >= 2 ? '会' : '锁' }}
+            </span>
             <span class="byline ml-auto">{{ formatDate(article.published_at) }}</span>
           </div>
 
@@ -201,6 +209,8 @@
 </template>
 
 <script setup lang="ts">
+import { articleApi } from '~/app/lib/api'
+
 definePageMeta({ layout: 'default' })
 
 const activeCategory = ref('all')
@@ -230,7 +240,11 @@ const articles = ref<any[]>([])
 const fetchArticles = async () => {
   loading.value = true
   try {
-    const res: any = await $fetch('/api/articles', { query: buildQuery() })
+    const res: any = await articleApi.getList({
+      page: buildQuery().page,
+      pageSize: buildQuery().page_size,
+      category: buildQuery().category,
+    })
     const data = res?.data || res
     articles.value = data?.articles || []
     totalCount.value = data?.total || 0
@@ -242,8 +256,9 @@ const fetchArticles = async () => {
   }
 }
 
-const { data: initial } = await useAsyncData('articles-initial', () => $fetch('/api/articles', {
-  query: { page: 1, page_size: pageSize.value },
+const { data: initial } = await useAsyncData('articles-initial', () => articleApi.getList({
+  page: 1,
+  pageSize: pageSize.value,
 }), {
   transform: (res: any) => {
     const data = res?.data || res

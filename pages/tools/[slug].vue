@@ -34,6 +34,14 @@
           <div class="flex items-center gap-3 mb-5">
             <span class="seal-square seal-square--tilt-l">工具</span>
             <span class="kicker kicker--indigo">TOOL DOSSIER</span>
+            <span
+              v-if="tool.is_locked"
+              class="seal-square seal-square--tilt-r text-[10px]"
+              :class="tool.required_level >= 2 ? 'seal-square--cinnabar' : 'seal-square--ink'"
+              :title="tool.required_level >= 2 ? '会员专享' : '登录后阅读'"
+            >
+              {{ tool.required_level >= 2 ? '会' : '锁' }}
+            </span>
             <span v-if="tool.difficulty" class="ml-auto byline">{{ getDifficultyName(tool.difficulty) }}</span>
           </div>
           <h1 class="headline headline--xl text-balance">{{ tool.name }}</h1>
@@ -44,7 +52,7 @@
             <p class="font-serif text-[15px] text-ink-soft leading-[1.85] mt-2 text-pretty">{{ tool.pricing_description }}</p>
           </div>
 
-          <div v-if="tool.official_url || tool.documentation_url" class="mt-7 flex flex-wrap gap-3">
+          <div v-if="!tool.is_locked && (tool.official_url || tool.documentation_url)" class="mt-7 flex flex-wrap gap-3">
             <a v-if="tool.official_url" :href="tool.official_url" target="_blank" rel="noopener noreferrer" class="btn btn--cinnabar">
               访 问 官 网
               <span class="arrow">→</span>
@@ -102,7 +110,13 @@
 
       <!-- 详细介绍 -->
       <section class="py-12 grid grid-cols-1 lg:grid-cols-12 gap-10">
-        <article class="lg:col-span-8 prose-cn indent-cn">
+        <article v-if="tool.is_locked" class="lg:col-span-8">
+          <LockNotice
+            :required-level="tool.required_level || 2"
+            content-type="tool"
+          />
+        </article>
+        <article v-else class="lg:col-span-8 prose-cn indent-cn">
           <h2 class="font-serif font-black text-[clamp(1.5rem,2vw,2rem)] leading-[1.3] mb-5 tracking-[0.04em] text-balance">
             它在哪个工作环节帮上忙
           </h2>
@@ -200,6 +214,8 @@
 
 <script setup lang="ts">
 import type { Tool, ToolCategoryListResponse } from '~/types/tool'
+import LockNotice from '~/app/components/article/LockNotice.vue'
+import { toolApi } from '~/app/lib/api'
 
 definePageMeta({ layout: 'default' })
 
@@ -244,9 +260,10 @@ const fetchTool = async () => {
   loading.value = true
   error.value = ''
   try {
-    const response: any = await $fetch(`/api/tools/${slug}`)
-    if ((response.code === 0 || response.code === 200) && response.data) {
-      tool.value = response.data
+    // 用 toolApi 走 axios 拦截器, 自动带上 JWT
+    const data: any = await toolApi.getById(slug)
+    if (data && data.id) {
+      tool.value = data as Tool
       try {
         if (typeof tool.value.tags === 'string') {
           tags.value = JSON.parse(tool.value.tags)
@@ -258,7 +275,7 @@ const fetchTool = async () => {
       }
       await fetchRelatedTools()
     } else {
-      error.value = response.message || '获取工具详情失败'
+      error.value = '获取工具详情失败'
     }
   } catch (err) {
     error.value = '网络错误，获取工具详情失败'
@@ -270,15 +287,9 @@ const fetchTool = async () => {
 
 const fetchRelatedTools = async () => {
   try {
-    const response: any = await $fetch('/api/tools', {
-      query: {
-        page: 1,
-        page_size: 3,
-        category_id: tool.value!.category_id,
-      },
-    })
-    if ((response.code === 0 || response.code === 200) && response.data) {
-      relatedTools.value = response.data.list.filter((t: Tool) => t.id !== tool.value!.id)
+    const data: any = await toolApi.getList({ page: 1, pageSize: 3, category: tool.value!.category_id })
+    if (data && Array.isArray(data.list)) {
+      relatedTools.value = data.list.filter((t: Tool) => t.id !== tool.value!.id)
     }
   } catch (err) {
     /* 静默 */
