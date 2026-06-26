@@ -28,3 +28,8 @@ dist/
 # 临时文件
 tmp/
 temp/
+
+# 运行时 / 临时产物 (不进版本库)
+.playwright-mcp/
+.tmp-screenshots/
+logs/nginx.pid
